@@ -4,7 +4,10 @@ from fastapi import APIRouter, HTTPException, Query, Path
 from typing import List, Optional
 from uuid import UUID
 from app.models.core import Artifact, ArtifactCreate, ArtifactUpdate, ArtifactList
-from app.services.artifacts import artifact_service
+from app.config import config
+
+# Get the appropriate service based on configuration
+artifact_service = config.get_artifact_service()
 
 router = APIRouter(
     prefix="/api/v1/artifacts",

@@ -9,8 +9,11 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from mcp.server.fastmcp import FastMCP
 from typing import Optional, Dict, Any, List
 from uuid import UUID
-from app.services.artifacts import artifact_service
 from app.models.core import ArtifactCreate, ArtifactUpdate
+from app.config import config
+
+# Get the appropriate service based on configuration
+artifact_service = config.get_artifact_service()
 
 # Initialize MCP server
 mcp = FastMCP("context-platform")

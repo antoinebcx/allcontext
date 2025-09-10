@@ -31,16 +31,16 @@ class ArtifactService:
                 metadata={"category": "engineering", "tags": ["review", "template"]}
             ),
             ArtifactCreate(
-                type="goal",
-                title="Launch MVP",
-                content="Launch the Context Platform MVP by end of Q1:\n- Complete core features\n- Documentation\n- Deploy to production",
-                metadata={"priority": "high", "quarter": "Q1"}
-            ),
-            ArtifactCreate(
                 type="document",
                 title="API Design Principles",
                 content="1. RESTful design\n2. Clear error messages\n3. Consistent naming\n4. Versioning strategy",
                 metadata={"category": "architecture"}
+            ),
+            ArtifactCreate(
+                type="prompt",
+                title="Sprint Planning Prompt",
+                content="For our sprint planning:\n- Review last sprint's velocity\n- Identify blockers\n- Estimate new tickets",
+                metadata={"category": "agile"}
             )
         ]
         

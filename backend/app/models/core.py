@@ -22,7 +22,7 @@ class ArtifactCreate(ArtifactBase):
 
 class ArtifactUpdate(BaseModel):
     """Request model for updating an artifact - all fields optional."""
-    type: Optional[Literal["goal", "prompt", "document", "snippet"]] = None
+    type: Optional[Literal["prompt", "document"]] = None
     title: Optional[str] = Field(None, min_length=1, max_length=200)
     content: Optional[str] = Field(None, min_length=1, max_length=100000)
     metadata: Optional[Dict[str, Any]] = None
