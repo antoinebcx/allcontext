@@ -35,7 +35,6 @@ apiClient.interceptors.response.use(
 export interface Artifact {
   id: string;
   user_id: string;
-  type: 'prompt' | 'document';
   title: string;
   content: string;
   metadata: Record<string, any>;
@@ -46,7 +45,6 @@ export interface Artifact {
 }
 
 export interface ArtifactCreate {
-  type: 'prompt' | 'document';
   title: string;
   content: string;
   metadata?: Record<string, any>;
@@ -62,14 +60,13 @@ export interface ArtifactUpdate {
 
 // API functions
 export const artifactApi = {
-  list: async (type?: string) => {
-    const params = type ? { type } : {};
+  list: async () => {
     const response = await apiClient.get<{
       items: Artifact[];
       total: number;
       page: number;
       page_size: number;
-    }>('/api/v1/artifacts', { params });
+    }>('/api/v1/artifacts');
     return response.data;
   },
 
@@ -92,8 +89,8 @@ export const artifactApi = {
     await apiClient.delete(`/api/v1/artifacts/${id}`);
   },
 
-  search: async (query: string, type?: string) => {
-    const params = { q: query, ...(type && { type }) };
+  search: async (query: string) => {
+    const params = { q: query };
     const response = await apiClient.get<Artifact[]>('/api/v1/artifacts/search', { params });
     return response.data;
   },

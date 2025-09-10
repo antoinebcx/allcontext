@@ -44,9 +44,7 @@ backend/
 
 ## Data Model
 
-The platform uses two artifact types:
-- **`prompt`** - AI prompts and templates
-- **`document`** - Reference documents and notes
+The platform stores artifacts - any markdown-based content for AI context
 
 Each artifact includes:
 - Title (max 200 chars)
@@ -95,7 +93,6 @@ Run the schema in your Supabase SQL Editor:
 CREATE TABLE IF NOT EXISTS artifacts (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     user_id UUID NOT NULL,
-    type TEXT NOT NULL CHECK (type IN ('prompt', 'document')),
     title TEXT NOT NULL,
     content TEXT NOT NULL,
     metadata JSONB DEFAULT '{}',
@@ -176,22 +173,12 @@ pytest -m "not integration"
 ### Manual API Testing
 
 ```bash
-# Create a prompt
+# Create an artifact
 curl -X POST http://localhost:8000/api/v1/artifacts \
   -H "Content-Type: application/json" \
   -d '{
-    "type": "prompt",
-    "title": "Test Prompt",
-    "content": "Generate a React component"
-  }'
-
-# Create a document
-curl -X POST http://localhost:8000/api/v1/artifacts \
-  -H "Content-Type: application/json" \
-  -d '{
-    "type": "document",
-    "title": "Meeting Notes",
-    "content": "Discussion points from today"
+    "title": "Test Artifact",
+    "content": "This is a test context artifact."
   }'
 
 # List all artifacts
@@ -203,8 +190,6 @@ curl "http://localhost:8000/api/v1/artifacts/search?q=React"
 # Get specific artifact (replace with actual ID)
 curl "http://localhost:8000/api/v1/artifacts/782dde8d-5cce-4427-a67c-9500d5b631ac"
 
-# Filter by type
-curl "http://localhost:8000/api/v1/artifacts?type=prompt"
 
 # Update an artifact
 curl -X PUT "http://localhost:8000/api/v1/artifacts/782dde8d-5cce-4427-a67c-9500d5b631ac" \

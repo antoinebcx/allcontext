@@ -29,7 +29,6 @@ class ArtifactServiceSupabase:
         """Create a new artifact in Supabase."""
         artifact_data = {
             "user_id": str(user_id),
-            "type": data.type,
             "title": data.title,
             "content": data.content,
             "metadata": data.metadata,
@@ -63,7 +62,6 @@ class ArtifactServiceSupabase:
     async def list(
         self,
         user_id: Optional[UUID] = None,
-        type: Optional[str] = None,
         limit: int = 50,
         offset: int = 0
     ) -> List[Artifact]:
@@ -74,10 +72,6 @@ class ArtifactServiceSupabase:
         if user_id:
             # Get user's artifacts and public ones
             query = query.or_(f"user_id.eq.{str(user_id)},is_public.eq.true")
-        
-        # Filter by type
-        if type:
-            query = query.eq("type", type)
         
         # Order by created_at descending
         query = query.order("created_at", desc=True)
@@ -103,8 +97,6 @@ class ArtifactServiceSupabase:
         
         # Prepare update data (only non-None fields)
         update_data = {}
-        if data.type is not None:
-            update_data["type"] = data.type
         if data.title is not None:
             update_data["title"] = data.title
         if data.content is not None:
@@ -141,8 +133,7 @@ class ArtifactServiceSupabase:
     async def search(
         self,
         user_id: UUID,
-        query: str,
-        type: Optional[str] = None
+        query: str
     ) -> List[Artifact]:
         """
         Search artifacts using Supabase full-text search.
@@ -153,10 +144,6 @@ class ArtifactServiceSupabase:
         # Filter by user or public
         search_query = search_query.or_(f"user_id.eq.{str(user_id)},is_public.eq.true")
         
-        # Filter by type if specified
-        if type:
-            search_query = search_query.eq("type", type)
-        
         # Use full-text search
         search_query = search_query.text_search("search_vector", query)
         
@@ -165,15 +152,12 @@ class ArtifactServiceSupabase:
         
         return [Artifact(**item) for item in response.data] if response.data else []
     
-    async def count(self, user_id: Optional[UUID] = None, type: Optional[str] = None) -> int:
+    async def count(self, user_id: Optional[UUID] = None) -> int:
         """Count artifacts in Supabase."""
         query = self.client.table("artifacts").select("id", count="exact")
         
         if user_id:
             query = query.or_(f"user_id.eq.{str(user_id)},is_public.eq.true")
-        
-        if type:
-            query = query.eq("type", type)
         
         response = query.execute()
         return response.count if response.count else 0

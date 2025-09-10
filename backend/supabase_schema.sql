@@ -5,7 +5,6 @@
 CREATE TABLE IF NOT EXISTS artifacts (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     user_id UUID NOT NULL DEFAULT auth.uid(),
-    type TEXT NOT NULL CHECK (type IN ('prompt', 'document')),
     title TEXT NOT NULL CHECK (length(title) <= 200),
     content TEXT NOT NULL CHECK (length(content) <= 100000),
     metadata JSONB DEFAULT '{}',
@@ -17,8 +16,6 @@ CREATE TABLE IF NOT EXISTS artifacts (
 
 -- Create indexes for performance
 CREATE INDEX idx_artifacts_user_id ON artifacts(user_id);
-CREATE INDEX idx_artifacts_type ON artifacts(type);
-CREATE INDEX idx_artifacts_user_type ON artifacts(user_id, type);
 CREATE INDEX idx_artifacts_created_at ON artifacts(created_at DESC);
 CREATE INDEX idx_artifacts_is_public ON artifacts(is_public);
 

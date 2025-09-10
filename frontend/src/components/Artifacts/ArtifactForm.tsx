@@ -6,10 +6,6 @@ import {
   DialogActions,
   Button,
   TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Box,
   Stack,
   IconButton,
@@ -18,7 +14,7 @@ import {
   Tab,
   Tabs,
 } from '@mui/material';
-import { X, FileText, Hash, Eye, Edit } from 'lucide-react';
+import { X, Eye, Edit } from 'lucide-react';
 import type { Artifact, ArtifactCreate, ArtifactUpdate } from '../../api/client';
 import { MarkdownRenderer } from '../Markdown/MarkdownRenderer';
 
@@ -38,7 +34,6 @@ export const ArtifactForm: React.FC<ArtifactFormProps> = ({
   mode,
 }) => {
   const [formData, setFormData] = useState<ArtifactCreate>({
-    type: 'prompt',
     title: '',
     content: '',
     metadata: {},
@@ -51,7 +46,6 @@ export const ArtifactForm: React.FC<ArtifactFormProps> = ({
   useEffect(() => {
     if (mode === 'edit' && artifact) {
       setFormData({
-        type: artifact.type,
         title: artifact.title,
         content: artifact.content,
         metadata: artifact.metadata || {},
@@ -59,7 +53,6 @@ export const ArtifactForm: React.FC<ArtifactFormProps> = ({
       });
     } else if (mode === 'create') {
       setFormData({
-        type: 'prompt',
         title: '',
         content: '',
         metadata: {},
@@ -89,7 +82,6 @@ export const ArtifactForm: React.FC<ArtifactFormProps> = ({
       }
       onClose();
       setFormData({
-        type: 'prompt',
         title: '',
         content: '',
         metadata: {},
@@ -129,43 +121,16 @@ export const ArtifactForm: React.FC<ArtifactFormProps> = ({
 
       <DialogContent sx={{ p: 2 }}>
         <Stack spacing={2}>
-          {/* Type and Title Row */}
-          <Stack direction="row" spacing={2}>
-            <FormControl size="small" sx={{ minWidth: 120 }}>
-              <InputLabel>Type</InputLabel>
-              <Select
-                value={formData.type}
-                label="Type"
-                onChange={(e) =>
-                  setFormData({ ...formData, type: e.target.value as 'prompt' | 'document' })
-                }
-                disabled={mode === 'edit'}
-              >
-                <MenuItem value="prompt">
-                  <Stack direction="row" spacing={1} alignItems="center">
-                    <Hash size={16} />
-                    <span>Prompt</span>
-                  </Stack>
-                </MenuItem>
-                <MenuItem value="document">
-                  <Stack direction="row" spacing={1} alignItems="center">
-                    <FileText size={16} />
-                    <span>Document</span>
-                  </Stack>
-                </MenuItem>
-              </Select>
-            </FormControl>
-
-            <TextField
-              label="Title"
-              size="small"
-              fullWidth
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              placeholder={`Enter ${formData.type} title`}
-              required
-            />
-          </Stack>
+          {/* Title Field */}
+          <TextField
+            label="Title"
+            size="small"
+            fullWidth
+            value={formData.title}
+            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+            placeholder="Enter artifact title"
+            required
+          />
 
           {/* Editor/Preview Tabs */}
           <Box>

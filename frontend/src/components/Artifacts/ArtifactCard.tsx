@@ -1,6 +1,6 @@
 import React from 'react';
-import { Card, CardContent, Stack, Typography, Box, Chip } from '@mui/material';
-import { FileText, Hash, Calendar } from 'lucide-react';
+import { Card, CardContent, Stack, Typography, Box } from '@mui/material';
+import { Calendar } from 'lucide-react';
 import type { Artifact } from '../../api/client';
 import { MarkdownRenderer } from '../Markdown/MarkdownRenderer';
 
@@ -10,7 +10,7 @@ interface ArtifactCardProps {
 }
 
 export const ArtifactCard: React.FC<ArtifactCardProps> = ({ artifact, onClick }) => {
-  const { type, title, content, created_at } = artifact;
+  const { title, content, created_at } = artifact;
   
   // Format date
   const formatDate = (dateString: string) => {
@@ -55,34 +55,11 @@ export const ArtifactCard: React.FC<ArtifactCardProps> = ({ artifact, onClick })
     >
       <CardContent sx={{ flexGrow: 1, p: 2.5 }}>
         {/* Header */}
-        <Stack direction="row" spacing={1} alignItems="center" mb={1.5}>
-          <Box sx={{ display: 'flex', alignItems: 'center', color: 'text.secondary' }}>
-            {type === 'prompt' ? (
-              <Hash size={16} strokeWidth={2} />
-            ) : (
-              <FileText size={16} strokeWidth={2} />
-            )}
-          </Box>
-          <Chip
-            label={type}
-            size="small"
-            sx={{
-              height: 20,
-              fontSize: '0.75rem',
-              fontWeight: 500,
-              backgroundColor: type === 'prompt' ? 'rgba(0,0,0,0.08)' : 'rgba(0,0,0,0.04)',
-              '& .MuiChip-label': {
-                px: 1,
-              },
-            }}
-          />
-          <Box sx={{ flexGrow: 1 }} />
-          <Stack direction="row" spacing={0.5} alignItems="center" color="text.secondary">
-            <Calendar size={14} />
-            <Typography variant="caption">
-              {formatDate(created_at)}
-            </Typography>
-          </Stack>
+        <Stack direction="row" spacing={0.5} alignItems="center" mb={1.5} justifyContent="flex-end">
+          <Calendar size={14} />
+          <Typography variant="caption" color="text.secondary">
+            {formatDate(created_at)}
+          </Typography>
         </Stack>
 
         {/* Title */}

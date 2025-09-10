@@ -2,13 +2,12 @@
 
 from pydantic import BaseModel, Field, ConfigDict
 from datetime import datetime, timezone
-from typing import Optional, Literal, Dict, Any
+from typing import Optional, Dict, Any
 from uuid import UUID, uuid4
 
 
 class ArtifactBase(BaseModel):
     """Base fields for artifacts."""
-    type: Literal["goal", "prompt", "document", "snippet"]
     title: str = Field(..., min_length=1, max_length=200)
     content: str = Field(..., min_length=1, max_length=100000)
     metadata: Dict[str, Any] = Field(default_factory=dict)
@@ -22,7 +21,6 @@ class ArtifactCreate(ArtifactBase):
 
 class ArtifactUpdate(BaseModel):
     """Request model for updating an artifact - all fields optional."""
-    type: Optional[Literal["prompt", "document"]] = None
     title: Optional[str] = Field(None, min_length=1, max_length=200)
     content: Optional[str] = Field(None, min_length=1, max_length=100000)
     metadata: Optional[Dict[str, Any]] = None
@@ -37,8 +35,7 @@ class Artifact(ArtifactBase):
             "example": {
                 "id": "123e4567-e89b-12d3-a456-426614174000",
                 "user_id": "123e4567-e89b-12d3-a456-426614174001",
-                "type": "prompt",
-                "title": "Code Review Prompt",
+                "title": "Code Review Guidelines",
                 "content": "Review this code for:\n1. Security issues\n2. Performance\n3. Best practices",
                 "metadata": {
                     "category": "engineering",

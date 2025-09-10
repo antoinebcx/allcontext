@@ -16,7 +16,7 @@ A minimal, elegant React application for managing markdown-based AI artifacts (p
 ## Features
 
 - ✨ **Markdown-first** - Full markdown editor with live preview
-- 📝 **Two artifact types** - Prompts and Documents
+- 📝 **Unified artifacts** - Everything is just an artifact
 - 🔍 **Search** - Debounced full-text search
 - 💾 **CRUD Operations** - Create, read, update, delete
 - 📋 **Copy & Download** - Export artifacts as markdown
@@ -101,14 +101,12 @@ npm run preview  # Test production build
 
 ### ArtifactCard
 Displays artifact preview in a grid layout with:
-- Type indicator (prompt/document)
 - Title and content preview
 - Creation date
 - Hover effects
 
 ### ArtifactForm
 Modal form for creating/editing artifacts:
-- Type selector
 - Title input
 - Markdown editor with live preview tabs
 - Save/cancel actions

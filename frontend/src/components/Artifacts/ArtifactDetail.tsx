@@ -9,7 +9,6 @@ import {
   IconButton,
   Typography,
   Box,
-  Chip,
   Tooltip,
   Snackbar,
   Alert,
@@ -19,11 +18,8 @@ import {
   Copy, 
   Edit, 
   Trash2, 
-  FileText, 
-  Hash, 
   Calendar,
-  Download,
-  ExternalLink
+  Download
 } from 'lucide-react';
 import type { Artifact } from '../../api/client';
 import { MarkdownRenderer } from '../Markdown/MarkdownRenderer';
@@ -105,18 +101,9 @@ export const ArtifactDetail: React.FC<ArtifactDetailProps> = ({
       >
         <DialogTitle sx={{ p: 2, pb: 1 }}>
           <Stack direction="row" alignItems="center" justifyContent="space-between">
-            <Stack direction="row" spacing={2} alignItems="center">
-              <Box sx={{ display: 'flex', alignItems: 'center', color: 'text.secondary' }}>
-                {artifact.type === 'prompt' ? (
-                  <Hash size={20} />
-                ) : (
-                  <FileText size={20} />
-                )}
-              </Box>
-              <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                {artifact.title}
-              </Typography>
-            </Stack>
+            <Typography variant="h6" sx={{ fontWeight: 600 }}>
+              {artifact.title}
+            </Typography>
             <IconButton onClick={onClose} size="small">
               <X size={20} />
             </IconButton>
@@ -135,15 +122,6 @@ export const ArtifactDetail: React.FC<ArtifactDetailProps> = ({
             }}
           >
             <Stack direction="row" spacing={2} alignItems="center">
-              <Chip
-                label={artifact.type}
-                size="small"
-                sx={{
-                  height: 24,
-                  fontSize: '0.75rem',
-                  fontWeight: 500,
-                }}
-              />
               <Stack direction="row" spacing={0.5} alignItems="center" color="text.secondary">
                 <Calendar size={14} />
                 <Typography variant="caption">

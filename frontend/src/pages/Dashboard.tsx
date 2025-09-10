@@ -138,7 +138,7 @@ export const Dashboard: React.FC = () => {
             {!searchQuery && (
               <>
                 <Typography variant="body2" color="text.secondary" mb={2}>
-                  Create your first prompt or document to get started
+                  Create your first artifact to get started
                 </Typography>
                 <Button
                   variant="contained"

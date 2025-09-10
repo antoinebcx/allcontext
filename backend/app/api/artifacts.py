@@ -1,7 +1,7 @@
 """REST API endpoints for artifacts."""
 
 from fastapi import APIRouter, HTTPException, Query, Path
-from typing import List, Optional
+from typing import List
 from uuid import UUID
 from app.models.core import Artifact, ArtifactCreate, ArtifactUpdate, ArtifactList
 from app.config import config
@@ -27,7 +27,6 @@ async def create_artifact(data: ArtifactCreate):
     """
     Create a new artifact.
     
-    - **type**: Type of artifact (goal, prompt, document, snippet)
     - **title**: Title of the artifact (max 200 chars)
     - **content**: Main content (max 100k chars)
     - **metadata**: Optional metadata as JSON object
@@ -39,23 +38,21 @@ async def create_artifact(data: ArtifactCreate):
 
 @router.get("", response_model=ArtifactList)
 async def list_artifacts(
-    type: Optional[str] = Query(None, description="Filter by type"),
     limit: int = Query(50, ge=1, le=100, description="Items per page"),
     offset: int = Query(0, ge=0, description="Number of items to skip")
 ):
     """
-    List artifacts with optional filtering.
+    List artifacts.
     
     Returns user's artifacts and public artifacts.
     """
     artifacts = await artifact_service.list(
         user_id=DEMO_USER_ID,
-        type=type,
         limit=limit,
         offset=offset
     )
     
-    total = await artifact_service.count(DEMO_USER_ID, type)
+    total = await artifact_service.count(DEMO_USER_ID)
     
     return ArtifactList(
         items=artifacts,
@@ -67,13 +64,12 @@ async def list_artifacts(
 
 @router.get("/search", response_model=List[Artifact])
 async def search_artifacts(
-    q: str = Query(..., min_length=1, description="Search query"),
-    type: Optional[str] = Query(None, description="Filter by type")
+    q: str = Query(..., min_length=1, description="Search query")
 ):
     """
     Search artifacts by text in title and content.
     
-    Simple substring search for now, will be upgraded to full-text search.
+    Uses full-text search when available.
     """
     if len(q) < 2:
         raise HTTPException(
@@ -83,8 +79,7 @@ async def search_artifacts(
     
     results = await artifact_service.search(
         user_id=DEMO_USER_ID,
-        query=q,
-        type=type
+        query=q
     )
     
     return results

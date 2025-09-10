@@ -7,10 +7,10 @@ const ARTIFACTS_KEY = 'artifacts';
 const ARTIFACT_KEY = 'artifact';
 
 // List artifacts
-export const useArtifacts = (type?: string) => {
+export const useArtifacts = () => {
   return useQuery({
-    queryKey: [ARTIFACTS_KEY, type],
-    queryFn: () => artifactApi.list(type),
+    queryKey: [ARTIFACTS_KEY],
+    queryFn: () => artifactApi.list(),
   });
 };
 
@@ -24,10 +24,10 @@ export const useArtifact = (id: string) => {
 };
 
 // Search artifacts
-export const useSearchArtifacts = (query: string, type?: string) => {
+export const useSearchArtifacts = (query: string) => {
   return useQuery({
-    queryKey: [ARTIFACTS_KEY, 'search', query, type],
-    queryFn: () => artifactApi.search(query, type),
+    queryKey: [ARTIFACTS_KEY, 'search', query],
+    queryFn: () => artifactApi.search(query),
     enabled: query.length > 0,
   });
 };

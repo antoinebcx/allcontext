@@ -25,20 +25,17 @@ class ArtifactService:
         
         demos = [
             ArtifactCreate(
-                type="prompt",
                 title="Code Review Template",
                 content="Review this code for:\n1. Security vulnerabilities\n2. Performance issues\n3. Code style\n4. Best practices",
                 metadata={"category": "engineering", "tags": ["review", "template"]}
             ),
             ArtifactCreate(
-                type="document",
                 title="API Design Principles",
                 content="1. RESTful design\n2. Clear error messages\n3. Consistent naming\n4. Versioning strategy",
                 metadata={"category": "architecture"}
             ),
             ArtifactCreate(
-                type="prompt",
-                title="Sprint Planning Prompt",
+                title="Sprint Planning Guide",
                 content="For our sprint planning:\n- Review last sprint's velocity\n- Identify blockers\n- Estimate new tickets",
                 metadata={"category": "agile"}
             )
@@ -77,7 +74,6 @@ class ArtifactService:
     async def list(
         self,
         user_id: Optional[UUID] = None,
-        type: Optional[str] = None,
         limit: int = 50,
         offset: int = 0
     ) -> List[Artifact]:
@@ -93,10 +89,6 @@ class ArtifactService:
                 a for a in artifacts 
                 if a.user_id == user_id or a.is_public
             ]
-        
-        # Filter by type
-        if type:
-            artifacts = [a for a in artifacts if a.type == type]
         
         # Sort by created_at descending
         artifacts.sort(key=lambda x: x.created_at, reverse=True)
@@ -141,15 +133,14 @@ class ArtifactService:
     async def search(
         self,
         user_id: UUID,
-        query: str,
-        type: Optional[str] = None
+        query: str
     ) -> List[Artifact]:
         """
         Simple text search in title and content.
         Returns only user's artifacts and public ones.
         """
         query_lower = query.lower()
-        artifacts = await self.list(user_id, type)
+        artifacts = await self.list(user_id)
         
         # Simple text search
         results = [
@@ -159,9 +150,9 @@ class ArtifactService:
         
         return results
     
-    async def count(self, user_id: Optional[UUID] = None, type: Optional[str] = None) -> int:
+    async def count(self, user_id: Optional[UUID] = None) -> int:
         """Count artifacts with optional filtering."""
-        artifacts = await self.list(user_id, type, limit=10000)
+        artifacts = await self.list(user_id, limit=10000)
         return len(artifacts)
 
 

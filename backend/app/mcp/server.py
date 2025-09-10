@@ -24,7 +24,6 @@ DEMO_USER_ID = UUID("123e4567-e89b-12d3-a456-426614174001")
 
 @mcp.tool()
 def create_artifact(
-    type: str,
     title: str,
     content: str,
     metadata: Optional[Dict[str, Any]] = None,
@@ -34,7 +33,6 @@ def create_artifact(
     Create a new artifact in your context platform.
     
     Args:
-        type: Type of artifact (goal, prompt, document, snippet)
         title: Title of the artifact (max 200 chars)
         content: Main content (max 100k chars)
         metadata: Optional metadata as key-value pairs
@@ -48,7 +46,6 @@ def create_artifact(
     async def _create():
         try:
             data = ArtifactCreate(
-                type=type,
                 title=title,
                 content=content,
                 metadata=metadata or {},
@@ -58,12 +55,11 @@ def create_artifact(
             artifact = await artifact_service.create(DEMO_USER_ID, data)
             return {
                 "id": str(artifact.id),
-                "type": artifact.type,
                 "title": artifact.title,
                 "content": artifact.content,
                 "metadata": artifact.metadata,
                 "created_at": artifact.created_at.isoformat(),
-                "message": f"Created {artifact.type} artifact: {artifact.title}"
+                "message": f"Created artifact: {artifact.title}"
             }
         except Exception as e:
             return {"error": str(e)}
@@ -73,15 +69,13 @@ def create_artifact(
 
 @mcp.tool()
 def search_artifacts(
-    query: str,
-    type: Optional[str] = None
+    query: str
 ) -> List[Dict[str, Any]]:
     """
     Search your artifacts by text in title and content.
     
     Args:
         query: Search query (searches in title and content)
-        type: Optional filter by type (goal, prompt, document, snippet)
     
     Returns:
         List of matching artifacts
@@ -92,14 +86,12 @@ def search_artifacts(
         try:
             artifacts = await artifact_service.search(
                 user_id=DEMO_USER_ID,
-                query=query,
-                type=type
+                query=query
             )
             
             return [
                 {
                     "id": str(a.id),
-                    "type": a.type,
                     "title": a.title,
                     "content": a.content[:200] + "..." if len(a.content) > 200 else a.content,
                     "metadata": a.metadata,
@@ -135,7 +127,6 @@ def get_artifact(artifact_id: str) -> Dict[str, Any]:
             
             return {
                 "id": str(artifact.id),
-                "type": artifact.type,
                 "title": artifact.title,
                 "content": artifact.content,
                 "metadata": artifact.metadata,
@@ -152,14 +143,12 @@ def get_artifact(artifact_id: str) -> Dict[str, Any]:
 
 @mcp.tool()
 def list_artifacts(
-    type: Optional[str] = None,
     limit: int = 10
 ) -> List[Dict[str, Any]]:
     """
-    List your artifacts with optional filtering.
+    List your artifacts.
     
     Args:
-        type: Optional filter by type (goal, prompt, document, snippet)
         limit: Maximum number of artifacts to return (default 10, max 50)
     
     Returns:
@@ -172,14 +161,12 @@ def list_artifacts(
             limit_capped = min(limit, 50)  # Cap at 50
             artifacts = await artifact_service.list(
                 user_id=DEMO_USER_ID,
-                type=type,
                 limit=limit_capped
             )
             
             return [
                 {
                     "id": str(a.id),
-                    "type": a.type,
                     "title": a.title,
                     "content_preview": a.content[:100] + "..." if len(a.content) > 100 else a.content,
                     "metadata": a.metadata,
@@ -198,7 +185,7 @@ if __name__ == "__main__":
     print("Starting Context Platform MCP Server...")
     print("This server exposes tools for managing your AI artifacts.")
     print("\nAvailable tools:")
-    print("  - create_artifact: Create new goals, prompts, documents")
+    print("  - create_artifact: Create new artifacts")
     print("  - list_artifacts: List your artifacts")
     print("  - search_artifacts: Search by text")
     print("  - get_artifact: Get specific artifact by ID")
