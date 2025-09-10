@@ -106,7 +106,26 @@ uvicorn app.main:app --reload
 
 ## Testing
 
-### Quick API Tests with curl
+### Unit Tests
+
+```bash
+# Run all tests
+pytest
+
+# Run with coverage
+pytest --cov=app tests/
+
+# Run specific test file
+pytest tests/test_api.py
+
+# Run with verbose output
+pytest -v
+
+# Run only unit tests (fast)
+pytest -m "not integration"
+```
+
+### Manual API Testing
 
 ```bash
 # Create an artifact
@@ -137,25 +156,9 @@ curl -X PUT "http://localhost:8000/api/v1/artifacts/782dde8d-5cce-4427-a67c-9500
 
 # Delete an artifact
 curl -X DELETE "http://localhost:8000/api/v1/artifacts/782dde8d-5cce-4427-a67c-9500d5b631ac"
-```
 
-### Automated Tests
-
-```bash
-# Run all tests
-pytest
-
-# Run with coverage
-pytest --cov=app tests/
-
-# Run specific test file
-pytest tests/test_api.py
-
-# Run with verbose output
-pytest -v
-
-# Run only unit tests (fast)
-pytest -m "not integration"
+# Health check
+curl http://localhost:8000/health
 ```
 
 ## Development
