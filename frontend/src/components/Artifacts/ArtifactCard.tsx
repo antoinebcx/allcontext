@@ -24,7 +24,7 @@ export const ArtifactCard: React.FC<ArtifactCardProps> = ({ artifact, onClick })
   // Get preview content (first 150 chars or until first double newline)
   const getPreview = (text: string) => {
     const firstBreak = text.indexOf('\n\n');
-    const maxLength = 150;
+    const maxLength = 120;
     
     if (firstBreak > 0 && firstBreak < maxLength) {
       return text.substring(0, firstBreak);
@@ -43,7 +43,7 @@ export const ArtifactCard: React.FC<ArtifactCardProps> = ({ artifact, onClick })
       sx={{
         cursor: onClick ? 'pointer' : 'default',
         width: '100%',
-        height: 220,
+        height: 195,
         display: 'flex',
         flexDirection: 'column',
         transition: 'border-color 0.2s ease',

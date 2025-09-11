@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from app.api import artifacts, auth
+from app.api import artifacts, auth, api_keys
 
 # Create FastAPI app
 app = FastAPI(
@@ -62,6 +62,7 @@ async def root():
 # Include routers
 app.include_router(auth.router)
 app.include_router(artifacts.router)
+app.include_router(api_keys.router)
 
 # Add middleware to log requests
 @app.middleware("http")

@@ -66,6 +66,37 @@ export interface ArtifactUpdate {
   is_public?: boolean;
 }
 
+// API Key types
+export interface ApiKey {
+  id: string;
+  user_id: string;
+  name: string;
+  key_prefix: string;
+  last_4: string;
+  last_used_at: string | null;
+  expires_at: string | null;
+  scopes: string[];
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ApiKeyCreate {
+  name: string;
+  expires_at?: string;
+  scopes?: string[];
+}
+
+export interface ApiKeyCreated extends ApiKey {
+  api_key: string;
+}
+
+export interface ApiKeyUpdate {
+  name?: string;
+  scopes?: string[];
+  is_active?: boolean;
+}
+
 // API functions
 export const artifactApi = {
   list: async () => {
@@ -101,5 +132,29 @@ export const artifactApi = {
     const params = { q: query };
     const response = await apiClient.get<Artifact[]>('/api/v1/artifacts/search', { params });
     return response.data;
+  },
+};
+
+export const apiKeyApi = {
+  list: async () => {
+    const response = await apiClient.get<{
+      items: ApiKey[];
+      total: number;
+    }>('/api/v1/api-keys');
+    return response.data;
+  },
+
+  create: async (data: ApiKeyCreate) => {
+    const response = await apiClient.post<ApiKeyCreated>('/api/v1/api-keys', data);
+    return response.data;
+  },
+
+  update: async (id: string, data: ApiKeyUpdate) => {
+    const response = await apiClient.put<ApiKey>(`/api/v1/api-keys/${id}`, data);
+    return response.data;
+  },
+
+  delete: async (id: string) => {
+    await apiClient.delete(`/api/v1/api-keys/${id}`);
   },
 };

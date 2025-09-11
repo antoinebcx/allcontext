@@ -9,10 +9,12 @@ A minimal, elegant React application for managing markdown-based AI artifacts (p
 - **Material-UI (MUI) v5** - Component library
 - **Lucide React** - Icons
 - **React Query (TanStack Query)** - Data fetching & caching
+- **React Router** - SPA routing
 - **React Markdown** - Markdown rendering
 - **React Syntax Highlighter** - Code highlighting
 - **Axios** - HTTP client
 - **Supabase Client** - Authentication & session management
+- **date-fns** - Date formatting
 
 ## Features
 
@@ -25,6 +27,7 @@ A minimal, elegant React application for managing markdown-based AI artifacts (p
 - ⚡ **Fast** - Optimistic updates with React Query
 - 🔐 **Authentication** - Email/password with automatic user detection
 - 👤 **User Management** - Profile menu with logout
+- 🔑 **API Keys** - Programmatic access management
 
 ## Directory Structure
 
@@ -38,16 +41,22 @@ frontend/
 │   │   │   ├── ArtifactCard.tsx    # Grid card component
 │   │   │   ├── ArtifactDetail.tsx  # Detail view modal
 │   │   │   └── ArtifactForm.tsx    # Create/edit form
+│   │   ├── ApiKeys/
+│   │   │   ├── ApiKeysList.tsx     # API keys table
+│   │   │   ├── CreateApiKey.tsx    # Creation dialog
+│   │   │   └── ApiKeyDisplay.tsx   # One-time key display
 │   │   └── Markdown/
 │   │       └── MarkdownRenderer.tsx # Markdown preview
 │   ├── contexts/
 │   │   └── AuthContext.tsx     # Auth state management  
 │   ├── hooks/
 │   │   ├── useArtifacts.ts     # React Query hooks
+│   │   ├── useApiKeys.ts       # API key hooks
 │   │   └── useDebounce.ts      # Debounce utility
 │   ├── pages/
 │   │   ├── Dashboard.tsx       # Main dashboard
-│   │   └── LoginPage.tsx       # Two-step auth flow
+│   │   ├── LoginPage.tsx       # Two-step auth flow
+│   │   └── Settings.tsx        # Settings with API keys
 │   ├── theme/
 │   │   └── index.ts            # MUI theme config
 │   ├── App.tsx                 # Root component
@@ -147,6 +156,12 @@ Manages authentication state:
 - Login/signup/logout methods
 - Protected route handling
 
+### Settings
+Settings page with tabs:
+- API Keys management
+- User profile
+- Security settings (future)
+
 ## API Integration
 
 The frontend expects a backend API at `VITE_API_URL` with these endpoints:
@@ -165,7 +180,13 @@ The frontend expects a backend API at `VITE_API_URL` with these endpoints:
 - `DELETE /api/v1/artifacts/{id}` - Delete artifact
 - `GET /api/v1/artifacts/search?q=` - Search artifacts
 
-**Note**: All artifact endpoints require authentication. The Bearer token is automatically injected via Axios interceptor after login.
+### API Key Management Endpoints
+- `POST /api/v1/api-keys` - Create API key
+- `GET /api/v1/api-keys` - List user's API keys
+- `GET /api/v1/api-keys/{id}` - Get API key details
+- `DELETE /api/v1/api-keys/{id}` - Revoke API key
+
+**Note**: All protected endpoints require authentication. The Bearer token is automatically injected via Axios interceptor after login.
 
 ## Styling
 

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Container, 
   Box, 
@@ -14,7 +15,7 @@ import {
   Menu,
   MenuItem,
 } from '@mui/material';
-import { Plus, Search, LogOut, User } from 'lucide-react';
+import { Plus, Search, LogOut, User, Settings as SettingsIcon } from 'lucide-react';
 import { useDebounce } from '../hooks/useDebounce';
 import { useArtifacts, useCreateArtifact, useUpdateArtifact, useDeleteArtifact, useSearchArtifacts } from '../hooks/useArtifacts';
 import { ArtifactCard } from '../components/Artifacts/ArtifactCard';
@@ -24,6 +25,7 @@ import { useAuth } from '../contexts/AuthContext';
 import type { Artifact, ArtifactCreate, ArtifactUpdate } from '../api/client';
 
 export const Dashboard: React.FC = () => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedArtifact, setSelectedArtifact] = useState<Artifact | null>(null);
   const [formOpen, setFormOpen] = useState(false);
@@ -159,6 +161,10 @@ export const Dashboard: React.FC = () => {
                   <Typography variant="body2" color="text.secondary">
                     {user?.email}
                   </Typography>
+                </MenuItem>
+                <MenuItem onClick={() => { navigate('/settings'); handleUserMenuClose(); }}>
+                  <SettingsIcon size={16} style={{ marginRight: 8 }} />
+                  Settings
                 </MenuItem>
                 <MenuItem onClick={handleLogout}>
                   <LogOut size={16} style={{ marginRight: 8 }} />

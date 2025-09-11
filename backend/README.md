@@ -10,6 +10,7 @@ AI context management platform with dual REST API and MCP (Model Context Protoco
 - **MCP SDK** - Model Context Protocol support
 - **Supabase** - PostgreSQL database & authentication
 - **Uvicorn** - ASGI server
+- **bcrypt** - API key hashing
 
 ## Directory Structure
 
@@ -22,16 +23,19 @@ backend/
 │   ├── api/
 │   │   ├── __init__.py
 │   │   ├── artifacts.py             # REST API endpoints
-│   │   └── auth.py                  # Authentication endpoints
+│   │   ├── auth.py                  # Authentication endpoints
+│   │   └── api_keys.py              # API key management endpoints
 │   ├── dependencies/
-│   │   └── auth.py                  # JWT auth dependency
+│   │   └── auth.py                  # JWT & API key auth dependency
 │   ├── models/
 │   │   ├── __init__.py
-│   │   └── core.py                  # Pydantic models
+│   │   ├── core.py                  # Pydantic models
+│   │   └── api_key.py               # API key models
 │   ├── services/
 │   │   ├── __init__.py
 │   │   ├── artifacts.py             # In-memory service (dev)
-│   │   └── artifacts_supabase.py    # Supabase service (prod)
+│   │   ├── artifacts_supabase.py    # Supabase service (prod)
+│   │   └── api_keys.py              # API key service with bcrypt
 │   └── mcp/
 │       ├── __init__.py
 │       └── server.py                # MCP server tools
@@ -133,6 +137,13 @@ The backend supports two storage modes controlled by `USE_SUPABASE` in `.env`:
 - **`USE_SUPABASE=true`** - Production mode with Supabase PostgreSQL
 - **`USE_SUPABASE=false`** - Development mode with in-memory storage
 
+## Authentication
+
+The platform supports dual authentication methods:
+
+- **JWT (Bearer Token)** - For web UI and session-based auth
+- **API Keys** - For programmatic access via `X-API-Key` header
+
 ## API Endpoints
 
 ### Authentication Endpoints
@@ -143,7 +154,7 @@ The backend supports two storage modes controlled by `USE_SUPABASE` in `.env`:
 | POST | `/api/v1/auth/check-email` | Check if email exists |
 | POST | `/api/v1/auth/logout` | Sign out |
 
-### Protected Endpoints (Require Authentication)
+### Protected Endpoints (Require Authentication - JWT or API Key)
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/health` | Health check |
@@ -154,6 +165,14 @@ The backend supports two storage modes controlled by `USE_SUPABASE` in `.env`:
 | PUT | `/api/v1/artifacts/{id}` | Update artifact |
 | DELETE | `/api/v1/artifacts/{id}` | Delete artifact |
 | GET | `/api/v1/artifacts/search?q=` | Full-text search |
+
+### API Key Management (Require JWT Authentication)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/v1/api-keys` | Create API key |
+| GET | `/api/v1/api-keys` | List user's API keys |
+| GET | `/api/v1/api-keys/{id}` | Get API key details |
+| DELETE | `/api/v1/api-keys/{id}` | Revoke API key |
 
 ## MCP Tools
 
@@ -192,10 +211,17 @@ TOKEN=$(curl -X POST http://localhost:8000/api/v1/auth/login \
   -d '{"email": "user@example.com", "password": "yourpassword"}' \
   | jq -r '.access_token')
 
-# Create an artifact (with authentication)
+# Create an API key
+API_KEY=$(curl -X POST http://localhost:8000/api/v1/api-keys \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Test Key", "scopes": ["read", "write"]}' \
+  | jq -r '.api_key')
+
+# Use API key for requests
 curl -X POST http://localhost:8000/api/v1/artifacts \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $TOKEN" \
+  -H "X-API-Key: $API_KEY" \
   -d '{
     "title": "Test Artifact",
     "content": "This is a test context artifact."
@@ -284,8 +310,9 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
 ## Security Notes
 
 - Using `service_role` key for backend operations (bypasses RLS)
-- JWT-based authentication via Supabase Auth
-- All artifact endpoints require Bearer token authentication
+- Dual authentication: JWT tokens and API keys
+- API keys hashed with bcrypt before storage
+- All artifact endpoints require authentication
 - Row Level Security (RLS) policies ready in database
 - CORS configured for local development
 - Environment variables for sensitive data
@@ -293,6 +320,6 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
 ## Next Steps
 
 - [x] Add user authentication (Supabase Auth)
-- [ ] Implement API keys for programmatic access
+- [x] Implement API keys for programmatic access
 - [ ] Add rate limiting
 - [ ] Implement proper RLS policies

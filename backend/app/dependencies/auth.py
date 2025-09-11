@@ -1,26 +1,24 @@
 """Authentication dependencies for FastAPI."""
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Header
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import jwt
 from uuid import UUID
-from typing import Optional
+from typing import Optional, Tuple
 import logging
 
 # Set up logging
 logger = logging.getLogger(__name__)
 
 # Security scheme for Bearer token
-security = HTTPBearer()
+security = HTTPBearer(auto_error=False)  # Don't auto-error, we'll handle it
 
 
-async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security)
+async def validate_jwt_token(
+    credentials: HTTPAuthorizationCredentials
 ) -> UUID:
     """
     Extract and verify user_id from JWT token.
-    
-    This dependency can be used in any endpoint that requires authentication.
     """
     try:
         # Decode JWT without signature verification
@@ -80,6 +78,50 @@ async def get_current_user(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid token"
         )
+
+
+async def validate_api_key(api_key: str) -> Tuple[UUID, list]:
+    """
+    Validate an API key and return user_id and scopes.
+    """
+    from app.services.api_keys import api_key_service
+    
+    validation = await api_key_service.validate(api_key)
+    
+    if not validation.is_valid:
+        logger.error(f"Invalid API key: {validation.error_message}")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=validation.error_message or "Invalid API key"
+        )
+    
+    return validation.user_id, validation.scopes
+
+
+async def get_current_user(
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
+    x_api_key: Optional[str] = Header(None, alias="X-API-Key")
+) -> UUID:
+    """
+    Extract and verify user_id from JWT token or API key.
+    
+    This dependency can be used in any endpoint that requires authentication.
+    Supports both Bearer token (JWT) and API key authentication.
+    """
+    # First, check for API key
+    if x_api_key:
+        user_id, _ = await validate_api_key(x_api_key)
+        return user_id
+    
+    # Then, check for Bearer token
+    if credentials:
+        return await validate_jwt_token(credentials)
+    
+    # No authentication provided
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Authentication required. Provide Bearer token or API key."
+    )
 
 
 async def get_optional_user(
