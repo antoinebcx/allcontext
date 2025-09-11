@@ -133,10 +133,10 @@ class ArtifactServiceSupabase:
     async def search(
         self,
         user_id: UUID,
-        query: str
+        query: str,
     ) -> List[Artifact]:
         """
-        Search artifacts using Supabase full-text search.
+        Search artifacts using ILIKE for partial text matching.
         """
         # Build the search query
         search_query = self.client.table("artifacts").select("*")
@@ -144,14 +144,17 @@ class ArtifactServiceSupabase:
         # Filter by user or public
         search_query = search_query.or_(f"user_id.eq.{str(user_id)},is_public.eq.true")
         
-        # Use full-text search
-        search_query = search_query.text_search("search_vector", query)
+        # Use ILIKE for partial matching
+        search_pattern = f"%{query}%"
+        search_query = search_query.or_(
+            f"title.ilike.{search_pattern},content.ilike.{search_pattern}"
+        )
         
         # Order by relevance (default for text search)
         response = search_query.execute()
         
         return [Artifact(**item) for item in response.data] if response.data else []
-    
+        
     async def count(self, user_id: Optional[UUID] = None) -> int:
         """Count artifacts in Supabase."""
         query = self.client.table("artifacts").select("id", count="exact")
