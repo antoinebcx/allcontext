@@ -104,7 +104,7 @@ export const ArtifactForm: React.FC<ArtifactFormProps> = ({
       PaperProps={{
         sx: {
           borderRadius: 2,
-          maxHeight: '90vh',
+          height: '85vh',
         },
       }}
     >
@@ -156,7 +156,6 @@ export const ArtifactForm: React.FC<ArtifactFormProps> = ({
               <TextField
                 multiline
                 fullWidth
-                rows={16}
                 value={formData.content}
                 onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                 placeholder="Write in Markdown..."
@@ -166,21 +165,21 @@ export const ArtifactForm: React.FC<ArtifactFormProps> = ({
                   '& .MuiInputBase-root': {
                     fontFamily: '"Fira Code", monospace',
                     fontSize: '0.875rem',
+                    height: 'calc(85vh - 300px)',
+                    alignItems: 'flex-start',
+                  },
+                  '& .MuiInputBase-input': {
+                    height: '100% !important',
+                    overflowY: 'auto !important',
                   },
                 }}
               />
             ) : (
               <Box
                 sx={{
-                  mt: 2,
-                  p: 2,
-                  minHeight: 400,
-                  maxHeight: 400,
+                  p: 3,
+                  height: 'calc(85vh - 300px)',
                   overflowY: 'auto',
-                  backgroundColor: 'background.default',
-                  borderRadius: 1,
-                  border: '1px solid',
-                  borderColor: 'divider',
                 }}
               >
                 {formData.content ? (

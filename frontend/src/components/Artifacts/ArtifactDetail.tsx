@@ -95,7 +95,7 @@ export const ArtifactDetail: React.FC<ArtifactDetailProps> = ({
         PaperProps={{
           sx: {
             borderRadius: 2,
-            maxHeight: '90vh',
+            height: '85vh',
           },
         }}
       >
@@ -167,7 +167,7 @@ export const ArtifactDetail: React.FC<ArtifactDetailProps> = ({
           <Box
             sx={{
               p: 3,
-              maxHeight: 'calc(90vh - 200px)',
+              height: 'calc(85vh - 200px)',
               overflowY: 'auto',
             }}
           >

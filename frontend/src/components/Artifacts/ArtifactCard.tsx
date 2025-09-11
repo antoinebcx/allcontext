@@ -1,6 +1,5 @@
 import React from 'react';
-import { Card, CardContent, Stack, Typography, Box } from '@mui/material';
-import { Calendar } from 'lucide-react';
+import { Card, CardContent, Typography, Box } from '@mui/material';
 import type { Artifact } from '../../api/client';
 import { MarkdownRenderer } from '../Markdown/MarkdownRenderer';
 
@@ -43,34 +42,29 @@ export const ArtifactCard: React.FC<ArtifactCardProps> = ({ artifact, onClick })
       onClick={onClick}
       sx={{
         cursor: onClick ? 'pointer' : 'default',
-        height: '100%',
+        width: '100%',
+        height: 220,
         display: 'flex',
         flexDirection: 'column',
-        transition: 'all 0.2s ease',
+        transition: 'border-color 0.2s ease',
         '&:hover': onClick ? {
           borderColor: 'primary.main',
-          transform: 'translateY(-2px)',
         } : {},
       }}
     >
-      <CardContent sx={{ flexGrow: 1, p: 2.5 }}>
-        {/* Header */}
-        <Stack direction="row" spacing={0.5} alignItems="center" mb={1.5} justifyContent="flex-end">
-          <Calendar size={14} />
-          <Typography variant="caption" color="text.secondary">
-            {formatDate(created_at)}
-          </Typography>
-        </Stack>
-
+      <CardContent sx={{ p: 2.5, height: '100%', display: 'flex', flexDirection: 'column' }}>
         {/* Title */}
         <Typography 
           variant="h6" 
-          gutterBottom
           sx={{ 
             fontWeight: 600,
             fontSize: '1rem',
             lineHeight: 1.3,
-            mb: 1.5,
+            overflow: 'hidden',
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            minHeight: '2.6rem', // Ensures consistent height even for 1-line titles
           }}
         >
           {title}
@@ -86,6 +80,7 @@ export const ArtifactCard: React.FC<ArtifactCardProps> = ({ artifact, onClick })
             display: '-webkit-box',
             WebkitLineClamp: 3,
             WebkitBoxOrient: 'vertical',
+            flexGrow: 1,
             '& *': {
               margin: '0 !important',
               fontSize: '0.875rem !important',
@@ -94,6 +89,18 @@ export const ArtifactCard: React.FC<ArtifactCardProps> = ({ artifact, onClick })
         >
           <MarkdownRenderer content={getPreview(content)} preview />
         </Box>
+
+        {/* Date at bottom */}
+        <Typography 
+          variant="caption" 
+          color="text.secondary"
+          sx={{ 
+            mt: 0.5,
+            fontSize: '0.75rem',
+          }}
+        >
+          {formatDate(created_at)}
+        </Typography>
       </CardContent>
     </Card>
   );

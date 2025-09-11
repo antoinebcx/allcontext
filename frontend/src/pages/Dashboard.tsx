@@ -89,7 +89,7 @@ export const Dashboard: React.FC = () => {
         <Stack spacing={3} mb={4}>
           <Stack direction="row" justifyContent="space-between" alignItems="center">
             <Typography variant="h1" sx={{ fontSize: '1.75rem', fontWeight: 600 }}>
-              Context Platform
+              Mycontext
             </Typography>
             <Stack direction="row" spacing={2} alignItems="center">
               <TextField
@@ -151,9 +151,9 @@ export const Dashboard: React.FC = () => {
             )}
           </Box>
         ) : (
-          <Grid container spacing={3}>
+          <Grid container spacing={2}>
             {artifacts.map((artifact) => (
-              <Grid item xs={12} sm={6} md={4} key={artifact.id}>
+              <Grid size={{ xs: 12, sm: 6, md: 4 }} key={artifact.id}>
                 <ArtifactCard
                   artifact={artifact}
                   onClick={() => handleView(artifact)}
