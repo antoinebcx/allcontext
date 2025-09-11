@@ -10,8 +10,6 @@ import {
   CircularProgress,
   Tabs,
   Tab,
-  Breadcrumbs,
-  Link,
 } from '@mui/material';
 import { Plus, Key, User, Shield } from 'lucide-react';
 import { useApiKeys, useCreateApiKey, useDeleteApiKey } from '../hooks/useApiKeys';
@@ -83,19 +81,6 @@ export const Settings: React.FC = () => {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      {/* Breadcrumbs */}
-      <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
-        <Link
-          underline="hover"
-          color="inherit"
-          href="#"
-          onClick={(e) => { e.preventDefault(); navigate('/'); }}
-        >
-          Dashboard
-        </Link>
-        <Typography color="text.primary">Settings</Typography>
-      </Breadcrumbs>
-
       {/* Header */}
       <Box sx={{ mb: 4 }}>
         <Typography variant="h4" gutterBottom>

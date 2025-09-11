@@ -20,10 +20,10 @@ A minimal, elegant React application for managing markdown-based AI artifacts (p
 
 - ✨ **Markdown-first** - Full markdown editor with live preview
 - 📝 **Unified artifacts** - Everything is just an artifact
-- 🔍 **Search** - Debounced full-text search
+- 🔍 **Search** - Centered search bar with debounced filtering
 - 💾 **CRUD Operations** - Create, read, update, delete
 - 📋 **Copy & Download** - Export artifacts as markdown
-- 🎨 **Clean UI** - Minimal design with subtle borders
+- 🎨 **Clean UI** - Minimal design with persistent navbar
 - ⚡ **Fast** - Optimistic updates with React Query
 - 🔐 **Authentication** - Email/password with automatic user detection
 - 👤 **User Management** - Profile menu with logout
@@ -45,6 +45,9 @@ frontend/
 │   │   │   ├── ApiKeysList.tsx     # API keys table
 │   │   │   ├── CreateApiKey.tsx    # Creation dialog
 │   │   │   └── ApiKeyDisplay.tsx   # One-time key display
+│   │   ├── Layout/
+│   │   │   ├── Layout.tsx          # App layout wrapper
+│   │   │   └── Navbar.tsx          # Persistent navigation
 │   │   └── Markdown/
 │   │       └── MarkdownRenderer.tsx # Markdown preview
 │   ├── contexts/
@@ -54,7 +57,7 @@ frontend/
 │   │   ├── useApiKeys.ts       # API key hooks
 │   │   └── useDebounce.ts      # Debounce utility
 │   ├── pages/
-│   │   ├── Dashboard.tsx       # Main dashboard
+│   │   ├── Dashboard.tsx       # Main page with search
 │   │   ├── LoginPage.tsx       # Two-step auth flow
 │   │   └── Settings.tsx        # Settings with API keys
 │   ├── theme/
@@ -115,6 +118,25 @@ npm run preview  # Test production build
 | `npm run type-check` | Run TypeScript compiler check |
 
 ## Key Components
+
+### Layout
+App layout wrapper:
+- Persistent navbar across all pages
+- Content area with container
+- Toolbar spacer for fixed navbar
+
+### Navbar
+Persistent navigation bar:
+- Logo/brand (clickable to home)
+- Settings button
+- User menu with profile and logout
+
+### Dashboard
+Main page with:
+- Centered search bar with debounce
+- New Artifact button
+- Artifacts grid
+- Empty states
 
 ### ArtifactCard
 Displays artifact preview in a grid layout with:

@@ -7,6 +7,7 @@ import '@fontsource/inter/500.css';
 import '@fontsource/inter/600.css';
 
 import { theme } from './theme';
+import { Layout } from './components/Layout/Layout';
 import { Dashboard } from './pages/Dashboard';
 import { Settings } from './pages/Settings';
 import { LoginPage } from './pages/LoginPage';
@@ -43,20 +44,20 @@ function App() {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <BrowserRouter>
-          <Routes>
-            {user ? (
-              <>
+          {user ? (
+            <Layout>
+              <Routes>
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
-              </>
-            ) : (
-              <>
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="*" element={<Navigate to="/login" replace />} />
-              </>
-            )}
-          </Routes>
+              </Routes>
+            </Layout>
+          ) : (
+            <Routes>
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="*" element={<Navigate to="/login" replace />} />
+            </Routes>
+          )}
         </BrowserRouter>
       </ThemeProvider>
     </QueryClientProvider>

@@ -1,38 +1,28 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
 import { 
-  Container, 
   Box, 
   Typography, 
   Button, 
-  Stack, 
   Grid, 
-  TextField,
-  InputAdornment,
   CircularProgress,
   Alert,
-  IconButton,
-  Menu,
-  MenuItem,
+  TextField,
+  InputAdornment,
 } from '@mui/material';
-import { Plus, Search, LogOut, User, Settings as SettingsIcon } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
 import { useDebounce } from '../hooks/useDebounce';
 import { useArtifacts, useCreateArtifact, useUpdateArtifact, useDeleteArtifact, useSearchArtifacts } from '../hooks/useArtifacts';
 import { ArtifactCard } from '../components/Artifacts/ArtifactCard';
 import { ArtifactForm } from '../components/Artifacts/ArtifactForm';
 import { ArtifactDetail } from '../components/Artifacts/ArtifactDetail';
-import { useAuth } from '../contexts/AuthContext';
 import type { Artifact, ArtifactCreate, ArtifactUpdate } from '../api/client';
 
 export const Dashboard: React.FC = () => {
-  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedArtifact, setSelectedArtifact] = useState<Artifact | null>(null);
   const [formOpen, setFormOpen] = useState(false);
   const [formMode, setFormMode] = useState<'create' | 'edit'>('create');
   const [detailOpen, setDetailOpen] = useState(false);
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const { user, logout } = useAuth();
 
   // Debounce search query
   const debouncedSearch = useDebounce(searchQuery, 300);
@@ -90,137 +80,87 @@ export const Dashboard: React.FC = () => {
     setFormOpen(false);
   };
 
-  const handleUserMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleUserMenuClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handleLogout = async () => {
-    await logout();
-    handleUserMenuClose();
-  };
-
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
-      <Container maxWidth="lg" sx={{ py: 4 }}>
-        {/* Header */}
-        <Stack spacing={3} mb={4}>
-          <Stack direction="row" justifyContent="space-between" alignItems="center">
-            <Typography variant="h1" sx={{ fontSize: '1.75rem', fontWeight: 600 }}>
-              Mycontext
-            </Typography>
-            <Stack direction="row" spacing={2} alignItems="center">
-              <TextField
-                placeholder="Search artifacts..."
-                size="small"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Search size={18} />
-                    </InputAdornment>
-                  ),
-                }}
-                sx={{ width: 320 }}
-              />
+    <>
+      {/* Action Bar */}
+      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'flex-end' }}>
+        <Button
+          variant="contained"
+          startIcon={<Plus size={18} />}
+          onClick={handleCreate}
+        >
+          New Artifact
+        </Button>
+      </Box>
+
+      {/* Search Bar */}
+      <Box sx={{ mb: 5, display: 'flex', justifyContent: 'center' }}>
+        <TextField
+          placeholder="Search artifacts..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <Search size={20} />
+              </InputAdornment>
+            ),
+          }}
+          sx={{ 
+            width: 600,
+            '& .MuiOutlinedInput-root': {
+              bgcolor: 'background.default',
+              height: 48
+            }
+          }}
+        />
+      </Box>
+
+      {/* Content */}
+      {error && (
+        <Alert severity="error" sx={{ mb: 3 }}>
+          Failed to load artifacts. Please check your backend connection.
+        </Alert>
+      )}
+
+      {loading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+          <CircularProgress size={32} thickness={2} />
+        </Box>
+      ) : artifacts.length === 0 ? (
+        <Box sx={{ textAlign: 'center', py: 8 }}>
+          <Typography color="text.secondary" gutterBottom>
+            {searchQuery 
+              ? `No artifacts found for "${searchQuery}"`
+              : 'No artifacts yet'}
+          </Typography>
+          {!searchQuery && (
+            <>
+              <Typography variant="body2" color="text.secondary" mb={2}>
+                Create your first artifact to get started
+              </Typography>
               <Button
                 variant="contained"
                 startIcon={<Plus size={18} />}
                 onClick={handleCreate}
               >
-                New Artifact
+                Create Your First Artifact
               </Button>
-              <IconButton
-                onClick={handleUserMenuOpen}
-                size="small"
-                sx={{ 
-                  border: '1px solid',
-                  borderColor: 'divider',
-                }}
-              >
-                <User size={18} />
-              </IconButton>
-              <Menu
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={handleUserMenuClose}
-                anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'right',
-                }}
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-              >
-                <MenuItem disabled>
-                  <Typography variant="body2" color="text.secondary">
-                    {user?.email}
-                  </Typography>
-                </MenuItem>
-                <MenuItem onClick={() => { navigate('/settings'); handleUserMenuClose(); }}>
-                  <SettingsIcon size={16} style={{ marginRight: 8 }} />
-                  Settings
-                </MenuItem>
-                <MenuItem onClick={handleLogout}>
-                  <LogOut size={16} style={{ marginRight: 8 }} />
-                  Logout
-                </MenuItem>
-              </Menu>
-            </Stack>
-          </Stack>
-        </Stack>
-
-        {/* Content */}
-        {error && (
-          <Alert severity="error" sx={{ mb: 3 }}>
-            Failed to load artifacts. Please check your backend connection.
-          </Alert>
-        )}
-
-        {loading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-            <CircularProgress size={32} thickness={2} />
-          </Box>
-        ) : artifacts.length === 0 ? (
-          <Box sx={{ textAlign: 'center', py: 8 }}>
-            <Typography color="text.secondary" gutterBottom>
-              {searchQuery 
-                ? `No artifacts found for "${searchQuery}"`
-                : 'No artifacts yet'}
-            </Typography>
-            {!searchQuery && (
-              <>
-                <Typography variant="body2" color="text.secondary" mb={2}>
-                  Create your first artifact to get started
-                </Typography>
-                <Button
-                  variant="contained"
-                  startIcon={<Plus size={18} />}
-                  onClick={handleCreate}
-                >
-                  Create Your First Artifact
-                </Button>
-              </>
-            )}
-          </Box>
-        ) : (
-          <Grid container spacing={2}>
-            {artifacts.map((artifact) => (
-              <Grid size={{ xs: 12, sm: 6, md: 4 }} key={artifact.id}>
-                <ArtifactCard
-                  artifact={artifact}
-                  onClick={() => handleView(artifact)}
-                />
-              </Grid>
-            ))}
-          </Grid>
-        )}
-      </Container>
+            </>
+          )}
+        </Box>
+      ) : (
+        <Grid container spacing={2}>
+          {artifacts.map((artifact) => (
+            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={artifact.id}>
+              <ArtifactCard
+                artifact={artifact}
+                onClick={() => handleView(artifact)}
+              />
+            </Grid>
+          ))}
+        </Grid>
+      )}
 
       {/* Create/Edit Form */}
       <ArtifactForm
@@ -239,6 +179,6 @@ export const Dashboard: React.FC = () => {
         onEdit={handleEdit}
         onDelete={handleDelete}
       />
-    </Box>
+    </>
   );
 };
