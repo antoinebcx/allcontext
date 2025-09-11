@@ -1,10 +1,11 @@
 """REST API endpoints for artifacts."""
 
-from fastapi import APIRouter, HTTPException, Query, Path
+from fastapi import APIRouter, HTTPException, Query, Path, Depends
 from typing import List
 from uuid import UUID
 from app.models.core import Artifact, ArtifactCreate, ArtifactUpdate, ArtifactList
 from app.config import config
+from app.dependencies.auth import get_current_user
 
 # Get the appropriate service based on configuration
 artifact_service = config.get_artifact_service()
@@ -18,12 +19,12 @@ router = APIRouter(
     }
 )
 
-# For now, using a hardcoded user_id. Will be replaced with auth later.
-DEMO_USER_ID = UUID("123e4567-e89b-12d3-a456-426614174001")
-
 
 @router.post("", response_model=Artifact, status_code=201)
-async def create_artifact(data: ArtifactCreate):
+async def create_artifact(
+    data: ArtifactCreate,
+    user_id: UUID = Depends(get_current_user)
+):
     """
     Create a new artifact.
     
@@ -32,14 +33,15 @@ async def create_artifact(data: ArtifactCreate):
     - **metadata**: Optional metadata as JSON object
     - **is_public**: Whether artifact is publicly accessible
     """
-    artifact = await artifact_service.create(DEMO_USER_ID, data)
+    artifact = await artifact_service.create(user_id, data)
     return artifact
 
 
 @router.get("", response_model=ArtifactList)
 async def list_artifacts(
     limit: int = Query(50, ge=1, le=100, description="Items per page"),
-    offset: int = Query(0, ge=0, description="Number of items to skip")
+    offset: int = Query(0, ge=0, description="Number of items to skip"),
+    user_id: UUID = Depends(get_current_user)
 ):
     """
     List artifacts.
@@ -47,12 +49,12 @@ async def list_artifacts(
     Returns user's artifacts and public artifacts.
     """
     artifacts = await artifact_service.list(
-        user_id=DEMO_USER_ID,
+        user_id=user_id,
         limit=limit,
         offset=offset
     )
     
-    total = await artifact_service.count(DEMO_USER_ID)
+    total = await artifact_service.count(user_id)
     
     return ArtifactList(
         items=artifacts,
@@ -64,7 +66,8 @@ async def list_artifacts(
 
 @router.get("/search", response_model=List[Artifact])
 async def search_artifacts(
-    q: str = Query(..., min_length=1, description="Search query")
+    q: str = Query(..., min_length=1, description="Search query"),
+    user_id: UUID = Depends(get_current_user)
 ):
     """
     Search artifacts by text in title and content.
@@ -78,7 +81,7 @@ async def search_artifacts(
         )
     
     results = await artifact_service.search(
-        user_id=DEMO_USER_ID,
+        user_id=user_id,
         query=q
     )
     
@@ -87,14 +90,15 @@ async def search_artifacts(
 
 @router.get("/{artifact_id}", response_model=Artifact)
 async def get_artifact(
-    artifact_id: UUID = Path(..., description="Artifact ID")
+    artifact_id: UUID = Path(..., description="Artifact ID"),
+    user_id: UUID = Depends(get_current_user)
 ):
     """
     Get a single artifact by ID.
     
     Returns artifact if it belongs to user or is public.
     """
-    artifact = await artifact_service.get(artifact_id, DEMO_USER_ID)
+    artifact = await artifact_service.get(artifact_id, user_id)
     
     if not artifact:
         raise HTTPException(
@@ -108,7 +112,8 @@ async def get_artifact(
 @router.put("/{artifact_id}", response_model=Artifact)
 async def update_artifact(
     artifact_id: UUID,
-    data: ArtifactUpdate
+    data: ArtifactUpdate,
+    user_id: UUID = Depends(get_current_user)
 ):
     """
     Update an artifact.
@@ -118,7 +123,7 @@ async def update_artifact(
     """
     artifact = await artifact_service.update(
         artifact_id=artifact_id,
-        user_id=DEMO_USER_ID,
+        user_id=user_id,
         data=data
     )
     
@@ -133,14 +138,15 @@ async def update_artifact(
 
 @router.delete("/{artifact_id}", status_code=204)
 async def delete_artifact(
-    artifact_id: UUID = Path(..., description="Artifact ID")
+    artifact_id: UUID = Path(..., description="Artifact ID"),
+    user_id: UUID = Depends(get_current_user)
 ):
     """
     Delete an artifact.
     
     Only the owner can delete their artifacts.
     """
-    success = await artifact_service.delete(artifact_id, DEMO_USER_ID)
+    success = await artifact_service.delete(artifact_id, user_id)
     
     if not success:
         raise HTTPException(

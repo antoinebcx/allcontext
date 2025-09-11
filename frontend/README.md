@@ -12,6 +12,7 @@ A minimal, elegant React application for managing markdown-based AI artifacts (p
 - **React Markdown** - Markdown rendering
 - **React Syntax Highlighter** - Code highlighting
 - **Axios** - HTTP client
+- **Supabase Client** - Authentication & session management
 
 ## Features
 
@@ -22,6 +23,8 @@ A minimal, elegant React application for managing markdown-based AI artifacts (p
 - 📋 **Copy & Download** - Export artifacts as markdown
 - 🎨 **Clean UI** - Minimal design with subtle borders
 - ⚡ **Fast** - Optimistic updates with React Query
+- 🔐 **Authentication** - Email/password with automatic user detection
+- 👤 **User Management** - Profile menu with logout
 
 ## Directory Structure
 
@@ -37,11 +40,14 @@ frontend/
 │   │   │   └── ArtifactForm.tsx    # Create/edit form
 │   │   └── Markdown/
 │   │       └── MarkdownRenderer.tsx # Markdown preview
+│   ├── contexts/
+│   │   └── AuthContext.tsx     # Auth state management  
 │   ├── hooks/
 │   │   ├── useArtifacts.ts     # React Query hooks
 │   │   └── useDebounce.ts      # Debounce utility
 │   ├── pages/
-│   │   └── Dashboard.tsx       # Main dashboard
+│   │   ├── Dashboard.tsx       # Main dashboard
+│   │   └── LoginPage.tsx       # Two-step auth flow
 │   ├── theme/
 │   │   └── index.ts            # MUI theme config
 │   ├── App.tsx                 # Root component
@@ -69,8 +75,10 @@ npm install
 # Copy environment template
 cp .env.example .env
 
-# Edit .env with your backend URL
+# Edit .env with your backend URL and Supabase credentials
 VITE_API_URL=http://localhost:8000
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key
 ```
 
 ### 3. Run Development Server
@@ -125,16 +133,39 @@ Renders markdown with:
 - Responsive typography
 - Link handling
 
+### LoginPage
+Two-step authentication flow:
+- Step 1: Email input with validation
+- Step 2: Automatic detection of new vs existing user
+- Smart password field labeling based on user status
+- Loading states and error handling
+
+### AuthContext
+Manages authentication state:
+- Supabase session handling
+- Auto-refresh tokens
+- Login/signup/logout methods
+- Protected route handling
+
 ## API Integration
 
 The frontend expects a backend API at `VITE_API_URL` with these endpoints:
 
+### Authentication Endpoints
+- `POST /api/v1/auth/login` - Sign in with email/password
+- `POST /api/v1/auth/signup` - Register new user
+- `POST /api/v1/auth/check-email` - Check if email exists
+- `POST /api/v1/auth/logout` - Sign out
+
+### Protected Endpoints (Require Bearer Token)
 - `GET /api/v1/artifacts` - List all artifacts
 - `POST /api/v1/artifacts` - Create artifact
 - `GET /api/v1/artifacts/{id}` - Get single artifact
 - `PUT /api/v1/artifacts/{id}` - Update artifact
 - `DELETE /api/v1/artifacts/{id}` - Delete artifact
 - `GET /api/v1/artifacts/search?q=` - Search artifacts
+
+**Note**: All artifact endpoints require authentication. The Bearer token is automatically injected via Axios interceptor after login.
 
 ## Styling
 
@@ -201,6 +232,8 @@ npm run build
 ### Environment Variables
 Set these in your deployment platform:
 - `VITE_API_URL` - Backend API URL
+- `VITE_SUPABASE_URL` - Supabase project URL
+- `VITE_SUPABASE_ANON_KEY` - Supabase anon key
 
 ### Static Hosting
 Deploy `dist/` folder to:
@@ -212,9 +245,12 @@ Deploy `dist/` folder to:
 
 ## Next Steps
 
+- [x] User authentication
 - [ ] Add keyboard shortcuts
 - [ ] Implement tags/categories
 - [ ] Add export/import functionality
 - [ ] Dark mode toggle
 - [ ] Collaborative editing
 - [ ] Version history
+- [ ] Password reset flow
+- [ ] Email verification

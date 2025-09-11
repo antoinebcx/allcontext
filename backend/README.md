@@ -8,7 +8,7 @@ AI context management platform with dual REST API and MCP (Model Context Protoco
 - **FastAPI** - REST API framework
 - **Pydantic v2** - Data validation
 - **MCP SDK** - Model Context Protocol support
-- **Supabase** - PostgreSQL database & future auth
+- **Supabase** - PostgreSQL database & authentication
 - **Uvicorn** - ASGI server
 
 ## Directory Structure
@@ -21,7 +21,10 @@ backend/
 │   ├── config.py                    # Configuration management
 │   ├── api/
 │   │   ├── __init__.py
-│   │   └── artifacts.py             # REST API endpoints
+│   │   ├── artifacts.py             # REST API endpoints
+│   │   └── auth.py                  # Authentication endpoints
+│   ├── dependencies/
+│   │   └── auth.py                  # JWT auth dependency
 │   ├── models/
 │   │   ├── __init__.py
 │   │   └── core.py                  # Pydantic models
@@ -81,6 +84,7 @@ cp .env.example .env
 # Edit .env with your values:
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_KEY=your-service-role-key  # Use service_role key for backend
+SUPABASE_ANON_KEY=your-anon-key     # For auth endpoints
 USE_SUPABASE=true                    # Set to false for in-memory mode
 ```
 
@@ -92,7 +96,7 @@ Run the schema in your Supabase SQL Editor:
 -- From supabase_schema.sql
 CREATE TABLE IF NOT EXISTS artifacts (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    user_id UUID NOT NULL,
+    user_id UUID NOT NULL,  -- No DEFAULT, passed from backend
     title TEXT NOT NULL,
     content TEXT NOT NULL,
     metadata JSONB DEFAULT '{}',
@@ -131,6 +135,15 @@ The backend supports two storage modes controlled by `USE_SUPABASE` in `.env`:
 
 ## API Endpoints
 
+### Authentication Endpoints
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/v1/auth/login` | Sign in with email/password |
+| POST | `/api/v1/auth/signup` | Register new user |
+| POST | `/api/v1/auth/check-email` | Check if email exists |
+| POST | `/api/v1/auth/logout` | Sign out |
+
+### Protected Endpoints (Require Authentication)
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/health` | Health check |
@@ -173,16 +186,24 @@ pytest -m "not integration"
 ### Manual API Testing
 
 ```bash
-# Create an artifact
+# First, authenticate to get a token
+TOKEN=$(curl -X POST http://localhost:8000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "user@example.com", "password": "yourpassword"}' \
+  | jq -r '.access_token')
+
+# Create an artifact (with authentication)
 curl -X POST http://localhost:8000/api/v1/artifacts \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
   -d '{
     "title": "Test Artifact",
     "content": "This is a test context artifact."
   }'
 
-# List all artifacts
-curl http://localhost:8000/api/v1/artifacts
+# List all artifacts (with authentication)
+curl http://localhost:8000/api/v1/artifacts \
+  -H "Authorization: Bearer $TOKEN"
 
 # Search artifacts
 curl "http://localhost:8000/api/v1/artifacts/search?q=React"
@@ -246,6 +267,7 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
 |----------|-------------|---------|
 | `SUPABASE_URL` | Supabase project URL | Required |
 | `SUPABASE_KEY` | Supabase service role key | Required |
+| `SUPABASE_ANON_KEY` | Supabase anon key for auth | Required |
 | `USE_SUPABASE` | Enable Supabase storage | `false` |
 | `MCP_MODE` | Run as MCP server | `false` |
 | `API_HOST` | API bind address | `0.0.0.0` |
@@ -257,16 +279,20 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
 - **Single Source of Truth**: Pydantic models define all data structures  
 - **Protocol Agnostic**: Same service methods power both REST and MCP
 - **Flexible Storage**: Easy switch between in-memory and Supabase
-- **Full-Text Search**: PostgreSQL text search capabilities in Supabase
+- **Text ILIKE Search**: PostgreSQL text (partial) search capabilities in Supabase
 
 ## Security Notes
 
 - Using `service_role` key for backend operations (bypasses RLS)
-- Row Level Security (RLS) ready for when auth is implemented
+- JWT-based authentication via Supabase Auth
+- All artifact endpoints require Bearer token authentication
+- Row Level Security (RLS) policies ready in database
 - CORS configured for local development
 - Environment variables for sensitive data
 
 ## Next Steps
 
-- [ ] Add user authentication (Supabase Auth)
+- [x] Add user authentication (Supabase Auth)
+- [ ] Implement API keys for programmatic access
+- [ ] Add rate limiting
 - [ ] Implement proper RLS policies

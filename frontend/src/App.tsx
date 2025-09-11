@@ -1,12 +1,14 @@
 import React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ThemeProvider, CssBaseline } from '@mui/material';
+import { ThemeProvider, CssBaseline, Box, CircularProgress } from '@mui/material';
 import '@fontsource/inter/400.css';
 import '@fontsource/inter/500.css';
 import '@fontsource/inter/600.css';
 
 import { theme } from './theme';
 import { Dashboard } from './pages/Dashboard';
+import { LoginPage } from './pages/LoginPage';
+import { useAuth } from './contexts/AuthContext';
 
 // Create a client
 const queryClient = new QueryClient({
@@ -19,11 +21,26 @@ const queryClient = new QueryClient({
 });
 
 function App() {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh' 
+      }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <Dashboard />
+        {user ? <Dashboard /> : <LoginPage />}
       </ThemeProvider>
     </QueryClientProvider>
   );

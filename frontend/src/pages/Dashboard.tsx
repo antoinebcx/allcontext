@@ -10,13 +10,17 @@ import {
   InputAdornment,
   CircularProgress,
   Alert,
+  IconButton,
+  Menu,
+  MenuItem,
 } from '@mui/material';
-import { Plus, Search } from 'lucide-react';
+import { Plus, Search, LogOut, User } from 'lucide-react';
 import { useDebounce } from '../hooks/useDebounce';
 import { useArtifacts, useCreateArtifact, useUpdateArtifact, useDeleteArtifact, useSearchArtifacts } from '../hooks/useArtifacts';
 import { ArtifactCard } from '../components/Artifacts/ArtifactCard';
 import { ArtifactForm } from '../components/Artifacts/ArtifactForm';
 import { ArtifactDetail } from '../components/Artifacts/ArtifactDetail';
+import { useAuth } from '../contexts/AuthContext';
 import type { Artifact, ArtifactCreate, ArtifactUpdate } from '../api/client';
 
 export const Dashboard: React.FC = () => {
@@ -25,6 +29,8 @@ export const Dashboard: React.FC = () => {
   const [formOpen, setFormOpen] = useState(false);
   const [formMode, setFormMode] = useState<'create' | 'edit'>('create');
   const [detailOpen, setDetailOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const { user, logout } = useAuth();
 
   // Debounce search query
   const debouncedSearch = useDebounce(searchQuery, 300);
@@ -82,6 +88,19 @@ export const Dashboard: React.FC = () => {
     setFormOpen(false);
   };
 
+  const handleUserMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleUserMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    handleUserMenuClose();
+  };
+
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
       <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -113,6 +132,39 @@ export const Dashboard: React.FC = () => {
               >
                 New Artifact
               </Button>
+              <IconButton
+                onClick={handleUserMenuOpen}
+                size="small"
+                sx={{ 
+                  border: '1px solid',
+                  borderColor: 'divider',
+                }}
+              >
+                <User size={18} />
+              </IconButton>
+              <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleUserMenuClose}
+                anchorOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'right',
+                }}
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+              >
+                <MenuItem disabled>
+                  <Typography variant="body2" color="text.secondary">
+                    {user?.email}
+                  </Typography>
+                </MenuItem>
+                <MenuItem onClick={handleLogout}>
+                  <LogOut size={16} style={{ marginRight: 8 }} />
+                  Logout
+                </MenuItem>
+              </Menu>
             </Stack>
           </Stack>
         </Stack>

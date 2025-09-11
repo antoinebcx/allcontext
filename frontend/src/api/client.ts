@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { supabase } from '../contexts/AuthContext';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
@@ -9,10 +10,17 @@ export const apiClient = axios.create({
   },
 });
 
-// Request interceptor for auth (when we add it)
+// Request interceptor to add auth token
 apiClient.interceptors.request.use(
-  (config) => {
-    // Add auth token here later
+  async (config) => {
+    // Get the current session from Supabase
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    // Add auth token if available
+    if (session?.access_token) {
+      config.headers.Authorization = `Bearer ${session.access_token}`;
+    }
+    
     return config;
   },
   (error) => {

@@ -4,7 +4,7 @@
 -- Create artifacts table
 CREATE TABLE IF NOT EXISTS artifacts (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    user_id UUID NOT NULL DEFAULT auth.uid(),
+    user_id UUID NOT NULL,  -- No DEFAULT - we pass this explicitly from backend
     title TEXT NOT NULL CHECK (length(title) <= 200),
     content TEXT NOT NULL CHECK (length(content) <= 100000),
     metadata JSONB DEFAULT '{}',

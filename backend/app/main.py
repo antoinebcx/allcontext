@@ -1,15 +1,23 @@
 """Main FastAPI application."""
 
 import sys
+import logging
 from pathlib import Path
 
 # Add parent directory to path so we can import app
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from fastapi import FastAPI
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from app.api import artifacts
+from app.api import artifacts, auth
 
 # Create FastAPI app
 app = FastAPI(
@@ -52,11 +60,26 @@ async def root():
     }
 
 # Include routers
+app.include_router(auth.router)
 app.include_router(artifacts.router)
+
+# Add middleware to log requests
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    logger.info(f"{request.method} {request.url.path}")
+    
+    # Log auth header presence (not the actual token for security)
+    if "authorization" in request.headers:
+        logger.info("Request has Authorization header")
+    
+    response = await call_next(request)
+    logger.info(f"Response status: {response.status_code}")
+    return response
 
 # Global error handler
 @app.exception_handler(500)
-async def internal_error_handler(request, exc):
+async def internal_error_handler(request: Request, exc):
+    logger.error(f"Internal error: {exc}")
     return JSONResponse(
         status_code=500,
         content={"detail": "Internal server error"}
