@@ -1,16 +1,16 @@
-import React from 'react';
+import React, { memo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { Box, Link, Typography } from '@mui/material';
+import { Box, Link } from '@mui/material';
 
 interface MarkdownRendererProps {
   content: string;
   preview?: boolean;
 }
 
-export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, preview = false }) => {
+const MarkdownRendererComponent: React.FC<MarkdownRendererProps> = ({ content, preview = false }) => {
   return (
     <Box
       sx={{
@@ -53,18 +53,17 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, pre
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
-          code({ node, inline, className, children, ...props }) {
+          code({ node, inline, className, children, ...props }: any) {
             const match = /language-(\w+)/.exec(className || '');
             return !inline && match ? (
               <SyntaxHighlighter
                 language={match[1]}
-                style={oneDark}
+                style={oneDark as any}
                 customStyle={{
                   margin: 0,
                   borderRadius: 8,
                   fontSize: '0.875rem',
                 }}
-                {...props}
               >
                 {String(children).replace(/\n$/, '')}
               </SyntaxHighlighter>
@@ -88,3 +87,6 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, pre
     </Box>
   );
 };
+
+// Memoize the component to prevent unnecessary re-renders
+export const MarkdownRenderer = memo(MarkdownRendererComponent);
