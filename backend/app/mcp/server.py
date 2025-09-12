@@ -24,8 +24,8 @@ DEMO_USER_ID = UUID("123e4567-e89b-12d3-a456-426614174001")
 
 @mcp.tool()
 def create_artifact(
-    title: str,
     content: str,
+    title: Optional[str] = None,
     metadata: Optional[Dict[str, Any]] = None,
     is_public: bool = False
 ) -> Dict[str, Any]:
@@ -33,8 +33,8 @@ def create_artifact(
     Create a new artifact in your context platform.
     
     Args:
-        title: Title of the artifact (max 200 chars)
-        content: Main content (max 100k chars)
+        content: Main content (max 100k chars) - title auto-extracted from first heading if not provided
+        title: Optional title (max 200 chars) - auto-generated from content if not provided
         metadata: Optional metadata as key-value pairs
         is_public: Whether artifact should be publicly accessible
     

@@ -6,6 +6,7 @@ from uuid import UUID
 from supabase import create_client, Client
 from dotenv import load_dotenv
 from app.models.core import Artifact, ArtifactCreate, ArtifactUpdate
+from app.utils import extract_title_from_content
 
 # Load environment variables
 load_dotenv()
@@ -27,9 +28,12 @@ class ArtifactServiceSupabase:
     
     async def create(self, user_id: UUID, data: ArtifactCreate) -> Artifact:
         """Create a new artifact in Supabase."""
+        # Auto-generate title if not provided
+        title = data.title if data.title else extract_title_from_content(data.content)
+        
         artifact_data = {
             "user_id": str(user_id),
-            "title": data.title,
+            "title": title,
             "content": data.content,
             "metadata": data.metadata,
             "is_public": data.is_public
@@ -101,6 +105,9 @@ class ArtifactServiceSupabase:
             update_data["title"] = data.title
         if data.content is not None:
             update_data["content"] = data.content
+            # Auto-generate title from new content if title not explicitly provided
+            if data.title is None:
+                update_data["title"] = extract_title_from_content(data.content)
         if data.metadata is not None:
             update_data["metadata"] = data.metadata
         if data.is_public is not None:

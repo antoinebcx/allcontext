@@ -53,7 +53,7 @@ export interface Artifact {
 }
 
 export interface ArtifactCreate {
-  title: string;
+  title?: string;
   content: string;
   metadata?: Record<string, any>;
   is_public?: boolean;

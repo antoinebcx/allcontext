@@ -4,6 +4,7 @@ from typing import List, Optional, Dict
 from uuid import UUID, uuid4
 from datetime import datetime, timezone
 from app.models.core import Artifact, ArtifactCreate, ArtifactUpdate
+from app.utils import extract_title_from_content
 
 
 class ArtifactService:
@@ -50,8 +51,13 @@ class ArtifactService:
     
     async def create(self, user_id: UUID, data: ArtifactCreate) -> Artifact:
         """Create a new artifact."""
+        # Auto-generate title if not provided
+        artifact_data = data.model_dump()
+        if not artifact_data.get('title'):
+            artifact_data['title'] = extract_title_from_content(data.content)
+        
         artifact = Artifact(
-            **data.model_dump(),
+            **artifact_data,
             user_id=user_id
         )
         self._artifacts[artifact.id] = artifact
@@ -110,6 +116,11 @@ class ArtifactService:
         
         # Update fields that are provided
         update_data = data.model_dump(exclude_unset=True)
+        
+        # Auto-generate title from new content if content changed but title not provided
+        if 'content' in update_data and 'title' not in update_data:
+            update_data['title'] = extract_title_from_content(update_data['content'])
+        
         for field, value in update_data.items():
             setattr(artifact, field, value)
         

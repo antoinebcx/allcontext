@@ -36,6 +36,9 @@ backend/
 │   │   ├── artifacts.py             # In-memory service (dev)
 │   │   ├── artifacts_supabase.py    # Supabase service (prod)
 │   │   └── api_keys.py              # API key service with bcrypt
+│   ├── utils/
+│   │   ├── __init__.py
+│   │   └── markdown.py              # Title extraction utility
 │   └── mcp/
 │       ├── __init__.py
 │       └── server.py                # MCP server tools
@@ -54,11 +57,19 @@ backend/
 The platform stores artifacts - any markdown-based content for AI context
 
 Each artifact includes:
-- Title (max 200 chars)
+- Title (auto-generated from content, max 200 chars)
 - Content (max 100k chars) 
 - Metadata (flexible JSON)
 - Public/private flag
 - Version tracking
+
+### Auto-Title Generation
+
+Titles are automatically extracted from markdown content:
+1. First `# heading` if present
+2. First `## heading` if no H1
+3. First non-empty line
+4. Truncated content (fallback)
 
 ## Quick Start
 
@@ -159,7 +170,7 @@ The platform supports dual authentication methods:
 |--------|----------|-------------|
 | GET | `/health` | Health check |
 | GET | `/api/docs` | Interactive API documentation |
-| POST | `/api/v1/artifacts` | Create artifact |
+| POST | `/api/v1/artifacts` | Create artifact (title optional - auto-generated) |
 | GET | `/api/v1/artifacts` | List artifacts |
 | GET | `/api/v1/artifacts/{id}` | Get artifact |
 | PUT | `/api/v1/artifacts/{id}` | Update artifact |
@@ -218,13 +229,12 @@ API_KEY=$(curl -X POST http://localhost:8000/api/v1/api-keys \
   -d '{"name": "Test Key", "scopes": ["read", "write"]}' \
   | jq -r '.api_key')
 
-# Use API key for requests
+# Use API key for requests (title auto-generated from content)
 curl -X POST http://localhost:8000/api/v1/artifacts \
   -H "Content-Type: application/json" \
   -H "X-API-Key: $API_KEY" \
   -d '{
-    "title": "Test Artifact",
-    "content": "This is a test context artifact."
+    "content": "# Test Artifact\n\nThis is a test context artifact."
   }'
 
 # List all artifacts (with authentication)

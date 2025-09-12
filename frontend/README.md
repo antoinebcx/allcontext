@@ -19,6 +19,7 @@ A minimal, elegant React application for managing markdown-based AI artifacts (p
 ## Features
 
 - ✨ **Markdown-first** - Full markdown editor with live preview
+- 🚀 **Auto-title** - Titles extracted from markdown headings automatically
 - 📝 **Unified artifacts** - Everything is just an artifact
 - 🔍 **Search** - Centered search bar with debounced filtering
 - 💾 **CRUD Operations** - Create, read, update, delete
@@ -40,7 +41,7 @@ frontend/
 │   │   ├── Artifacts/
 │   │   │   ├── ArtifactCard.tsx    # Grid card component
 │   │   │   ├── ArtifactDetail.tsx  # Detail view modal
-│   │   │   └── ArtifactForm.tsx    # Create/edit form
+│   │   │   └── ArtifactForm.tsx    # Create/edit form (no title field)
 │   │   ├── ApiKeys/
 │   │   │   ├── ApiKeysList.tsx     # API keys table
 │   │   │   ├── CreateApiKey.tsx    # Creation dialog
@@ -146,8 +147,8 @@ Displays artifact preview in a grid layout with:
 
 ### ArtifactForm
 Modal form for creating/editing artifacts:
-- Title input
 - Markdown editor with live preview tabs
+- Auto-title generation from content
 - Save/cancel actions
 
 ### ArtifactDetail
@@ -258,10 +259,11 @@ Edit `src/theme/index.ts` to change:
 # Test backend connection
 curl http://localhost:8000/health
 
-# Create test artifact
+# Create test artifact (title auto-generated from H1)
 curl -X POST http://localhost:8000/api/v1/artifacts \
   -H "Content-Type: application/json" \
-  -d '{"type": "prompt", "title": "Test", "content": "# Test"}'
+  -H "X-API-Key: YOUR_API_KEY" \
+  -d '{"content": "# Test Artifact\n\nContent here..."}'
 ```
 
 ## Deployment

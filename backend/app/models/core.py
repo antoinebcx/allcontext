@@ -14,9 +14,12 @@ class ArtifactBase(BaseModel):
     is_public: bool = False
 
 
-class ArtifactCreate(ArtifactBase):
+class ArtifactCreate(BaseModel):
     """Request model for creating an artifact."""
-    pass
+    title: Optional[str] = Field(None, min_length=1, max_length=200)
+    content: str = Field(..., min_length=1, max_length=100000)
+    metadata: Dict[str, Any] = Field(default_factory=dict)
+    is_public: bool = False
 
 
 class ArtifactUpdate(BaseModel):

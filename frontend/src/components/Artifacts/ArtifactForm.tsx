@@ -34,7 +34,6 @@ export const ArtifactForm: React.FC<ArtifactFormProps> = ({
   mode,
 }) => {
   const [formData, setFormData] = useState<ArtifactCreate>({
-    title: '',
     content: '',
     metadata: {},
     is_public: false,
@@ -46,14 +45,12 @@ export const ArtifactForm: React.FC<ArtifactFormProps> = ({
   useEffect(() => {
     if (mode === 'edit' && artifact) {
       setFormData({
-        title: artifact.title,
         content: artifact.content,
         metadata: artifact.metadata || {},
         is_public: artifact.is_public,
       });
     } else if (mode === 'create') {
       setFormData({
-        title: '',
         content: '',
         metadata: {},
         is_public: false,
@@ -62,7 +59,7 @@ export const ArtifactForm: React.FC<ArtifactFormProps> = ({
   }, [artifact, mode, open]);
 
   const handleSubmit = async () => {
-    if (!formData.title.trim() || !formData.content.trim()) {
+    if (!formData.content.trim()) {
       return;
     }
 
@@ -71,7 +68,6 @@ export const ArtifactForm: React.FC<ArtifactFormProps> = ({
       if (mode === 'edit') {
         // For edit mode, only send changed fields
         const updates: ArtifactUpdate = {
-          title: formData.title,
           content: formData.content,
           metadata: formData.metadata,
           is_public: formData.is_public,
@@ -82,7 +78,6 @@ export const ArtifactForm: React.FC<ArtifactFormProps> = ({
       }
       onClose();
       setFormData({
-        title: '',
         content: '',
         metadata: {},
         is_public: false,
@@ -121,17 +116,6 @@ export const ArtifactForm: React.FC<ArtifactFormProps> = ({
 
       <DialogContent sx={{ p: 2 }}>
         <Stack spacing={2}>
-          {/* Title Field */}
-          <TextField
-            label="Title"
-            size="small"
-            fullWidth
-            value={formData.title}
-            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            placeholder="Enter artifact title"
-            required
-          />
-
           {/* Editor/Preview Tabs */}
           <Box>
             <Tabs value={tabValue} onChange={(_, v) => setTabValue(v)} sx={{ mb: 1 }}>
@@ -158,14 +142,14 @@ export const ArtifactForm: React.FC<ArtifactFormProps> = ({
                 fullWidth
                 value={formData.content}
                 onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                placeholder="Write in Markdown..."
+                placeholder="Write in Markdown... (use # for title)"
                 required
                 sx={{
                   mt: 2,
                   '& .MuiInputBase-root': {
                     fontFamily: '"Fira Code", monospace',
                     fontSize: '0.875rem',
-                    height: 'calc(85vh - 300px)',
+                    height: 'calc(85vh - 250px)',
                     alignItems: 'flex-start',
                   },
                   '& .MuiInputBase-input': {
@@ -178,7 +162,7 @@ export const ArtifactForm: React.FC<ArtifactFormProps> = ({
               <Box
                 sx={{
                   p: 3,
-                  height: 'calc(85vh - 300px)',
+                  height: 'calc(85vh - 250px)',
                   overflowY: 'auto',
                 }}
               >
@@ -202,7 +186,7 @@ export const ArtifactForm: React.FC<ArtifactFormProps> = ({
         <Button
           onClick={handleSubmit}
           variant="contained"
-          disabled={loading || !formData.title.trim() || !formData.content.trim()}
+          disabled={loading || !formData.content.trim()}
         >
           {loading ? 'Saving...' : mode === 'create' ? 'Create' : 'Save'}
         </Button>
