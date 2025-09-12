@@ -28,9 +28,10 @@ backend/
 │   ├── dependencies/
 │   │   └── auth.py                  # JWT & API key auth dependency
 │   ├── models/
-│   │   ├── __init__.py
-│   │   ├── core.py                  # Pydantic models
-│   │   └── api_key.py               # API key models
+│   │   ├── __init__.py              # Model exports
+│   │   ├── core.py                  # Artifact models
+│   │   ├── api_key.py               # API key models
+│   │   └── auth.py                  # Auth models
 │   ├── services/
 │   │   ├── __init__.py
 │   │   ├── artifacts.py             # In-memory service (dev)
@@ -42,13 +43,12 @@ backend/
 │   └── mcp/
 │       ├── __init__.py
 │       └── server.py                # MCP server tools
-├── tests/
-│   └── test_mcp.py                  # Test files
+├── schema/
+│   └── schema.sql                   # Consolidated database schema
 ├── requirements.txt                  # Python dependencies
-├── pyproject.toml                   # Project configuration
-├── supabase_schema.sql             # Database schema
 ├── .env.example                     # Environment template
 ├── .env                            # Local environment (git ignored)
+├── .gitignore                      # Git ignore rules
 └── README.md                       # This file
 ```
 
@@ -88,12 +88,10 @@ source .venv/bin/activate  # macOS/Linux
 pip install -r requirements.txt
 ```
 
-### 2. Configure Supabase
-
-Create a `.env` file with your Supabase credentials:
+### 2. Configure Environment
 
 ```bash
-# Copy template
+# Copy template to create .env in backend directory
 cp .env.example .env
 
 # Edit .env with your values:
@@ -103,26 +101,22 @@ SUPABASE_ANON_KEY=your-anon-key     # For auth endpoints
 USE_SUPABASE=true                    # Set to false for in-memory mode
 ```
 
+**Note:** Environment file must be in `/backend/.env` (not root). Config loads explicitly from backend directory.
+
 ### 3. Setup Database
 
-Run the schema in your Supabase SQL Editor:
+Apply the consolidated schema to your Supabase project:
 
-```sql
--- From supabase_schema.sql
-CREATE TABLE IF NOT EXISTS artifacts (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    user_id UUID NOT NULL,  -- No DEFAULT, passed from backend
-    title TEXT NOT NULL,
-    content TEXT NOT NULL,
-    metadata JSONB DEFAULT '{}',
-    is_public BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW(),
-    version INTEGER DEFAULT 1
-);
-
--- Add indexes and full-text search (see supabase_schema.sql for complete setup)
+```bash
+# Run in Supabase SQL Editor
+# File: backend/schema/schema.sql
 ```
+
+The schema includes:
+- Artifacts table with full-text search
+- API keys table with bcrypt hashing
+- RLS policies for both tables
+- Triggers for updated_at timestamps
 
 ### 4. Run Servers
 
@@ -298,6 +292,8 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
 ```
 
 ## Environment Variables
+
+Located in `/backend/.env`:
 
 | Variable | Description | Default |
 |----------|-------------|---------|

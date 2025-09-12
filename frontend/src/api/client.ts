@@ -1,5 +1,16 @@
 import axios from 'axios';
 import { supabase } from '../contexts/AuthContext';
+import type { 
+  Artifact, 
+  ArtifactCreate, 
+  ArtifactUpdate, 
+  ArtifactList,
+  ApiKey,
+  ApiKeyCreate,
+  ApiKeyCreated,
+  ApiKeyUpdate,
+  ApiKeyList
+} from '../types';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
@@ -39,73 +50,10 @@ apiClient.interceptors.response.use(
   }
 );
 
-// Type definitions
-export interface Artifact {
-  id: string;
-  user_id: string;
-  title: string;
-  content: string;
-  metadata: Record<string, any>;
-  is_public: boolean;
-  created_at: string;
-  updated_at: string;
-  version: number;
-}
-
-export interface ArtifactCreate {
-  title?: string;
-  content: string;
-  metadata?: Record<string, any>;
-  is_public?: boolean;
-}
-
-export interface ArtifactUpdate {
-  title?: string;
-  content?: string;
-  metadata?: Record<string, any>;
-  is_public?: boolean;
-}
-
-// API Key types
-export interface ApiKey {
-  id: string;
-  user_id: string;
-  name: string;
-  key_prefix: string;
-  last_4: string;
-  last_used_at: string | null;
-  expires_at: string | null;
-  scopes: string[];
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface ApiKeyCreate {
-  name: string;
-  expires_at?: string;
-  scopes?: string[];
-}
-
-export interface ApiKeyCreated extends ApiKey {
-  api_key: string;
-}
-
-export interface ApiKeyUpdate {
-  name?: string;
-  scopes?: string[];
-  is_active?: boolean;
-}
-
 // API functions
 export const artifactApi = {
   list: async () => {
-    const response = await apiClient.get<{
-      items: Artifact[];
-      total: number;
-      page: number;
-      page_size: number;
-    }>('/api/v1/artifacts');
+    const response = await apiClient.get<ArtifactList>('/api/v1/artifacts');
     return response.data;
   },
 
@@ -137,10 +85,7 @@ export const artifactApi = {
 
 export const apiKeyApi = {
   list: async () => {
-    const response = await apiClient.get<{
-      items: ApiKey[];
-      total: number;
-    }>('/api/v1/api-keys');
+    const response = await apiClient.get<ApiKeyList>('/api/v1/api-keys');
     return response.data;
   },
 

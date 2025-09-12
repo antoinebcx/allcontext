@@ -1,13 +1,17 @@
 """Authentication endpoints for the Context Platform."""
 
 from fastapi import APIRouter, HTTPException, Depends
-from pydantic import BaseModel, EmailStr
 from supabase import create_client, Client
 from typing import Dict, Any
+from app.models import AuthRequest, EmailCheckRequest
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 
-load_dotenv()
+# Load environment variables from backend/.env
+backend_dir = Path(__file__).parent.parent.parent
+env_path = backend_dir / '.env'
+load_dotenv(env_path)
 
 router = APIRouter(
     prefix="/api/v1/auth",
@@ -22,17 +26,6 @@ if not SUPABASE_URL or not SUPABASE_ANON_KEY:
     raise ValueError("SUPABASE_URL and SUPABASE_ANON_KEY must be set")
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
-
-
-class AuthRequest(BaseModel):
-    """Request model for authentication."""
-    email: EmailStr
-    password: str
-
-
-class EmailCheckRequest(BaseModel):
-    """Request model for checking if email exists."""
-    email: EmailStr
 
 
 @router.post("/login")

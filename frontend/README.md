@@ -36,7 +36,12 @@ A minimal, elegant React application for managing markdown-based AI artifacts (p
 frontend/
 ├── src/
 │   ├── api/
-│   │   └── client.ts           # API client & types
+│   │   └── client.ts           # API client & axios config
+│   ├── types/
+│   │   ├── index.ts            # Re-exports all types
+│   │   ├── artifact.ts         # Artifact types
+│   │   ├── auth.ts             # Auth types
+│   │   └── api-key.ts          # API key types
 │   ├── components/
 │   │   ├── Artifacts/
 │   │   │   ├── ArtifactCard.tsx    # Grid card component
@@ -85,7 +90,7 @@ npm install
 ### 2. Configure Environment
 
 ```bash
-# Copy environment template
+# Copy template to create .env in frontend directory
 cp .env.example .env
 
 # Edit .env with your backend URL and Supabase credentials
@@ -93,6 +98,8 @@ VITE_API_URL=http://localhost:8000
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key
 ```
+
+**Note:** Environment file must be in `/frontend/.env` (not root).
 
 ### 3. Run Development Server
 
@@ -223,6 +230,7 @@ The frontend expects a backend API at `VITE_API_URL` with these endpoints:
 
 - **Server State**: React Query for API data
 - **Local State**: React hooks for UI state
+- **Type Safety**: Centralized types in `src/types/`
 - **No global store**: Keeps it simple
 
 ## Performance
@@ -243,9 +251,10 @@ The frontend expects a backend API at `VITE_API_URL` with these endpoints:
 
 ### Adding a New Feature
 1. Create component in appropriate folder
-2. Add API function to `client.ts`
-3. Create React Query hook in `useArtifacts.ts`
-4. Import and use in Dashboard
+2. Define types in `src/types/`
+3. Add API function to `client.ts`
+4. Create React Query hook
+5. Import and use in Dashboard
 
 ### Modifying Theme
 Edit `src/theme/index.ts` to change:
@@ -288,9 +297,17 @@ Deploy `dist/` folder to:
 - GitHub Pages
 - AWS S3 + CloudFront
 
+## Recent Updates
+
+- Auto-title generation from markdown content (no title field in forms)
+- Types centralized in `src/types/` directory
+- MUI Dialog components updated (`slotProps.paper` replaces deprecated `PaperProps`)
+- Environment configuration must be in `/frontend/.env` (no root .env)
+
 ## Next Steps
 
 - [x] User authentication
+- [x] Auto-title generation from markdown
 - [ ] Add keyboard shortcuts
 - [ ] Implement tags/categories
 - [ ] Add export/import functionality

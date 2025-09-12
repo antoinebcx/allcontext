@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, CardContent, Typography, Box } from '@mui/material';
-import type { Artifact } from '../../api/client';
+import type { Artifact } from '../../types';
 import { MarkdownRenderer } from '../Markdown/MarkdownRenderer';
 
 interface ArtifactCardProps {

@@ -1,10 +1,13 @@
 """Configuration management for the Context Platform."""
 
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 
-# Load environment variables
-load_dotenv()
+# Load environment variables from backend/.env
+backend_dir = Path(__file__).parent.parent
+env_path = backend_dir / '.env'
+load_dotenv(env_path)
 
 
 class Config:

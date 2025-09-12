@@ -17,7 +17,7 @@ import {
   Typography,
 } from '@mui/material';
 import { addDays, addMonths } from 'date-fns';
-import type { ApiKeyCreate } from '../../api/client';
+import type { ApiKeyCreate } from '../../types';
 
 interface CreateApiKeyProps {
   open: boolean;

@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { artifactApi } from '../api/client';
-import type { Artifact, ArtifactCreate, ArtifactUpdate } from '../api/client';
+import type { Artifact, ArtifactCreate, ArtifactUpdate } from '../types';
 
 // Query keys
 const ARTIFACTS_KEY = 'artifacts';

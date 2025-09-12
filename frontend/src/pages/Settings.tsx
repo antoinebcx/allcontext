@@ -17,7 +17,7 @@ import { ApiKeysList } from '../components/ApiKeys/ApiKeysList';
 import { CreateApiKey } from '../components/ApiKeys/CreateApiKey';
 import { ApiKeyDisplay } from '../components/ApiKeys/ApiKeyDisplay';
 import { useAuth } from '../contexts/AuthContext';
-import type { ApiKey, ApiKeyCreated } from '../api/client';
+import type { ApiKey, ApiKeyCreated } from '../types';
 
 interface TabPanelProps {
   children?: React.ReactNode;

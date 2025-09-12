@@ -20,7 +20,7 @@ import {
 } from '@mui/material';
 import { Trash2, Copy, Eye, EyeOff } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
-import type { ApiKey } from '../../api/client';
+import type { ApiKey } from '../../types';
 
 interface ApiKeysListProps {
   apiKeys: ApiKey[];

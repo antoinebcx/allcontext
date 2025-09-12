@@ -13,7 +13,7 @@ import {
   Paper,
 } from '@mui/material';
 import { Copy, Eye, EyeOff } from 'lucide-react';
-import type { ApiKeyCreated } from '../../api/client';
+import type { ApiKeyCreated } from '../../types';
 
 interface ApiKeyDisplayProps {
   open: boolean;

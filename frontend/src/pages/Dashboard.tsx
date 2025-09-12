@@ -15,7 +15,7 @@ import { useArtifacts, useCreateArtifact, useUpdateArtifact, useDeleteArtifact, 
 import { ArtifactCard } from '../components/Artifacts/ArtifactCard';
 import { ArtifactForm } from '../components/Artifacts/ArtifactForm';
 import { ArtifactDetail } from '../components/Artifacts/ArtifactDetail';
-import type { Artifact, ArtifactCreate, ArtifactUpdate } from '../api/client';
+import type { Artifact, ArtifactCreate, ArtifactUpdate } from '../types';
 
 export const Dashboard: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');

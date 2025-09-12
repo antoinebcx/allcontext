@@ -15,7 +15,7 @@ import {
   Tabs,
 } from '@mui/material';
 import { X, Eye, Edit } from 'lucide-react';
-import type { Artifact, ArtifactCreate, ArtifactUpdate } from '../../api/client';
+import type { Artifact, ArtifactCreate, ArtifactUpdate } from '../../types';
 import { MarkdownRenderer } from '../Markdown/MarkdownRenderer';
 
 interface ArtifactFormProps {
@@ -96,10 +96,12 @@ export const ArtifactForm: React.FC<ArtifactFormProps> = ({
       onClose={onClose}
       maxWidth="md"
       fullWidth
-      PaperProps={{
-        sx: {
-          borderRadius: 2,
-          height: '85vh',
+      slotProps={{
+        paper: {
+          sx: {
+            borderRadius: 2,
+            height: '85vh',
+          },
         },
       }}
     >

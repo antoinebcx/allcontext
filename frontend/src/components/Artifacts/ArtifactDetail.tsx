@@ -21,7 +21,7 @@ import {
   Calendar,
   Download
 } from 'lucide-react';
-import type { Artifact } from '../../api/client';
+import type { Artifact } from '../../types';
 import { MarkdownRenderer } from '../Markdown/MarkdownRenderer';
 
 interface ArtifactDetailProps {
@@ -92,10 +92,12 @@ export const ArtifactDetail: React.FC<ArtifactDetailProps> = ({
         onClose={onClose}
         maxWidth="md"
         fullWidth
-        PaperProps={{
-          sx: {
-            borderRadius: 2,
-            height: '85vh',
+        slotProps={{
+          paper: {
+            sx: {
+              borderRadius: 2,
+              height: '85vh',
+            },
           },
         }}
       >

@@ -1,8 +1,0 @@
-[project]
-name = "context-platform"
-version = "0.1.0"
-description = "AI Context Management Platform"
-requires-python = ">=3.9"
-
-[tool.uvicorn]
-reload = true
