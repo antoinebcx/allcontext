@@ -1,4 +1,4 @@
-# Mycontext
+# Contexthub
 
 Monorepo with:
 - `/backend`: the Python server, API / MCP

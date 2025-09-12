@@ -140,7 +140,7 @@ export const LoginPage: React.FC = () => {
           )}
           
           <Typography component="h1" variant="h5" sx={{ mb: 1, textAlign: 'center' }}>
-            Welcome to Mycontext
+            Welcome to Contexthub
           </Typography>
           
           <Typography 

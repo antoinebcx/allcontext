@@ -164,7 +164,7 @@ export const Settings: React.FC = () => {
                 Include your API key in the request header:
                 <Box component="pre" sx={{ mt: 1, p: 1, bgcolor: 'white', borderRadius: 1, fontSize: '0.875rem' }}>
                   {`curl -H "X-API-Key: sk_prod_your_key_here" \\
-     https://api.mycontext.com/api/v1/artifacts`}
+     https://api.contexthub.com/api/v1/artifacts`}
                 </Box>
               </Typography>
             </Box>
