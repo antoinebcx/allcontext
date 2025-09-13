@@ -31,11 +31,102 @@ async def lifespan(app: FastAPI):
         yield
 
 
-# Create FastAPI app with lifespan
+# OpenAPI configuration
+tags_metadata = [
+    {
+        "name": "auth",
+        "description": "Authentication endpoints for user registration, login, and session management. "
+                      "Supports email/password authentication via Supabase Auth.",
+        "externalDocs": {
+            "description": "Supabase Auth Documentation",
+            "url": "https://supabase.com/docs/guides/auth",
+        },
+    },
+    {
+        "name": "artifacts",
+        "description": "Core CRUD operations for managing AI context artifacts. "
+                      "Artifacts are markdown-based content with auto-title generation, metadata support, "
+                      "and full-text search capabilities. Supports both personal and public artifacts.",
+    },
+    {
+        "name": "api-keys",
+        "description": "API key management for programmatic access. "
+                      "Create, manage, and revoke API keys with configurable scopes and expiration. "
+                      "API keys enable stateless authentication for REST API and MCP access.",
+    },
+]
+
+# Server configurations
+servers = [
+    {
+        "url": "http://localhost:8000",
+        "description": "Local development server"
+    },
+    {
+        "url": "https://api.contexthub.com",
+        "description": "Production server"
+    }
+]
+
+# Add ngrok server if configured
+import os
+ngrok_url = os.getenv("NGROK_URL")
+if ngrok_url:
+    servers.append({
+        "url": ngrok_url,
+        "description": "Development tunnel (ngrok)"
+    })
+
+# Create FastAPI app with enhanced OpenAPI configuration
 app = FastAPI(
-    title="Context Platform API",
-    description="Store and retrieve AI context via REST API and MCP",
+    title="Contexthub API",
+    description="""
+## Personal AI Context Management Platform
+
+Contexthub provides a unified platform for storing and managing AI context artifacts through multiple access patterns:
+
+### 🔗 **Dual Access Architecture**
+- **REST API** (`/api/v1/*`) - Traditional HTTP endpoints for web applications
+- **MCP Server** (`/mcp`) - Model Context Protocol for AI assistants (Claude, OpenAI, etc.)
+
+### 📄 **Artifacts**
+Store markdown-based content with:
+- **Auto-title generation** from H1/H2 headings or content
+- **Flexible metadata** as JSON objects
+- **Full-text search** across title and content
+- **Public/private** visibility controls
+- **Version tracking** with automatic timestamps
+
+### 🔐 **Authentication**
+- **JWT tokens** for web UI sessions (Bearer authentication)
+- **API keys** for programmatic access (`X-API-Key` header)
+- Both methods work for REST API and MCP access
+
+### 🔍 **Search & Discovery**
+- PostgreSQL full-text search with GIN indexes
+- ILIKE pattern matching for flexible queries
+- User-scoped results with public artifact inclusion
+
+### 📊 **Pagination & Limits**
+- Configurable page sizes (1-100 items)
+- Offset-based pagination
+- Content limits: 100k characters per artifact
+- API key limits: 10 keys per user
+
+Built with FastAPI, Supabase, and following OpenAPI 3.1 standards.
+    """.strip(),
     version="1.0.0",
+    contact={
+        "name": "Contexthub",
+        "url": "https://github.com/contexthub/api",
+        "email": "support@contexthub.com"
+    },
+    license_info={
+        "name": "MIT",
+        "url": "https://opensource.org/licenses/MIT"
+    },
+    servers=servers,
+    openapi_tags=tags_metadata,
     docs_url="/api/docs",
     redoc_url="/api/redoc",
     openapi_url="/api/openapi.json",

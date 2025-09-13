@@ -197,17 +197,7 @@ The platform supports dual authentication methods:
 
 ### Using API Keys with MCP
 
-API keys created through the UI work for both REST API and MCP access:
-
-```python
-# In MCP clients (e.g., Claude, OpenAI)
-mcp_servers=[{
-    "type": "url",
-    "url": "https://api.contexthub.com/mcp",
-    "name": "contexthub",
-    "authorization_token": "sk_prod_your_api_key"  # Same API key as REST!
-}]
-```
+API keys created through the UI work for both REST API and MCP access. Configure your MCP client with the API key as the authorization token.
 
 ## API Endpoints
 
@@ -444,14 +434,22 @@ Located in `/backend/.env`:
 - Workaround: Using Python's `contextvars` for thread-safe request context
 - This is a framework limitation that may be fixed in future SDK versions
 
+## Documentation
+
+- **Interactive**: `/api/docs` (Swagger), `/api/redoc` (ReDoc)
+- **OpenAPI**: `/api/openapi.json`
+- **[API Reference](../docs/API_REFERENCE.md)** - REST API documentation
+- **[MCP Specification](../docs/MCP_SPECIFICATION.md)** - MCP server specification
+
 ## Contributing
 
 When contributing, please:
 1. Follow the existing code structure and patterns
 2. Add tests for new functionality
-3. Update documentation as needed
+3. Update documentation as needed (both code docs and `/docs` guides)
 4. Ensure all authentication flows work correctly
 5. Test both REST API and MCP endpoints
+6. Validate OpenAPI spec updates via `/api/docs`
 
 ## Next Steps
 
@@ -460,6 +458,7 @@ When contributing, please:
 - [x] Add MCP server with HTTP transport
 - [x] Optimize API key validation performance
 - [x] Fix MCP authentication context issue
+- [x] Complete API and MCP documentation
 - [ ] Add rate limiting
 - [ ] Implement proper versioning for artifacts
 - [ ] Add bulk operations

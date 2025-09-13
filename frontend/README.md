@@ -28,7 +28,10 @@ A minimal, elegant React application for managing markdown-based AI artifacts (p
 - ⚡ **Fast** - Optimistic updates with React Query
 - 🔐 **Authentication** - Email/password with automatic user detection
 - 👤 **User Management** - Profile menu with logout
-- 🔑 **API Keys** - Programmatic access management
+
+## API Documentation
+
+- **[API Reference](../docs/API_REFERENCE.md)** - REST API endpoints used by frontend
 
 ## Directory Structure
 
