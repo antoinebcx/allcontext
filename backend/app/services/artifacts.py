@@ -1,80 +1,66 @@
-"""Service layer for artifact operations."""
+"""Service layer for artifact operations using Supabase."""
 
-from typing import List, Optional, Dict
-from uuid import UUID, uuid4
-from datetime import datetime, timezone
+import os
+from typing import List, Optional
+from uuid import UUID
+from supabase import create_client, Client
+from dotenv import load_dotenv
 from app.models.artifacts import Artifact, ArtifactCreate, ArtifactUpdate
 from app.models.search import ArtifactSearchResult
 from app.utils import extract_title_from_content, generate_snippet
 
+# Load environment variables
+load_dotenv()
+
 
 class ArtifactService:
     """
-    Service class for artifact operations.
-    Currently uses in-memory storage, will be replaced with Supabase.
+    Service class for artifact operations using Supabase.
     """
     
     def __init__(self):
-        # In-memory storage - will be replaced with Supabase
-        self._artifacts: Dict[UUID, Artifact] = {}
+        url = os.getenv("SUPABASE_URL")
+        key = os.getenv("SUPABASE_KEY")
         
-        # Add some demo data for testing
-        self._init_demo_data()
-    
-    def _init_demo_data(self):
-        """Initialize with some demo artifacts for testing."""
-        demo_user_id = UUID("123e4567-e89b-12d3-a456-426614174001")
+        if not url or not key:
+            raise ValueError("SUPABASE_URL and SUPABASE_KEY must be set in environment")
         
-        demos = [
-            ArtifactCreate(
-                title="Code Review Template",
-                content="Review this code for:\n1. Security vulnerabilities\n2. Performance issues\n3. Code style\n4. Best practices",
-                metadata={"category": "engineering", "tags": ["review", "template"]}
-            ),
-            ArtifactCreate(
-                title="API Design Principles",
-                content="1. RESTful design\n2. Clear error messages\n3. Consistent naming\n4. Versioning strategy",
-                metadata={"category": "architecture"}
-            ),
-            ArtifactCreate(
-                title="Sprint Planning Guide",
-                content="For our sprint planning:\n- Review last sprint's velocity\n- Identify blockers\n- Estimate new tickets",
-                metadata={"category": "agile"}
-            )
-        ]
-        
-        for demo in demos:
-            artifact = Artifact(
-                **demo.model_dump(),
-                user_id=demo_user_id
-            )
-            self._artifacts[artifact.id] = artifact
+        self.client: Client = create_client(url, key)
     
     async def create(self, user_id: UUID, data: ArtifactCreate) -> Artifact:
-        """Create a new artifact."""
+        """Create a new artifact in Supabase."""
         # Auto-generate title if not provided
-        artifact_data = data.model_dump()
-        if not artifact_data.get('title'):
-            artifact_data['title'] = extract_title_from_content(data.content)
+        title = data.title if data.title else extract_title_from_content(data.content)
         
-        artifact = Artifact(
-            **artifact_data,
-            user_id=user_id
-        )
-        self._artifacts[artifact.id] = artifact
-        return artifact
+        artifact_data = {
+            "user_id": str(user_id),
+            "title": title,
+            "content": data.content,
+            "metadata": data.metadata,
+            "is_public": data.is_public
+        }
+        
+        response = self.client.table("artifacts").insert(artifact_data).execute()
+        
+        if response.data:
+            return Artifact(**response.data[0])
+        else:
+            raise Exception("Failed to create artifact")
     
     async def get(self, artifact_id: UUID, user_id: Optional[UUID] = None) -> Optional[Artifact]:
-        """
-        Get an artifact by ID.
-        If user_id is provided, ensures the artifact belongs to that user.
-        """
-        artifact = self._artifacts.get(artifact_id)
+        """Get an artifact by ID from Supabase."""
+        query = self.client.table("artifacts").select("*").eq("id", str(artifact_id))
         
-        if artifact and user_id:
-            # Check ownership
-            if artifact.user_id != user_id and not artifact.is_public:
-                return None
+        response = query.execute()
+        
+        if not response.data:
+            return None
+        
+        artifact = Artifact(**response.data[0])
+        
+        # Check access permissions
+        if user_id and artifact.user_id != user_id and not artifact.is_public:
+            return None
         
         return artifact
     
@@ -84,24 +70,23 @@ class ArtifactService:
         limit: int = 50,
         offset: int = 0
     ) -> List[Artifact]:
-        """
-        List artifacts with optional filtering.
-        If user_id is provided, returns only that user's artifacts and public ones.
-        """
-        artifacts = list(self._artifacts.values())
+        """List artifacts from Supabase with optional filtering."""
+        query = self.client.table("artifacts").select("*")
         
-        # Filter by user
+        # Filter by user or public
         if user_id:
-            artifacts = [
-                a for a in artifacts 
-                if a.user_id == user_id or a.is_public
-            ]
+            # Get user's artifacts and public ones
+            query = query.or_(f"user_id.eq.{str(user_id)},is_public.eq.true")
         
-        # Sort by created_at descending
-        artifacts.sort(key=lambda x: x.created_at, reverse=True)
+        # Order by created_at descending
+        query = query.order("created_at", desc=True)
         
         # Apply pagination
-        return artifacts[offset:offset + limit]
+        query = query.range(offset, offset + limit - 1)
+        
+        response = query.execute()
+        
+        return [Artifact(**item) for item in response.data] if response.data else []
     
     async def update(
         self,
@@ -109,76 +94,100 @@ class ArtifactService:
         user_id: UUID,
         data: ArtifactUpdate
     ) -> Optional[Artifact]:
-        """Update an artifact if it belongs to the user."""
-        artifact = await self.get(artifact_id, user_id)
-        
-        if not artifact or artifact.user_id != user_id:
+        """Update an artifact in Supabase."""
+        # First check if user owns the artifact
+        existing = await self.get(artifact_id, user_id)
+        if not existing or existing.user_id != user_id:
             return None
         
-        # Update fields that are provided
-        update_data = data.model_dump(exclude_unset=True)
+        # Prepare update data (only non-None fields)
+        update_data = {}
+        if data.title is not None:
+            update_data["title"] = data.title
+        if data.content is not None:
+            update_data["content"] = data.content
+            # Auto-generate title from new content if title not explicitly provided
+            if data.title is None:
+                update_data["title"] = extract_title_from_content(data.content)
+        if data.metadata is not None:
+            update_data["metadata"] = data.metadata
+        if data.is_public is not None:
+            update_data["is_public"] = data.is_public
         
-        # Auto-generate title from new content if content changed but title not provided
-        if 'content' in update_data and 'title' not in update_data:
-            update_data['title'] = extract_title_from_content(update_data['content'])
+        if not update_data:
+            return existing  # Nothing to update
         
-        for field, value in update_data.items():
-            setattr(artifact, field, value)
+        response = self.client.table("artifacts") \
+            .update(update_data) \
+            .eq("id", str(artifact_id)) \
+            .eq("user_id", str(user_id)) \
+            .execute()
         
-        # Update metadata
-        artifact.updated_at = datetime.now(timezone.utc)
-        artifact.version += 1
-        
-        self._artifacts[artifact_id] = artifact
-        return artifact
+        if response.data:
+            return Artifact(**response.data[0])
+        return None
     
     async def delete(self, artifact_id: UUID, user_id: UUID) -> bool:
-        """Delete an artifact if it belongs to the user."""
-        artifact = await self.get(artifact_id, user_id)
+        """Delete an artifact from Supabase."""
+        response = self.client.table("artifacts") \
+            .delete() \
+            .eq("id", str(artifact_id)) \
+            .eq("user_id", str(user_id)) \
+            .execute()
         
-        if not artifact or artifact.user_id != user_id:
-            return False
-        
-        del self._artifacts[artifact_id]
-        return True
+        # Supabase returns deleted rows
+        return len(response.data) > 0 if response.data else False
     
     async def search(
         self,
         user_id: UUID,
-        query: str
+        query: str,
     ) -> List[ArtifactSearchResult]:
         """
-        Simple text search in title and content.
+        Search artifacts using ILIKE for partial text matching.
         Returns search results with snippets instead of full content.
         """
-        query_lower = query.lower()
-        artifacts = await self.list(user_id)
+        # Build the search query
+        search_query = self.client.table("artifacts").select("*")
 
-        # Simple text search
-        matching_artifacts = [
-            a for a in artifacts
-            if query_lower in a.title.lower() or query_lower in a.content.lower()
-        ]
+        # Filter by user or public
+        search_query = search_query.or_(f"user_id.eq.{str(user_id)},is_public.eq.true")
+
+        # Use ILIKE for partial matching
+        search_pattern = f"%{query}%"
+        search_query = search_query.or_(
+            f"title.ilike.{search_pattern},content.ilike.{search_pattern}"
+        )
+
+        # Order by relevance (default for text search)
+        response = search_query.execute()
 
         # Transform to search results with snippets
-        return [
-            ArtifactSearchResult(
-                id=a.id,
-                title=a.title,
-                snippet=generate_snippet(a.content),
-                metadata=a.metadata,
-                is_public=a.is_public,
-                created_at=a.created_at,
-                updated_at=a.updated_at
-            )
-            for a in matching_artifacts
-        ]
-    
+        results = []
+        for item in response.data if response.data else []:
+            artifact = Artifact(**item)
+            results.append(ArtifactSearchResult(
+                id=artifact.id,
+                title=artifact.title,
+                snippet=generate_snippet(artifact.content),
+                metadata=artifact.metadata,
+                is_public=artifact.is_public,
+                created_at=artifact.created_at,
+                updated_at=artifact.updated_at
+            ))
+
+        return results
+        
     async def count(self, user_id: Optional[UUID] = None) -> int:
-        """Count artifacts with optional filtering."""
-        artifacts = await self.list(user_id, limit=10000)
-        return len(artifacts)
+        """Count artifacts in Supabase."""
+        query = self.client.table("artifacts").select("id", count="exact")
+        
+        if user_id:
+            query = query.or_(f"user_id.eq.{str(user_id)},is_public.eq.true")
+        
+        response = query.execute()
+        return response.count if response.count else 0
 
 
-# Singleton instance
+# Create service instance
 artifact_service = ArtifactService()

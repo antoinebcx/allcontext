@@ -11,14 +11,11 @@ from mcp.server.auth.provider import TokenVerifier, AccessToken
 from mcp.server.auth.settings import AuthSettings
 
 from app.models.artifacts import ArtifactCreate, ArtifactUpdate
-from app.config import config
 from app.utils import generate_snippet
+from app.services.artifacts import artifact_service
 
 # Set up logging
 logger = logging.getLogger(__name__)
-
-# Get the appropriate service based on configuration
-artifact_service = config.get_artifact_service()
 
 # Context variable for storing authenticated user ID per request
 # This is thread-safe and async-safe

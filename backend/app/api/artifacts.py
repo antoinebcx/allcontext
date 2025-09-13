@@ -5,11 +5,8 @@ from typing import List
 from uuid import UUID
 from app.models.artifacts import Artifact, ArtifactCreate, ArtifactUpdate, ArtifactList
 from app.models.search import ArtifactSearchResult
-from app.config import config
 from app.dependencies.auth import get_current_user
-
-# Get the appropriate service based on configuration
-artifact_service = config.get_artifact_service()
+from app.services.artifacts import artifact_service
 
 router = APIRouter(
     prefix="/api/v1/artifacts",

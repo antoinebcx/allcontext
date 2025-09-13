@@ -36,8 +36,7 @@ backend/
 │   │   └── auth.py                  # Auth models
 │   ├── services/
 │   │   ├── __init__.py
-│   │   ├── artifacts.py             # In-memory service (dev)
-│   │   ├── artifacts_supabase.py    # Supabase service (prod)
+│   │   ├── artifacts.py             # Artifact service (Supabase)
 │   │   └── api_keys.py              # API key service with bcrypt and lookup optimization
 │   ├── utils/
 │   │   ├── __init__.py
@@ -51,6 +50,7 @@ backend/
 │   ├── integration_tests/
 │   │   ├── __init__.py
 │   │   ├── test_api_endpoints.py    # Complete API integration test
+│   │   ├── test_artifacts_supabase.py # Artifact service Supabase tests
 │   │   ├── test_openai_mcp.py      # OpenAI MCP integration tests
 │   │   └── test_anthropic_mcp.py   # Anthropic MCP integration tests
 │   └── unit_tests/
@@ -58,7 +58,6 @@ backend/
 │       ├── test_utils_markdown.py  # Markdown title extraction tests
 │       ├── test_utils_text.py      # Text processing tests (snippets)
 │       ├── test_models_validation.py # Pydantic model validation tests
-│       ├── test_services_artifacts.py # Artifact service logic tests
 │       └── test_api_key_hashing.py # API key security tests
 ├── schema/
 │   └── schema.sql                   # Consolidated database schema with lookup_hash
@@ -96,7 +95,7 @@ FastMCP(
 **Authentication Context Management**: Due to limitations in the MCP SDK's stateless mode, we use Python's `contextvars` to maintain thread-safe, request-scoped authentication context. This ensures proper user isolation in concurrent requests while working within the framework's constraints.
 
 ### Service Layer Pattern
-- Abstract service layer switchable between in-memory and Supabase
+- Service layer using Supabase for persistence
 - Shared Pydantic models ensure consistency
 - Business logic isolated from transport layers
 
@@ -144,7 +143,6 @@ cp .env.example .env
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_KEY=your-service-role-key  # Use service_role key for backend
 SUPABASE_ANON_KEY=your-anon-key     # For auth endpoints
-USE_SUPABASE=true                    # Set to false for in-memory mode
 API_BASE_URL=https://api.contexthub.com  # Your API URL
 ```
 
@@ -408,7 +406,6 @@ Located in `/backend/.env`:
 | `SUPABASE_URL` | Supabase project URL | Required |
 | `SUPABASE_KEY` | Supabase service role key | Required |
 | `SUPABASE_ANON_KEY` | Supabase anon key for auth | Required |
-| `USE_SUPABASE` | Enable Supabase storage | `true` |
 | `API_HOST` | API bind address | `0.0.0.0` |
 | `API_PORT` | API port | `8000` |
 | `API_BASE_URL` | Base URL for MCP auth | `https://api.contexthub.com` |
