@@ -48,6 +48,7 @@ backend/
 │   ├── __init__.py
 │   ├── integration_tests/
 │   │   ├── __init__.py
+│   │   ├── test_api_endpoints.py    # Complete API integration test
 │   │   ├── test_openai_mcp.py      # OpenAI MCP integration tests
 │   │   └── test_anthropic_mcp.py   # Anthropic MCP integration tests
 │   └── unit_tests/
@@ -271,6 +272,34 @@ pytest tests/unit_tests/test_utils_markdown.py -v
 
 ### Integration Tests
 
+#### API Integration Tests
+
+Complete test suite for the REST API endpoints, simulating real developer usage:
+
+```bash
+# From backend directory
+python tests/integration_tests/test_api_endpoints.py
+```
+
+**Test Coverage:**
+- Server health and connectivity
+- Authentication (API key validation)
+- Complete CRUD lifecycle (create, read, update, delete)
+- Search functionality and edge cases
+- Auto-title generation from markdown
+- Content validation and limits
+- Error handling and edge cases
+- Full workflow integration scenarios
+
+**Prerequisites:**
+- Server running on localhost:8000 or ngrok
+- `CONTEXTHUB_API_KEY` in `.env`
+- Optional: `NGROK_URL` for remote testing
+
+**Output:** Detailed test report with timing, pass/fail status, and cleanup verification.
+
+#### MCP Integration Tests
+
 ```bash
 # For remote testing, start ngrok first
 ngrok http 8000
@@ -285,6 +314,10 @@ pytest tests/integration_tests/
 ```
 
 ### Manual API Testing
+
+**Alternative:** Use the automated integration test above for comprehensive API testing.
+
+**Manual curl commands:**
 
 ```bash
 # First, authenticate to get a token
