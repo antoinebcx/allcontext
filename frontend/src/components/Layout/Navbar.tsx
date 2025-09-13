@@ -67,57 +67,84 @@ export const Navbar: React.FC = () => {
         <Box sx={{ flexGrow: 1 }} />
 
         {/* Navigation */}
-        <Button
-          startIcon={<Settings size={18} />}
-          onClick={() => navigate('/settings')}
-          sx={{ 
-            color: location.pathname === '/settings' ? 'primary.main' : 'text.secondary',
-            fontWeight: location.pathname === '/settings' ? 600 : 400
-          }}
-        >
-          Settings
-        </Button>
+        {user ? (
+          <>
+            {/* Authenticated user UI */}
+            <Button
+              startIcon={<Settings size={18} />}
+              onClick={() => navigate('/settings')}
+              sx={{
+                color: location.pathname === '/settings' ? 'primary.main' : 'text.secondary',
+                fontWeight: location.pathname === '/settings' ? 600 : 400
+              }}
+            >
+              Settings
+            </Button>
 
-        {/* User Menu */}
-        <IconButton
-          onClick={handleUserMenuOpen}
-          size="small"
-          sx={{ 
-            border: '1px solid',
-            borderColor: 'divider',
-          }}
-        >
-          <User size={18} />
-        </IconButton>
-        
-        <Menu
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={handleUserMenuClose}
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'right',
-          }}
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'right',
-          }}
-        >
-          <MenuItem disabled>
-            <Typography variant="body2" color="text.secondary">
-              {user?.email}
-            </Typography>
-          </MenuItem>
-          <Divider />
-          <MenuItem onClick={handleSettingsClick}>
-            <Settings size={16} style={{ marginRight: 8 }} />
-            Settings
-          </MenuItem>
-          <MenuItem onClick={handleLogout}>
-            <LogOut size={16} style={{ marginRight: 8 }} />
-            Logout
-          </MenuItem>
-        </Menu>
+            {/* User Menu */}
+            <IconButton
+              onClick={handleUserMenuOpen}
+              size="small"
+              sx={{
+                border: '1px solid',
+                borderColor: 'divider',
+              }}
+            >
+              <User size={18} />
+            </IconButton>
+
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleUserMenuClose}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'right',
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+              }}
+            >
+              <MenuItem disabled>
+                <Typography variant="body2" color="text.secondary">
+                  {user?.email}
+                </Typography>
+              </MenuItem>
+              <Divider />
+              <MenuItem onClick={handleSettingsClick}>
+                <Settings size={16} style={{ marginRight: 8 }} />
+                Settings
+              </MenuItem>
+              <MenuItem onClick={handleLogout}>
+                <LogOut size={16} style={{ marginRight: 8 }} />
+                Logout
+              </MenuItem>
+            </Menu>
+          </>
+        ) : (
+          <>
+            {/* Non-authenticated user UI */}
+            <Button
+              onClick={() => navigate('/login')}
+              sx={{
+                color: 'text.secondary',
+                fontWeight: 400
+              }}
+            >
+              Sign In
+            </Button>
+            <Button
+              variant="contained"
+              onClick={() => navigate('/login?signup=true')}
+              sx={{
+                fontWeight: 500
+              }}
+            >
+              Sign Up
+            </Button>
+          </>
+        )}
       </Toolbar>
     </AppBar>
   );

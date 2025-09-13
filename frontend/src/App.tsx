@@ -28,11 +28,11 @@ function App() {
 
   if (loading) {
     return (
-      <Box sx={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh' 
+      <Box sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh'
       }}>
         <CircularProgress />
       </Box>
@@ -44,20 +44,24 @@ function App() {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <BrowserRouter>
-          {user ? (
-            <Layout>
-              <Routes>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/settings" element={<Settings />} />
-                <Route path="*" element={<Navigate to="/" replace />} />
-              </Routes>
-            </Layout>
-          ) : (
-            <Routes>
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="*" element={<Navigate to="/login" replace />} />
-            </Routes>
-          )}
+          <Routes>
+            {/* Login route without layout */}
+            <Route path="/login" element={<LoginPage />} />
+
+            {/* All other routes with layout */}
+            <Route path="*" element={
+              <Layout>
+                <Routes>
+                  <Route path="/" element={<Dashboard />} />
+                  <Route
+                    path="/settings"
+                    element={user ? <Settings /> : <Navigate to="/login?redirect=/settings" replace />}
+                  />
+                  <Route path="*" element={<Navigate to="/" replace />} />
+                </Routes>
+              </Layout>
+            } />
+          </Routes>
         </BrowserRouter>
       </ThemeProvider>
     </QueryClientProvider>

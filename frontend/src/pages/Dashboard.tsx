@@ -1,23 +1,29 @@
 import React, { useState } from 'react';
-import { 
-  Box, 
-  Typography, 
-  Button, 
-  Grid, 
+import { useNavigate } from 'react-router-dom';
+import {
+  Box,
+  Typography,
+  Button,
+  Grid,
   CircularProgress,
   Alert,
   TextField,
   InputAdornment,
+  Paper,
 } from '@mui/material';
-import { Plus, Search } from 'lucide-react';
+import { Plus, Search, Info } from 'lucide-react';
 import { useDebounce } from '../hooks/useDebounce';
 import { useArtifacts, useCreateArtifact, useUpdateArtifact, useDeleteArtifact, useSearchArtifacts } from '../hooks/useArtifacts';
 import { ArtifactCard } from '../components/Artifacts/ArtifactCard';
 import { ArtifactForm } from '../components/Artifacts/ArtifactForm';
 import { ArtifactDetail } from '../components/Artifacts/ArtifactDetail';
-import type { Artifact, ArtifactCreate, ArtifactUpdate } from '../types';
+import { useAuth } from '../contexts/AuthContext';
+import { demoArtifacts, demoCreateMessage } from '../data/demoData';
+import type { Artifact, ArtifactCreate, ArtifactUpdate, ArtifactSearchResult } from '../types';
 
 export const Dashboard: React.FC = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedArtifact, setSelectedArtifact] = useState<Artifact | null>(null);
   const [formOpen, setFormOpen] = useState(false);
@@ -27,10 +33,10 @@ export const Dashboard: React.FC = () => {
   // Debounce search query
   const debouncedSearch = useDebounce(searchQuery, 300);
 
-  // Queries
+  // Queries - only fetch if authenticated
   const { data, isLoading, error } = useArtifacts();
   const { data: searchResults, isLoading: isSearching } = useSearchArtifacts(
-    debouncedSearch
+    user ? debouncedSearch : ''
   );
 
   // Mutations
@@ -38,29 +44,66 @@ export const Dashboard: React.FC = () => {
   const updateMutation = useUpdateArtifact();
   const deleteMutation = useDeleteArtifact();
 
-  // Use search results if searching, otherwise use regular data
-  const artifacts = debouncedSearch ? (searchResults || []) : (data?.items || []);
-  const loading = isLoading || (debouncedSearch && isSearching);
+  // Determine which artifacts to show
+  let artifacts: (Artifact | ArtifactSearchResult)[] = [];
+  let loading = false;
+
+  if (user) {
+    // Authenticated: use real data
+    artifacts = debouncedSearch ? (searchResults || []) : (data?.items || []);
+    loading = isLoading || (debouncedSearch && isSearching);
+  } else {
+    // Non-authenticated: use demo data
+    artifacts = demoArtifacts;
+    if (debouncedSearch) {
+      // Simple client-side filtering for demo
+      artifacts = demoArtifacts.filter(a =>
+        a.title.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+        a.content.toLowerCase().includes(debouncedSearch.toLowerCase())
+      );
+    }
+  }
 
   // Handlers
   const handleCreate = () => {
+    if (!user) {
+      navigate('/login?signup=true');
+      return;
+    }
     setSelectedArtifact(null);
     setFormMode('create');
     setFormOpen(true);
   };
 
-  const handleView = (artifact: Artifact) => {
-    setSelectedArtifact(artifact);
+  const handleView = async (artifactOrResult: Artifact | ArtifactSearchResult) => {
+    // If it's a search result, we need to fetch the full artifact
+    if ('snippet' in artifactOrResult && user) {
+      // This is a search result, need to fetch full artifact
+      // For now, we'll just show what we have
+      // In a real implementation, you'd fetch the full artifact by ID
+      setSelectedArtifact(null);
+      navigate('/login');
+      return;
+    }
+    setSelectedArtifact(artifactOrResult as Artifact);
     setDetailOpen(true);
   };
 
   const handleEdit = () => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
     setFormMode('edit');
     setFormOpen(true);
     setDetailOpen(false);
   };
 
   const handleDelete = async () => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
     if (selectedArtifact) {
       await deleteMutation.mutateAsync(selectedArtifact.id);
       setDetailOpen(false);
@@ -82,6 +125,44 @@ export const Dashboard: React.FC = () => {
 
   return (
     <>
+      {/* Welcome Banner for non-authenticated users */}
+      {!user && (
+        <Paper
+          sx={{
+            p: 2,
+            mb: 3,
+            bgcolor: 'primary.main',
+            color: 'primary.contrastText',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2
+          }}
+        >
+          <Info size={20} />
+          <Box sx={{ flexGrow: 1 }}>
+            <Typography variant="body1" fontWeight={500}>
+              Welcome to Contexthub!
+            </Typography>
+            <Typography variant="body2" sx={{ opacity: 0.9 }}>
+              You're viewing demo content. Sign up to create and save your own artifacts.
+            </Typography>
+          </Box>
+          <Button
+            variant="contained"
+            onClick={() => navigate('/login?signup=true')}
+            sx={{
+              bgcolor: 'white',
+              color: 'primary.main',
+              '&:hover': {
+                bgcolor: 'grey.100'
+              }
+            }}
+          >
+            Sign Up Free
+          </Button>
+        </Paper>
+      )}
+
       {/* Action Bar */}
       <Box sx={{ mb: 3, display: 'flex', justifyContent: 'flex-end' }}>
         <Button
@@ -117,7 +198,7 @@ export const Dashboard: React.FC = () => {
       </Box>
 
       {/* Content */}
-      {error && (
+      {error && user && (
         <Alert severity="error" sx={{ mb: 3 }}>
           Failed to load artifacts. Please check your backend connection.
         </Alert>
@@ -154,7 +235,7 @@ export const Dashboard: React.FC = () => {
           {artifacts.map((artifact) => (
             <Grid size={{ xs: 12, sm: 6, md: 4 }} key={artifact.id}>
               <ArtifactCard
-                artifact={artifact}
+                artifact={artifact as Artifact}
                 onClick={() => handleView(artifact)}
               />
             </Grid>

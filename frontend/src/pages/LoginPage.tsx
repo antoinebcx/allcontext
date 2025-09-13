@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Container,
   Box,
@@ -14,13 +15,26 @@ import { ArrowRight, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 export const LoginPage: React.FC = () => {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [step, setStep] = useState<'email' | 'password'>('email');
   const [isNewUser, setIsNewUser] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login, signup } = useAuth();
+  const { login, signup, user } = useAuth();
+
+  // Check if we should show signup flow
+  const isSignupMode = searchParams.get('signup') === 'true';
+  const redirectTo = searchParams.get('redirect') || '/';
+
+  // If user is already logged in, redirect
+  useEffect(() => {
+    if (user) {
+      navigate(redirectTo);
+    }
+  }, [user, navigate, redirectTo]);
 
   const validateEmail = (email: string) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -39,19 +53,25 @@ export const LoginPage: React.FC = () => {
     setLoading(true);
 
     try {
-      // Check if email exists using our API
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/v1/auth/check-email`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email })
-        }
-      );
-      
-      const data = await response.json();
-      setIsNewUser(!data.exists);
-      setStep('password');
+      // If signup mode is explicitly set, skip email check
+      if (isSignupMode) {
+        setIsNewUser(true);
+        setStep('password');
+      } else {
+        // Check if email exists using our API
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/v1/auth/check-email`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+          }
+        );
+
+        const data = await response.json();
+        setIsNewUser(!data.exists);
+        setStep('password');
+      }
     } catch (err: any) {
       // If check fails, assume existing user to be safe
       setIsNewUser(false);
@@ -140,17 +160,17 @@ export const LoginPage: React.FC = () => {
           )}
           
           <Typography component="h1" variant="h5" sx={{ mb: 1, textAlign: 'center' }}>
-            Welcome to Contexthub
+            {isSignupMode ? 'Create Account' : 'Welcome to Contexthub'}
           </Typography>
-          
-          <Typography 
-            variant="body2" 
-            color="text.secondary" 
+
+          <Typography
+            variant="body2"
+            color="text.secondary"
             sx={{ mb: 3, textAlign: 'center' }}
           >
-            {step === 'email' 
-              ? 'Enter your email to continue'
-              : isNewUser 
+            {step === 'email'
+              ? (isSignupMode ? 'Sign up for your free account' : 'Enter your email to continue')
+              : isNewUser
                 ? 'Create your account'
                 : 'Welcome back! Enter your password'
             }

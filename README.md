@@ -2,6 +2,8 @@
 
 Personal AI context management platform.
 
+Your context, stored in the cloud, always accessible by any means (app, API, MCP).
+
 ## Structure
 
 - `/backend`: Python FastAPI server (REST API + MCP)
@@ -12,3 +14,13 @@ Personal AI context management platform.
 
 - **[API Reference](./docs/API_REFERENCE.md)** - REST API endpoints
 - **[MCP Specification](./docs/MCP_SPECIFICATION.md)** - MCP server spec
+
+## Future To-dos
+
+Add:
+- LICENSE file
+- Docker files / docker-compose and deployment documentation
+- CI/CD pipelines - GitHub Actions with automated testing
+- Contributing guidelines - CONTRIBUTING.md
+- Security policy - SECURITY.md
+- Code of Conduct - CODE_OF_CONDUCT.md

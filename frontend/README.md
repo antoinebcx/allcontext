@@ -29,6 +29,7 @@ A minimal, elegant React application for managing markdown-based AI artifacts (p
 - 🔐 **Authentication** - Email/password with automatic user detection
 - 👤 **User Management** - Profile menu with logout
 - 📊 **Progressive Rendering** - Large documents load in chunks for better performance
+- 🎯 **Demo Mode** - Explore app with demo content before signing up
 
 ## API Documentation
 
@@ -73,10 +74,12 @@ frontend/
 │   ├── utils/
 │   │   └── markdown/
 │   │       └── chunking.ts     # Content splitting utilities
+│   ├── data/
+│   │   └── demoData.ts         # Demo artifacts for non-auth users
 │   ├── pages/
-│   │   ├── Dashboard.tsx       # Main page with search
-│   │   ├── LoginPage.tsx       # Two-step auth flow
-│   │   └── Settings.tsx        # Settings with API keys
+│   │   ├── Dashboard.tsx       # Main page with search & demo mode
+│   │   ├── LoginPage.tsx       # Two-step auth flow with signup mode
+│   │   └── Settings.tsx        # Settings with API keys (auth required)
 │   ├── theme/
 │   │   └── index.ts            # MUI theme config
 │   ├── App.tsx                 # Root component
@@ -135,83 +138,6 @@ npm run preview  # Test production build
 | `npm run preview` | Preview production build |
 | `npm run lint` | Run ESLint |
 | `npm run type-check` | Run TypeScript compiler check |
-
-## Key Components
-
-### Layout
-App layout wrapper:
-- Persistent navbar across all pages
-- Content area with container
-- Toolbar spacer for fixed navbar
-
-### Navbar
-Persistent navigation bar:
-- Logo/brand (clickable to home)
-- Settings button
-- User menu with profile and logout
-
-### Dashboard
-Main page with:
-- Centered search bar with debounce
-- New Artifact button
-- Artifacts grid
-- Empty states
-
-### ArtifactCard
-Displays artifact preview in a grid layout with:
-- Title and content preview
-- Creation date
-- Hover effects
-
-### ArtifactForm
-Modal form for creating/editing artifacts:
-- Markdown editor with live preview tabs
-- Auto-title generation from content
-- Save button in header (90vh height, lg width)
-- No footer buttons
-
-### ArtifactDetail
-Full view modal showing:
-- Complete rendered markdown (progressive for >10k chars)
-- Copy to clipboard
-- Download as .md file
-- Edit and delete actions in header
-- Larger modal (90vh height, lg width)
-- No footer buttons
-
-### MarkdownRenderer
-Renders markdown with:
-- GitHub Flavored Markdown support
-- Syntax highlighting for code blocks (8px border radius)
-- Responsive typography
-- Link handling
-
-### ProgressiveMarkdownRenderer
-Optimized renderer for large content (>10k chars):
-- Loads content in 5k character chunks
-- Intersection Observer for scroll-based loading
-- Smooth fade-in animations
-- Minimal loading skeleton
-
-### LoginPage
-Two-step authentication flow:
-- Step 1: Email input with validation
-- Step 2: Automatic detection of new vs existing user
-- Smart password field labeling based on user status
-- Loading states and error handling
-
-### AuthContext
-Manages authentication state:
-- Supabase session handling
-- Auto-refresh tokens
-- Login/signup/logout methods
-- Protected route handling
-
-### Settings
-Settings page with tabs:
-- API Keys management
-- User profile
-- Security settings (future)
 
 ## API Integration
 
