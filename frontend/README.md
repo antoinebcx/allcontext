@@ -30,6 +30,7 @@ A minimal, elegant React application for managing markdown-based AI artifacts (p
 - 👤 **User Management** - Profile menu with logout
 - 📊 **Progressive Rendering** - Large documents load in chunks for better performance
 - 🎯 **Demo Mode** - Explore app with demo content before signing up
+- 🌓 **Dark Mode** - System-aware theme with manual override
 
 ## API Documentation
 
@@ -64,7 +65,8 @@ frontend/
 │   │       ├── ProgressiveMarkdownRenderer.tsx # Chunked renderer for large content (>10k chars)
 │   │       └── ChunkSkeleton.tsx           # Loading skeleton for chunks
 │   ├── contexts/
-│   │   └── AuthContext.tsx     # Auth state management  
+│   │   ├── AuthContext.tsx     # Auth state management
+│   │   └── ThemeContext.tsx    # Theme mode & localStorage
 │   ├── hooks/
 │   │   ├── useArtifacts.ts     # React Query hooks
 │   │   ├── useApiKeys.ts       # API key hooks
@@ -79,9 +81,9 @@ frontend/
 │   ├── pages/
 │   │   ├── Dashboard.tsx       # Main page with search & demo mode
 │   │   ├── LoginPage.tsx       # Two-step auth flow with signup mode
-│   │   └── Settings.tsx        # Settings with API keys (auth required)
+│   │   └── Settings.tsx        # Settings with API keys & appearance
 │   ├── theme/
-│   │   └── index.ts            # MUI theme config
+│   │   └── index.ts            # Light/dark theme definitions
 │   ├── App.tsx                 # Root component
 │   └── main.tsx               # Entry point
 ├── public/
@@ -165,20 +167,13 @@ The frontend expects a backend API at `VITE_API_URL` with these endpoints:
 
 **Note**: All protected endpoints require authentication. The Bearer token is automatically injected via Axios interceptor after login.
 
-## Styling
-
-- **Theme**: Light mode with minimal aesthetic
-- **Colors**: Black primary, gray secondary
-- **Typography**: Inter font family
-- **Borders**: 1px solid borders instead of shadows
-- **Spacing**: 8px grid system
-
 ## State Management
 
 - **Server State**: React Query for API data
+- **Auth State**: Context provider with Supabase session
+- **Theme State**: Context provider with localStorage sync
 - **Local State**: React hooks for UI state
 - **Type Safety**: Centralized types in `src/types/`
-- **No global store**: Keeps it simple
 
 ## Performance
 
@@ -205,11 +200,17 @@ The frontend expects a backend API at `VITE_API_URL` with these endpoints:
 5. Import and use in Dashboard
 
 ### Modifying Theme
-Edit `src/theme/index.ts` to change:
-- Colors
-- Typography
-- Component defaults
-- Border radius
+Edit `src/theme/index.ts`:
+```typescript
+// Modify theme for both modes
+export const createAppTheme = (mode: PaletteMode) => {
+  const isLight = mode === 'light';
+  return createTheme({
+    palette: { /* colors */ },
+    components: { /* overrides */ }
+  });
+};
+```
 
 ### Testing API Changes
 ```bash
@@ -245,10 +246,10 @@ Deploy `dist/` folder to:
 
 - [x] User authentication
 - [x] Auto-title generation from markdown
+- [x] Dark mode with system detection
 - [ ] Add keyboard shortcuts
 - [ ] Implement tags/categories
 - [ ] Add export/import functionality
-- [ ] Dark mode toggle
 - [ ] Collaborative editing
 - [ ] Version history
 - [ ] Password reset flow

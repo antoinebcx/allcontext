@@ -5,18 +5,18 @@ import {
   Box,
   Typography,
   Button,
-  Paper,
   Alert,
   CircularProgress,
   Tabs,
   Tab,
 } from '@mui/material';
-import { Plus, Key, User, Shield } from 'lucide-react';
+import { Plus, Key, User, Shield, Palette } from 'lucide-react';
 import { useApiKeys, useCreateApiKey, useDeleteApiKey } from '../hooks/useApiKeys';
 import { ApiKeysList } from '../components/ApiKeys/ApiKeysList';
 import { CreateApiKey } from '../components/ApiKeys/CreateApiKey';
 import { ApiKeyDisplay } from '../components/ApiKeys/ApiKeyDisplay';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import type { ApiKey, ApiKeyCreated } from '../types';
 
 interface TabPanelProps {
@@ -47,8 +47,9 @@ export const Settings: React.FC = () => {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [displayDialogOpen, setDisplayDialogOpen] = useState(false);
   const [createdKey, setCreatedKey] = useState<ApiKeyCreated | null>(null);
-  
+
   const { user } = useAuth();
+  const { mode, themeMode, setThemeMode } = useTheme();
   const { data, isLoading, error } = useApiKeys();
   const createMutation = useCreateApiKey();
   const deleteMutation = useDeleteApiKey();
@@ -92,20 +93,20 @@ export const Settings: React.FC = () => {
       </Box>
 
       {/* Tabs */}
-      <Paper elevation={0} sx={{ border: 1, borderColor: 'divider' }}>
-        <Tabs 
-          value={tabValue} 
-          onChange={handleTabChange}
-          sx={{ borderBottom: 1, borderColor: 'divider', px: 2 }}
-        >
-          <Tab icon={<Key size={18} />} iconPosition="start" label="API Keys" />
-          <Tab icon={<User size={18} />} iconPosition="start" label="Profile" />
-          <Tab icon={<Shield size={18} />} iconPosition="start" label="Security" />
-        </Tabs>
+      <Tabs
+        value={tabValue}
+        onChange={handleTabChange}
+        sx={{ borderBottom: 1, borderColor: 'divider' }}
+      >
+        <Tab icon={<Key size={18} />} iconPosition="start" label="API Keys" />
+        <Tab icon={<User size={18} />} iconPosition="start" label="Profile" />
+        <Tab icon={<Palette size={18} />} iconPosition="start" label="Appearance" />
+        <Tab icon={<Shield size={18} />} iconPosition="start" label="Security" />
+      </Tabs>
 
-        {/* API Keys Tab */}
-        <TabPanel value={tabValue} index={0}>
-          <Box sx={{ p: 3 }}>
+      {/* API Keys Tab */}
+      <TabPanel value={tabValue} index={0}>
+        <Box sx={{ py: 3 }}>
             {/* Section Header */}
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
               <Box>
@@ -156,24 +157,37 @@ export const Settings: React.FC = () => {
             )}
 
             {/* Usage Instructions */}
-            <Box sx={{ mt: 4, p: 2, bgcolor: 'grey.50', borderRadius: 1 }}>
+            <Box sx={{ mt: 4 }}>
               <Typography variant="subtitle2" gutterBottom>
                 How to use API keys
               </Typography>
               <Typography variant="body2" color="text.secondary" component="div">
                 Include your API key in the request header:
-                <Box component="pre" sx={{ mt: 1, p: 1, bgcolor: 'white', borderRadius: 1, fontSize: '0.875rem' }}>
+                <Box
+                  component="pre"
+                  sx={{
+                    mt: 1,
+                    p: 2,
+                    bgcolor: 'background.paper',
+                    border: 1,
+                    borderColor: 'divider',
+                    borderRadius: 1,
+                    fontSize: '0.875rem',
+                    fontFamily: 'monospace',
+                    overflow: 'auto'
+                  }}
+                >
                   {`curl -H "X-API-Key: sk_prod_your_key_here" \\
      https://api.contexthub.com/api/v1/artifacts`}
                 </Box>
               </Typography>
             </Box>
-          </Box>
-        </TabPanel>
+        </Box>
+      </TabPanel>
 
-        {/* Profile Tab */}
-        <TabPanel value={tabValue} index={1}>
-          <Box sx={{ p: 3 }}>
+      {/* Profile Tab */}
+      <TabPanel value={tabValue} index={1}>
+        <Box sx={{ py: 3 }}>
             <Typography variant="h6" gutterBottom>
               Profile Information
             </Typography>
@@ -193,21 +207,72 @@ export const Settings: React.FC = () => {
                 {user?.id}
               </Typography>
             </Box>
-          </Box>
-        </TabPanel>
+        </Box>
+      </TabPanel>
 
-        {/* Security Tab */}
-        <TabPanel value={tabValue} index={2}>
-          <Box sx={{ p: 3 }}>
+      {/* Appearance Tab */}
+      <TabPanel value={tabValue} index={2}>
+        <Box sx={{ py: 3 }}>
+            <Typography variant="h6" gutterBottom>
+              Appearance
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              Customize how Contexthub looks on your device
+            </Typography>
+
+            <Box>
+              <Typography variant="subtitle2" gutterBottom>
+                Theme
+              </Typography>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                <Button
+                  variant={themeMode === 'system' ? 'contained' : 'outlined'}
+                  onClick={() => setThemeMode('system')}
+                  sx={{ justifyContent: 'flex-start', px: 2 }}
+                >
+                  System preference
+                  {themeMode === 'system' && (
+                    <Typography variant="caption" sx={{ ml: 'auto', opacity: 0.7 }}>
+                      (Currently {mode})
+                    </Typography>
+                  )}
+                </Button>
+                <Button
+                  variant={themeMode === 'light' ? 'contained' : 'outlined'}
+                  onClick={() => setThemeMode('light')}
+                  sx={{ justifyContent: 'flex-start', px: 2 }}
+                >
+                  Light
+                </Button>
+                <Button
+                  variant={themeMode === 'dark' ? 'contained' : 'outlined'}
+                  onClick={() => setThemeMode('dark')}
+                  sx={{ justifyContent: 'flex-start', px: 2 }}
+                >
+                  Dark
+                </Button>
+              </Box>
+            </Box>
+
+            <Box sx={{ mt: 4, p: 2, bgcolor: 'background.default', borderRadius: 1 }}>
+              <Typography variant="body2" color="text.secondary">
+                Your preference is saved locally and will be remembered when you return.
+              </Typography>
+            </Box>
+        </Box>
+      </TabPanel>
+
+      {/* Security Tab */}
+      <TabPanel value={tabValue} index={3}>
+        <Box sx={{ py: 3 }}>
             <Typography variant="h6" gutterBottom>
               Security Settings
             </Typography>
             <Typography variant="body2" color="text.secondary">
               Security settings and password management coming soon.
             </Typography>
-          </Box>
-        </TabPanel>
-      </Paper>
+        </Box>
+      </TabPanel>
 
       {/* Dialogs */}
       <CreateApiKey

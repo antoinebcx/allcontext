@@ -1,4 +1,4 @@
-import React from 'react';
+import { useMemo } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider, CssBaseline, Box, CircularProgress } from '@mui/material';
@@ -6,12 +6,13 @@ import '@fontsource/inter/400.css';
 import '@fontsource/inter/500.css';
 import '@fontsource/inter/600.css';
 
-import { theme } from './theme';
+import { createAppTheme } from './theme';
 import { Layout } from './components/Layout/Layout';
 import { Dashboard } from './pages/Dashboard';
 import { Settings } from './pages/Settings';
 import { LoginPage } from './pages/LoginPage';
 import { useAuth } from './contexts/AuthContext';
+import { useTheme } from './contexts/ThemeContext';
 
 // Create a client
 const queryClient = new QueryClient({
@@ -25,6 +26,10 @@ const queryClient = new QueryClient({
 
 function App() {
   const { user, loading } = useAuth();
+  const { mode } = useTheme();
+
+  // Create theme based on current mode
+  const theme = useMemo(() => createAppTheme(mode), [mode]);
 
   if (loading) {
     return (
@@ -32,7 +37,8 @@ function App() {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        height: '100vh'
+        height: '100vh',
+        bgcolor: mode === 'dark' ? '#121212' : '#fafafa'
       }}>
         <CircularProgress />
       </Box>

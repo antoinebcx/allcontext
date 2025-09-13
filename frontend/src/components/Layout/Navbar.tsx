@@ -11,13 +11,15 @@ import {
   Box,
   Divider,
 } from '@mui/material';
-import { User, LogOut, Settings } from 'lucide-react';
+import { User, LogOut, Settings, Moon, Sun } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTheme } from '../../contexts/ThemeContext';
 
 export const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuth();
+  const { mode, toggleTheme } = useTheme();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleUserMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -38,15 +40,21 @@ export const Navbar: React.FC = () => {
     handleUserMenuClose();
   };
 
+  const handleThemeToggle = () => {
+    toggleTheme();
+    handleUserMenuClose();
+  };
+
   return (
-    <AppBar 
-      position="fixed" 
+    <AppBar
+      position="fixed"
       elevation={0}
-      sx={{ 
-        bgcolor: 'background.paper',
+      sx={{
+        bgcolor: 'transparent',
         borderBottom: 1,
         borderColor: 'divider',
-        color: 'text.primary'
+        color: 'text.primary',
+        backdropFilter: 'blur(8px)'
       }}
     >
       <Toolbar sx={{ gap: 2 }}>
@@ -112,10 +120,19 @@ export const Navbar: React.FC = () => {
                 </Typography>
               </MenuItem>
               <Divider />
+              <MenuItem onClick={handleThemeToggle}>
+                {mode === 'light' ? (
+                  <Moon size={16} style={{ marginRight: 8 }} />
+                ) : (
+                  <Sun size={16} style={{ marginRight: 8 }} />
+                )}
+                {mode === 'light' ? 'Dark Mode' : 'Light Mode'}
+              </MenuItem>
               <MenuItem onClick={handleSettingsClick}>
                 <Settings size={16} style={{ marginRight: 8 }} />
                 Settings
               </MenuItem>
+              <Divider />
               <MenuItem onClick={handleLogout}>
                 <LogOut size={16} style={{ marginRight: 8 }} />
                 Logout
@@ -125,6 +142,13 @@ export const Navbar: React.FC = () => {
         ) : (
           <>
             {/* Non-authenticated user UI */}
+            <IconButton
+              onClick={toggleTheme}
+              size="small"
+              title={mode === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+            >
+              {mode === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+            </IconButton>
             <Button
               onClick={() => navigate('/login')}
               sx={{

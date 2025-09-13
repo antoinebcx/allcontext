@@ -18,12 +18,14 @@ import { ArtifactCard } from '../components/Artifacts/ArtifactCard';
 import { ArtifactForm } from '../components/Artifacts/ArtifactForm';
 import { ArtifactDetail } from '../components/Artifacts/ArtifactDetail';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { demoArtifacts, demoCreateMessage } from '../data/demoData';
 import type { Artifact, ArtifactCreate, ArtifactUpdate, ArtifactSearchResult } from '../types';
 
 export const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { mode } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedArtifact, setSelectedArtifact] = useState<Artifact | null>(null);
   const [formOpen, setFormOpen] = useState(false);
@@ -151,10 +153,10 @@ export const Dashboard: React.FC = () => {
             variant="contained"
             onClick={() => navigate('/login?signup=true')}
             sx={{
-              bgcolor: 'white',
-              color: 'primary.main',
+              bgcolor: 'background.paper',
+              color: 'text.primary',
               '&:hover': {
-                bgcolor: 'grey.100'
+                bgcolor: mode === 'light' ? 'grey.100' : 'grey.900'
               }
             }}
           >
