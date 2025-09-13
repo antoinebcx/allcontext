@@ -30,7 +30,8 @@ backend/
 │   │   └── auth.py                  # JWT & API key auth dependency
 │   ├── models/
 │   │   ├── __init__.py              # Model exports
-│   │   ├── core.py                  # Artifact models
+│   │   ├── artifacts.py             # Artifact models
+│   │   ├── search.py                # Search result models
 │   │   ├── api_key.py               # API key models
 │   │   └── auth.py                  # Auth models
 │   ├── services/
@@ -40,7 +41,8 @@ backend/
 │   │   └── api_keys.py              # API key service with bcrypt and lookup optimization
 │   ├── utils/
 │   │   ├── __init__.py
-│   │   └── markdown.py              # Title extraction utility
+│   │   ├── markdown.py              # Title extraction utility
+│   │   └── text.py                  # Text processing utilities (snippets)
 │   └── mcp/
 │       ├── __init__.py
 │       └── server.py                # MCP server with stateless HTTP transport
@@ -54,6 +56,7 @@ backend/
 │   └── unit_tests/
 │       ├── __init__.py
 │       ├── test_utils_markdown.py  # Markdown title extraction tests
+│       ├── test_utils_text.py      # Text processing tests (snippets)
 │       ├── test_models_validation.py # Pydantic model validation tests
 │       ├── test_services_artifacts.py # Artifact service logic tests
 │       └── test_api_key_hashing.py # API key security tests
@@ -219,7 +222,7 @@ API keys created through the UI work for both REST API and MCP access. Configure
 | GET | `/api/v1/artifacts/{id}` | Get artifact |
 | PUT | `/api/v1/artifacts/{id}` | Update artifact |
 | DELETE | `/api/v1/artifacts/{id}` | Delete artifact |
-| GET | `/api/v1/artifacts/search?q=` | Full-text search |
+| GET | `/api/v1/artifacts/search?q=` | Search (returns 200-char snippets) |
 
 ### API Key Management (Require JWT Authentication)
 | Method | Endpoint | Description |

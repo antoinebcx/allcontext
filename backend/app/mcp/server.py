@@ -10,8 +10,9 @@ from mcp.server.fastmcp import FastMCP, Context
 from mcp.server.auth.provider import TokenVerifier, AccessToken
 from mcp.server.auth.settings import AuthSettings
 
-from app.models.core import ArtifactCreate, ArtifactUpdate
+from app.models.artifacts import ArtifactCreate, ArtifactUpdate
 from app.config import config
+from app.utils import generate_snippet
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -200,7 +201,7 @@ async def list_artifacts(
             {
                 "id": str(a.id),
                 "title": a.title,
-                "content_preview": a.content[:200] + "..." if len(a.content) > 200 else a.content,
+                "content_preview": generate_snippet(a.content),
                 "metadata": a.metadata,
                 "is_public": a.is_public,
                 "created_at": a.created_at.isoformat(),
@@ -255,7 +256,7 @@ async def search_artifacts(
             {
                 "id": str(a.id),
                 "title": a.title,
-                "content_preview": a.content[:200] + "..." if len(a.content) > 200 else a.content,
+                "content_preview": generate_snippet(a.content),
                 "metadata": a.metadata,
                 "relevance_context": f"Matched query: '{query}'",
                 "created_at": a.created_at.isoformat()

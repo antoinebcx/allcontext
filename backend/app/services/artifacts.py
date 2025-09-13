@@ -3,8 +3,9 @@
 from typing import List, Optional, Dict
 from uuid import UUID, uuid4
 from datetime import datetime, timezone
-from app.models.core import Artifact, ArtifactCreate, ArtifactUpdate
-from app.utils import extract_title_from_content
+from app.models.artifacts import Artifact, ArtifactCreate, ArtifactUpdate
+from app.models.search import ArtifactSearchResult
+from app.utils import extract_title_from_content, generate_snippet
 
 
 class ArtifactService:
@@ -145,21 +146,33 @@ class ArtifactService:
         self,
         user_id: UUID,
         query: str
-    ) -> List[Artifact]:
+    ) -> List[ArtifactSearchResult]:
         """
         Simple text search in title and content.
-        Returns only user's artifacts and public ones.
+        Returns search results with snippets instead of full content.
         """
         query_lower = query.lower()
         artifacts = await self.list(user_id)
-        
+
         # Simple text search
-        results = [
+        matching_artifacts = [
             a for a in artifacts
             if query_lower in a.title.lower() or query_lower in a.content.lower()
         ]
-        
-        return results
+
+        # Transform to search results with snippets
+        return [
+            ArtifactSearchResult(
+                id=a.id,
+                title=a.title,
+                snippet=generate_snippet(a.content),
+                metadata=a.metadata,
+                is_public=a.is_public,
+                created_at=a.created_at,
+                updated_at=a.updated_at
+            )
+            for a in matching_artifacts
+        ]
     
     async def count(self, user_id: Optional[UUID] = None) -> int:
         """Count artifacts with optional filtering."""

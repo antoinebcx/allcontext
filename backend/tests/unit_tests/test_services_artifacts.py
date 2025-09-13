@@ -4,7 +4,7 @@ import pytest
 from uuid import UUID, uuid4
 from datetime import datetime, timezone
 
-from app.models.core import ArtifactCreate, ArtifactUpdate
+from app.models.artifacts import ArtifactCreate, ArtifactUpdate
 from app.services.artifacts import ArtifactService
 
 
@@ -248,25 +248,41 @@ class TestArtifactService:
     @pytest.mark.asyncio
     async def test_search_artifacts(self, artifact_service, user_id):
         """Should search artifacts by text in title and content."""
-        # Create test artifacts
+        # Create test artifacts with different content lengths
         await artifact_service.create(user_id, ArtifactCreate(
             title="Python Guide", content="Learn Python programming"
         ))
         await artifact_service.create(user_id, ArtifactCreate(
             title="JavaScript Tips", content="Modern JS best practices"
         ))
+        long_content = "Container with Python examples. " * 20  # Over 200 chars
         await artifact_service.create(user_id, ArtifactCreate(
-            title="Docker Tutorial", content="Container with Python examples"
+            title="Docker Tutorial", content=long_content
         ))
-        
+
         # Search for "Python"
         results = await artifact_service.search(user_id, "Python")
-        titles = [a.title for a in results]
-        
+        titles = [r.title for r in results]
+
         assert "Python Guide" in titles
         assert "Docker Tutorial" in titles  # Has Python in content
         assert "JavaScript Tips" not in titles
         assert len(results) == 2
+
+        # Verify search returns snippets, not full content
+        for result in results:
+            # Check that result has snippet field (not content)
+            assert hasattr(result, 'snippet')
+            assert not hasattr(result, 'content')
+
+            # Verify snippet length constraint
+            if result.title == "Docker Tutorial":
+                # This one has long content, should be truncated
+                assert len(result.snippet) == 203  # 200 + "..."
+                assert result.snippet.endswith("...")
+            elif result.title == "Python Guide":
+                # Short content, no truncation
+                assert result.snippet == "Learn Python programming"
     
     @pytest.mark.asyncio
     async def test_search_case_insensitive(self, artifact_service, user_id):

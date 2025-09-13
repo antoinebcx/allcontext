@@ -3,7 +3,8 @@
 from fastapi import APIRouter, HTTPException, Query, Path, Depends
 from typing import List
 from uuid import UUID
-from app.models.core import Artifact, ArtifactCreate, ArtifactUpdate, ArtifactList
+from app.models.artifacts import Artifact, ArtifactCreate, ArtifactUpdate, ArtifactList
+from app.models.search import ArtifactSearchResult
 from app.config import config
 from app.dependencies.auth import get_current_user
 
@@ -64,27 +65,28 @@ async def list_artifacts(
     )
 
 
-@router.get("/search", response_model=List[Artifact])
+@router.get("/search", response_model=List[ArtifactSearchResult])
 async def search_artifacts(
     q: str = Query(..., min_length=1, description="Search query"),
     user_id: UUID = Depends(get_current_user)
 ):
     """
     Search artifacts by text in title and content.
-    
-    Uses full-text search when available.
+
+    Returns preview snippets instead of full content (best practice).
+    Use GET /artifacts/{id} to retrieve full content.
     """
     if len(q) < 2:
         raise HTTPException(
             status_code=400,
             detail="Search query must be at least 2 characters"
         )
-    
+
     results = await artifact_service.search(
         user_id=user_id,
         query=q
     )
-    
+
     return results
 
 

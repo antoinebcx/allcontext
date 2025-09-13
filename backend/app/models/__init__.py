@@ -1,6 +1,6 @@
 """Context Platform models."""
 
-from .core import (
+from .artifacts import (
     ArtifactBase,
     ArtifactCreate,
     ArtifactUpdate,
@@ -18,6 +18,7 @@ from .api_key import (
     ApiKeyValidation
 )
 from .auth import AuthRequest, EmailCheckRequest
+from .search import ArtifactSearchResult
 
 __all__ = [
     # Artifacts
@@ -26,6 +27,8 @@ __all__ = [
     "ArtifactUpdate",
     "Artifact",
     "ArtifactList",
+    # Search
+    "ArtifactSearchResult",
     # API Keys
     "ApiKeyScope",
     "ApiKeyBase",

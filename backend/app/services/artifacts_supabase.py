@@ -5,8 +5,9 @@ from typing import List, Optional
 from uuid import UUID
 from supabase import create_client, Client
 from dotenv import load_dotenv
-from app.models.core import Artifact, ArtifactCreate, ArtifactUpdate
-from app.utils import extract_title_from_content
+from app.models.artifacts import Artifact, ArtifactCreate, ArtifactUpdate
+from app.models.search import ArtifactSearchResult
+from app.utils import extract_title_from_content, generate_snippet
 
 # Load environment variables
 load_dotenv()
@@ -141,26 +142,41 @@ class ArtifactServiceSupabase:
         self,
         user_id: UUID,
         query: str,
-    ) -> List[Artifact]:
+    ) -> List[ArtifactSearchResult]:
         """
         Search artifacts using ILIKE for partial text matching.
+        Returns search results with snippets instead of full content.
         """
         # Build the search query
         search_query = self.client.table("artifacts").select("*")
-        
+
         # Filter by user or public
         search_query = search_query.or_(f"user_id.eq.{str(user_id)},is_public.eq.true")
-        
+
         # Use ILIKE for partial matching
         search_pattern = f"%{query}%"
         search_query = search_query.or_(
             f"title.ilike.{search_pattern},content.ilike.{search_pattern}"
         )
-        
+
         # Order by relevance (default for text search)
         response = search_query.execute()
-        
-        return [Artifact(**item) for item in response.data] if response.data else []
+
+        # Transform to search results with snippets
+        results = []
+        for item in response.data if response.data else []:
+            artifact = Artifact(**item)
+            results.append(ArtifactSearchResult(
+                id=artifact.id,
+                title=artifact.title,
+                snippet=generate_snippet(artifact.content),
+                metadata=artifact.metadata,
+                is_public=artifact.is_public,
+                created_at=artifact.created_at,
+                updated_at=artifact.updated_at
+            ))
+
+        return results
         
     async def count(self, user_id: Optional[UUID] = None) -> int:
         """Count artifacts in Supabase."""

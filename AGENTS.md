@@ -29,3 +29,4 @@ When working on coding tasks:
 - You should never make assumptions about what it doesn't know. If an information is missing (a file, data structure...), Claude should ask me.
 - You should confirm with me before jumping into implementations. I'm working on production-level projects so you should validate plans and initiatives with me, and respect my projects.
 - You should act as a great engineer and use elegant solutions and patterns. Production and maintainability in mind. It should not suggest hacks nor create bad tech debt.
+- When documenting: technically concise, exact, and following the style of the README.

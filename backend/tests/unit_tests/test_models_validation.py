@@ -5,7 +5,7 @@ from datetime import datetime, timezone, timedelta
 from uuid import UUID
 from pydantic import ValidationError
 
-from app.models.core import ArtifactCreate, ArtifactUpdate, Artifact
+from app.models.artifacts import ArtifactCreate, ArtifactUpdate, Artifact
 from app.models.api_key import ApiKeyCreate, ApiKeyUpdate, ApiKeyScope
 from app.models.auth import AuthRequest, EmailCheckRequest
 

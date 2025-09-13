@@ -1,7 +1,6 @@
 """Markdown utility functions."""
 
 import re
-from typing import Optional
 
 
 def extract_title_from_content(content: str, max_length: int = 200) -> str:

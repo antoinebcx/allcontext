@@ -395,12 +395,11 @@ Search artifacts by text in title and content.
   {
     "id": "123e4567-e89b-12d3-a456-426614174000",
     "title": "API Guidelines",
-    "content": "# API Guidelines\n\nBest practices for our API design...",
+    "snippet": "# API Guidelines\n\nBest practices for our API design:\n\n1. Use RESTful conventions\n2. Include proper status codes\n3. Provide clear error messages...",
     "metadata": {"category": "engineering"},
     "is_public": false,
     "created_at": "2024-01-01T00:00:00Z",
-    "updated_at": "2024-01-01T00:00:00Z",
-    "version": 1
+    "updated_at": "2024-01-01T00:00:00Z"
   }
 ]
 ```
@@ -409,7 +408,8 @@ Search artifacts by text in title and content.
 - Searches both title and content
 - Case-insensitive partial matching
 - Returns user's artifacts + public artifacts
-- Results ordered by relevance
+- Returns preview snippets (200 chars)
+- Use `GET /artifacts/{id}` to retrieve full content
 
 **Example**:
 ```bash
