@@ -28,6 +28,7 @@ A minimal, elegant React application for managing markdown-based AI artifacts (p
 - ⚡ **Fast** - Optimistic updates with React Query
 - 🔐 **Authentication** - Email/password with automatic user detection
 - 👤 **User Management** - Profile menu with logout
+- 📊 **Progressive Rendering** - Large documents load in chunks for better performance
 
 ## API Documentation
 
@@ -58,13 +59,20 @@ frontend/
 │   │   │   ├── Layout.tsx          # App layout wrapper
 │   │   │   └── Navbar.tsx          # Persistent navigation
 │   │   └── Markdown/
-│   │       └── MarkdownRenderer.tsx # Markdown preview
+│   │       ├── MarkdownRenderer.tsx         # Standard markdown renderer
+│   │       ├── ProgressiveMarkdownRenderer.tsx # Chunked renderer for large content (>10k chars)
+│   │       └── ChunkSkeleton.tsx           # Loading skeleton for chunks
 │   ├── contexts/
 │   │   └── AuthContext.tsx     # Auth state management  
 │   ├── hooks/
 │   │   ├── useArtifacts.ts     # React Query hooks
 │   │   ├── useApiKeys.ts       # API key hooks
-│   │   └── useDebounce.ts      # Debounce utility
+│   │   ├── useDebounce.ts      # Debounce utility
+│   │   ├── useIntersectionObserver.ts # Viewport detection for lazy loading
+│   │   └── useProgressiveContent.ts   # Chunk loading management
+│   ├── utils/
+│   │   └── markdown/
+│   │       └── chunking.ts     # Content splitting utilities
 │   ├── pages/
 │   │   ├── Dashboard.tsx       # Main page with search
 │   │   ├── LoginPage.tsx       # Two-step auth flow
@@ -159,21 +167,31 @@ Displays artifact preview in a grid layout with:
 Modal form for creating/editing artifacts:
 - Markdown editor with live preview tabs
 - Auto-title generation from content
-- Save/cancel actions
+- Save button in header (90vh height, lg width)
+- No footer buttons
 
 ### ArtifactDetail
 Full view modal showing:
-- Complete rendered markdown
+- Complete rendered markdown (progressive for >10k chars)
 - Copy to clipboard
 - Download as .md file
-- Edit and delete actions
+- Edit and delete actions in header
+- Larger modal (90vh height, lg width)
+- No footer buttons
 
 ### MarkdownRenderer
 Renders markdown with:
 - GitHub Flavored Markdown support
-- Syntax highlighting for code blocks
+- Syntax highlighting for code blocks (8px border radius)
 - Responsive typography
 - Link handling
+
+### ProgressiveMarkdownRenderer
+Optimized renderer for large content (>10k chars):
+- Loads content in 5k character chunks
+- Intersection Observer for scroll-based loading
+- Smooth fade-in animations
+- Minimal loading skeleton
 
 ### LoginPage
 Two-step authentication flow:
@@ -242,6 +260,7 @@ The frontend expects a backend API at `VITE_API_URL` with these endpoints:
 - **Optimistic Updates**: Immediate UI feedback
 - **Query Caching**: 5-minute stale time
 - **Lazy Loading**: Code splitting for modals
+- **Progressive Loading**: Content >10k chars loads in 5k chunks on scroll
 
 ## Browser Support
 
@@ -294,18 +313,7 @@ Set these in your deployment platform:
 
 ### Static Hosting
 Deploy `dist/` folder to:
-- Vercel
 - Netlify  
-- Cloudflare Pages
-- GitHub Pages
-- AWS S3 + CloudFront
-
-## Recent Updates
-
-- Auto-title generation from markdown content (no title field in forms)
-- Types centralized in `src/types/` directory
-- MUI Dialog components updated (`slotProps.paper` replaces deprecated `PaperProps`)
-- Environment configuration must be in `/frontend/.env` (no root .env)
 
 ## Next Steps
 

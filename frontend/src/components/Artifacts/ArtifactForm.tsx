@@ -3,8 +3,6 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions,
-  Button,
   TextField,
   Box,
   Stack,
@@ -13,10 +11,12 @@ import {
   Divider,
   Tab,
   Tabs,
+  Button,
 } from '@mui/material';
 import { X, Eye, Edit } from 'lucide-react';
 import type { Artifact, ArtifactCreate, ArtifactUpdate } from '../../types';
 import { MarkdownRenderer } from '../Markdown/MarkdownRenderer';
+import { ProgressiveMarkdownRenderer } from '../Markdown/ProgressiveMarkdownRenderer';
 
 interface ArtifactFormProps {
   open: boolean;
@@ -94,13 +94,13 @@ export const ArtifactForm: React.FC<ArtifactFormProps> = ({
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth="md"
+      maxWidth="lg"
       fullWidth
       slotProps={{
         paper: {
           sx: {
             borderRadius: 2,
-            height: '85vh',
+            height: '90vh',
           },
         },
       }}
@@ -110,9 +110,19 @@ export const ArtifactForm: React.FC<ArtifactFormProps> = ({
           <Typography variant="h6" sx={{ fontWeight: 600 }}>
             {mode === 'create' ? 'New Artifact' : 'Edit Artifact'}
           </Typography>
-          <IconButton onClick={onClose} size="small">
-            <X size={20} />
-          </IconButton>
+          <Stack direction="row" spacing={1}>
+            <Button
+              onClick={handleSubmit}
+              variant="contained"
+              size="small"
+              disabled={loading || !formData.content.trim()}
+            >
+              {loading ? 'Saving...' : mode === 'create' ? 'Create' : 'Save'}
+            </Button>
+            <IconButton onClick={onClose} size="small">
+              <X size={20} />
+            </IconButton>
+          </Stack>
         </Stack>
       </DialogTitle>
 
@@ -151,7 +161,7 @@ export const ArtifactForm: React.FC<ArtifactFormProps> = ({
                   '& .MuiInputBase-root': {
                     fontFamily: '"Fira Code", monospace',
                     fontSize: '0.875rem',
-                    height: 'calc(85vh - 250px)',
+                    height: 'calc(90vh - 180px)',
                     alignItems: 'flex-start',
                   },
                   '& .MuiInputBase-input': {
@@ -164,12 +174,20 @@ export const ArtifactForm: React.FC<ArtifactFormProps> = ({
               <Box
                 sx={{
                   p: 3,
-                  height: 'calc(85vh - 250px)',
+                  height: 'calc(90vh - 180px)',
                   overflowY: 'auto',
                 }}
               >
                 {formData.content ? (
-                  <MarkdownRenderer content={formData.content} />
+                  formData.content.length > 10000 ? (
+                    <ProgressiveMarkdownRenderer
+                      content={formData.content}
+                      chunkSize={5000}
+                      initialChunks={2}
+                    />
+                  ) : (
+                    <MarkdownRenderer content={formData.content} />
+                  )
                 ) : (
                   <Typography color="text.secondary" sx={{ fontStyle: 'italic' }}>
                     Nothing to preview
@@ -180,19 +198,6 @@ export const ArtifactForm: React.FC<ArtifactFormProps> = ({
           </Box>
         </Stack>
       </DialogContent>
-
-      <DialogActions sx={{ p: 2, pt: 0 }}>
-        <Button onClick={onClose} variant="outlined">
-          Cancel
-        </Button>
-        <Button
-          onClick={handleSubmit}
-          variant="contained"
-          disabled={loading || !formData.content.trim()}
-        >
-          {loading ? 'Saving...' : mode === 'create' ? 'Create' : 'Save'}
-        </Button>
-      </DialogActions>
     </Dialog>
   );
 };

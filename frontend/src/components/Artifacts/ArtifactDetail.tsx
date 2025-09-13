@@ -13,16 +13,16 @@ import {
   Snackbar,
   Alert,
 } from '@mui/material';
-import { 
-  X, 
-  Copy, 
-  Edit, 
-  Trash2, 
-  Calendar,
+import {
+  X,
+  Copy,
+  Edit,
+  Trash2,
   Download
 } from 'lucide-react';
 import type { Artifact } from '../../types';
 import { MarkdownRenderer } from '../Markdown/MarkdownRenderer';
+import { ProgressiveMarkdownRenderer } from '../Markdown/ProgressiveMarkdownRenderer';
 
 interface ArtifactDetailProps {
   open: boolean;
@@ -90,13 +90,13 @@ export const ArtifactDetail: React.FC<ArtifactDetailProps> = ({
       <Dialog
         open={open}
         onClose={onClose}
-        maxWidth="md"
+        maxWidth="lg"
         fullWidth
         slotProps={{
           paper: {
             sx: {
               borderRadius: 2,
-              height: '85vh',
+              height: '90vh',
             },
           },
         }}
@@ -124,12 +124,9 @@ export const ArtifactDetail: React.FC<ArtifactDetailProps> = ({
             }}
           >
             <Stack direction="row" spacing={2} alignItems="center">
-              <Stack direction="row" spacing={0.5} alignItems="center" color="text.secondary">
-                <Calendar size={14} />
-                <Typography variant="caption">
-                  Created {formatDate(artifact.created_at)}
-                </Typography>
-              </Stack>
+              <Typography variant="caption" color="text.secondary">
+              Created {formatDate(artifact.created_at)}
+            </Typography>
               {artifact.updated_at !== artifact.created_at && (
                 <Typography variant="caption" color="text.secondary">
                   • Updated {formatDate(artifact.updated_at)}
@@ -169,26 +166,22 @@ export const ArtifactDetail: React.FC<ArtifactDetailProps> = ({
           <Box
             sx={{
               p: 3,
-              height: 'calc(85vh - 200px)',
+              height: 'calc(90vh - 120px)',
               overflowY: 'auto',
             }}
           >
-            <MarkdownRenderer content={artifact.content} />
+            {/* Use progressive rendering for content over 10k chars */}
+            {artifact.content.length > 10000 ? (
+              <ProgressiveMarkdownRenderer
+                content={artifact.content}
+                chunkSize={5000}
+                initialChunks={2}
+              />
+            ) : (
+              <MarkdownRenderer content={artifact.content} />
+            )}
           </Box>
         </DialogContent>
-
-        <DialogActions sx={{ p: 2, pt: 0 }}>
-          <Button onClick={onClose} variant="outlined">
-            Close
-          </Button>
-          <Button
-            onClick={onEdit}
-            variant="contained"
-            startIcon={<Edit size={16} />}
-          >
-            Edit
-          </Button>
-        </DialogActions>
       </Dialog>
 
       {/* Delete Confirmation Dialog */}

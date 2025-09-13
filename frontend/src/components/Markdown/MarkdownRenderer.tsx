@@ -23,13 +23,13 @@ const MarkdownRendererComponent: React.FC<MarkdownRendererProps> = ({ content, p
         '& code': {
           backgroundColor: '#f5f5f5',
           padding: '2px 6px',
-          borderRadius: 4,
+          borderRadius: '8px',
           fontSize: '0.875em',
           fontFamily: '"Fira Code", "Courier New", monospace',
         },
         '& pre': {
           overflow: 'auto',
-          borderRadius: 8,
+          borderRadius: '8px',
           my: 2,
         },
         '& blockquote': {
@@ -61,7 +61,7 @@ const MarkdownRendererComponent: React.FC<MarkdownRendererProps> = ({ content, p
                 style={oneDark as any}
                 customStyle={{
                   margin: 0,
-                  borderRadius: 8,
+                  borderRadius: '8px',
                   fontSize: '0.875rem',
                 }}
               >
