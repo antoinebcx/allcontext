@@ -31,7 +31,6 @@ backend/
 │   ├── models/
 │   │   ├── __init__.py              # Model exports
 │   │   ├── artifacts.py             # Artifact models
-│   │   ├── search.py                # Search result models
 │   │   ├── api_key.py               # API key models
 │   │   └── auth.py                  # Auth models
 │   ├── services/

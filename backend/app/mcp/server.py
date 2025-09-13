@@ -253,7 +253,7 @@ async def search_artifacts(
             {
                 "id": str(a.id),
                 "title": a.title,
-                "content_preview": generate_snippet(a.content),
+                "content_preview": a.snippet,
                 "metadata": a.metadata,
                 "relevance_context": f"Matched query: '{query}'",
                 "created_at": a.created_at.isoformat()

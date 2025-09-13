@@ -5,8 +5,7 @@ from typing import List, Optional
 from uuid import UUID
 from supabase import create_client, Client
 from dotenv import load_dotenv
-from app.models.artifacts import Artifact, ArtifactCreate, ArtifactUpdate
-from app.models.search import ArtifactSearchResult
+from app.models.artifacts import Artifact, ArtifactCreate, ArtifactUpdate, ArtifactSearchResult
 from app.utils import extract_title_from_content, generate_snippet
 
 # Load environment variables

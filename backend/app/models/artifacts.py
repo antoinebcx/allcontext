@@ -66,3 +66,14 @@ class ArtifactList(BaseModel):
     total: int
     page: int = 1
     page_size: int = 50
+
+
+class ArtifactSearchResult(BaseModel):
+    """Search result with preview - following best practices."""
+    id: UUID
+    title: str
+    snippet: str = Field(..., description="First 200 chars of content")
+    metadata: Dict[str, Any] = Field(default_factory=dict)
+    is_public: bool
+    created_at: datetime
+    updated_at: datetime

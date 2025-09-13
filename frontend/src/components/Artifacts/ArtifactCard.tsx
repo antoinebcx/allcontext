@@ -1,15 +1,16 @@
 import React from 'react';
 import { Card, CardContent, Typography, Box } from '@mui/material';
-import type { Artifact } from '../../types';
+import type { Artifact, ArtifactSearchResult } from '../../types';
 import { MarkdownRenderer } from '../Markdown/MarkdownRenderer';
 
 interface ArtifactCardProps {
-  artifact: Artifact;
+  artifact: Artifact | ArtifactSearchResult;
   onClick?: () => void;
 }
 
 export const ArtifactCard: React.FC<ArtifactCardProps> = ({ artifact, onClick }) => {
-  const { title, content, created_at } = artifact;
+  const { title, created_at } = artifact;
+  const content = 'content' in artifact ? artifact.content : artifact.snippet;
   
   // Format date
   const formatDate = (dateString: string) => {

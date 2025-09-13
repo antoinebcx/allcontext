@@ -5,7 +5,8 @@ from .artifacts import (
     ArtifactCreate,
     ArtifactUpdate,
     Artifact,
-    ArtifactList
+    ArtifactList,
+    ArtifactSearchResult
 )
 from .api_key import (
     ApiKeyScope,
@@ -18,7 +19,6 @@ from .api_key import (
     ApiKeyValidation
 )
 from .auth import AuthRequest, EmailCheckRequest
-from .search import ArtifactSearchResult
 
 __all__ = [
     # Artifacts
@@ -27,7 +27,6 @@ __all__ = [
     "ArtifactUpdate",
     "Artifact",
     "ArtifactList",
-    # Search
     "ArtifactSearchResult",
     # API Keys
     "ApiKeyScope",

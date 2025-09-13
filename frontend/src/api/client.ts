@@ -1,10 +1,11 @@
 import axios from 'axios';
 import { supabase } from '../contexts/AuthContext';
-import type { 
-  Artifact, 
-  ArtifactCreate, 
-  ArtifactUpdate, 
+import type {
+  Artifact,
+  ArtifactCreate,
+  ArtifactUpdate,
   ArtifactList,
+  ArtifactSearchResult,
   ApiKey,
   ApiKeyCreate,
   ApiKeyCreated,
@@ -78,7 +79,7 @@ export const artifactApi = {
 
   search: async (query: string) => {
     const params = { q: query };
-    const response = await apiClient.get<Artifact[]>('/api/v1/artifacts/search', { params });
+    const response = await apiClient.get<ArtifactSearchResult[]>('/api/v1/artifacts/search', { params });
     return response.data;
   },
 };

@@ -3,8 +3,7 @@
 from fastapi import APIRouter, HTTPException, Query, Path, Depends
 from typing import List
 from uuid import UUID
-from app.models.artifacts import Artifact, ArtifactCreate, ArtifactUpdate, ArtifactList
-from app.models.search import ArtifactSearchResult
+from app.models.artifacts import Artifact, ArtifactCreate, ArtifactUpdate, ArtifactList, ArtifactSearchResult
 from app.dependencies.auth import get_current_user
 from app.services.artifacts import artifact_service
 

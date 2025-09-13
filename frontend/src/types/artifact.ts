@@ -30,3 +30,13 @@ export interface ArtifactList {
   page: number;
   page_size: number;
 }
+
+export interface ArtifactSearchResult {
+  id: string;
+  title: string;
+  snippet: string;  // First 200 chars of content
+  metadata: Record<string, any>;
+  is_public: boolean;
+  created_at: string;
+  updated_at: string;
+}
