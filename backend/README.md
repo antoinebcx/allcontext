@@ -11,6 +11,7 @@ AI context management platform with dual REST API and MCP (Model Context Protoco
 - **Supabase** - PostgreSQL database & authentication
 - **Uvicorn** - ASGI server
 - **bcrypt** - API key hashing
+- **contextvars** - Thread-safe request context management
 
 ## Directory Structure
 
@@ -18,7 +19,7 @@ AI context management platform with dual REST API and MCP (Model Context Protoco
 backend/
 ├── app/
 │   ├── __init__.py
-│   ├── main.py                      # FastAPI app entry point
+│   ├── main.py                      # FastAPI app entry point with MCP mounting
 │   ├── config.py                    # Configuration management
 │   ├── api/
 │   │   ├── __init__.py
@@ -36,40 +37,71 @@ backend/
 │   │   ├── __init__.py
 │   │   ├── artifacts.py             # In-memory service (dev)
 │   │   ├── artifacts_supabase.py    # Supabase service (prod)
-│   │   └── api_keys.py              # API key service with bcrypt
+│   │   └── api_keys.py              # API key service with bcrypt and lookup optimization
 │   ├── utils/
 │   │   ├── __init__.py
 │   │   └── markdown.py              # Title extraction utility
 │   └── mcp/
 │       ├── __init__.py
-│       └── server.py                # MCP server tools
+│       └── server.py                # MCP server with stateless HTTP transport
 ├── schema/
-│   └── schema.sql                   # Consolidated database schema
+│   └── schema.sql                   # Consolidated database schema with lookup_hash
 ├── requirements.txt                  # Python dependencies
 ├── .env.example                     # Environment template
 ├── .env                            # Local environment (git ignored)
 ├── .gitignore                      # Git ignore rules
+├── test_openai_mcp.py              # OpenAI MCP testing script
+├── test_anthropic_mcp.py           # Anthropic MCP testing script
 └── README.md                       # This file
 ```
 
+## Architecture
+
+### Dual Access Pattern
+- **REST API** at `/api/v1/*` for traditional HTTP clients
+- **MCP Server** at `/mcp` for AI assistants (Claude, OpenAI, etc.)
+- Both use the same backend services and authentication system
+
+### Authentication Strategy
+1. **JWT tokens** (Bearer) for web UI sessions via Supabase Auth
+2. **API keys** (`sk_prod_*`) for programmatic access
+   - Performance optimized with `lookup_hash` (SHA256 of first 16 chars)
+   - Avoids iterating all keys with bcrypt
+
+### MCP Implementation
+The MCP server uses a stateless HTTP configuration optimized for cloud deployment:
+
+```python
+FastMCP(
+    stateless_http=True,  # No session persistence between requests
+    json_response=True,   # Pure JSON responses (no SSE)
+    streamable_http_path="/"  # Prevents double-path issues
+)
+```
+
+**Authentication Context Management**: Due to limitations in the MCP SDK's stateless mode, we use Python's `contextvars` to maintain thread-safe, request-scoped authentication context. This ensures proper user isolation in concurrent requests while working within the framework's constraints.
+
+### Service Layer Pattern
+- Abstract service layer switchable between in-memory and Supabase
+- Shared Pydantic models ensure consistency
+- Business logic isolated from transport layers
+
 ## Data Model
 
-The platform stores artifacts - any markdown-based content for AI context
+### Artifacts
+Core content units with:
+- **Auto-title generation** from markdown (H1 > H2 > first line > truncated)
+- **100k char limit** for content
+- **Flexible JSON metadata**
+- **Full-text search** capability via PostgreSQL
+- **Version tracking** with auto-incrementing version numbers
 
-Each artifact includes:
-- Title (auto-generated from content, max 200 chars)
-- Content (max 100k chars) 
-- Metadata (flexible JSON)
-- Public/private flag
-- Version tracking
-
-### Auto-Title Generation
-
-Titles are automatically extracted from markdown content:
-1. First `# heading` if present
-2. First `## heading` if no H1
-3. First non-empty line
-4. Truncated content (fallback)
+### API Keys
+- **bcrypt hashed** with lookup_hash optimization
+- **Scoped permissions** (read, write, delete)
+- **Max 10 keys** per user
+- **Optional expiration** with automatic cleanup
+- **Usage tracking** via last_used_at timestamp
 
 ## Quick Start
 
@@ -99,13 +131,14 @@ SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_KEY=your-service-role-key  # Use service_role key for backend
 SUPABASE_ANON_KEY=your-anon-key     # For auth endpoints
 USE_SUPABASE=true                    # Set to false for in-memory mode
+API_BASE_URL=https://api.contexthub.com  # Your API URL
 ```
 
 **Note:** Environment file must be in `/backend/.env` (not root). Config loads explicitly from backend directory.
 
 ### 3. Setup Database
 
-Apply the consolidated schema to your Supabase project:
+Apply the schema to your Supabase project:
 
 ```bash
 # Run in Supabase SQL Editor
@@ -114,33 +147,35 @@ Apply the consolidated schema to your Supabase project:
 
 The schema includes:
 - Artifacts table with full-text search
-- API keys table with bcrypt hashing
+- API keys table with bcrypt hashing and lookup_hash optimization
 - RLS policies for both tables
 - Triggers for updated_at timestamps
 
-### 4. Run Servers
+### 4. Run Server
 
 ```bash
-# REST API Server (default)
+# Start the combined REST API and MCP server
 python app/main.py
-# API available at http://localhost:8000
-# Docs at http://localhost:8000/api/docs
 
-# MCP Server (for AI clients)
-MCP_MODE=true python app/main.py
-# Or directly:
-python app/mcp/server.py
-
-# Development mode with auto-reload
+# Or with auto-reload for development
 uvicorn app.main:app --reload
 ```
 
-## Storage Modes
+## Access Patterns
 
-The backend supports two storage modes controlled by `USE_SUPABASE` in `.env`:
+The backend serves both REST API and MCP from a single deployment:
 
-- **`USE_SUPABASE=true`** - Production mode with Supabase PostgreSQL
-- **`USE_SUPABASE=false`** - Development mode with in-memory storage
+### REST API Endpoints
+- `http://localhost:8000/api/v1/artifacts` - Artifact CRUD operations
+- `http://localhost:8000/api/v1/auth` - Authentication endpoints
+- `http://localhost:8000/api/v1/api-keys` - API key management
+- `http://localhost:8000/api/docs` - Interactive API documentation
+
+### MCP Server Endpoint
+- `http://localhost:8000/mcp` - MCP server for AI assistants
+
+### Health Check
+- `http://localhost:8000/health` - Service health status
 
 ## Authentication
 
@@ -148,6 +183,20 @@ The platform supports dual authentication methods:
 
 - **JWT (Bearer Token)** - For web UI and session-based auth
 - **API Keys** - For programmatic access via `X-API-Key` header
+
+### Using API Keys with MCP
+
+API keys created through the UI work for both REST API and MCP access:
+
+```python
+# In MCP clients (e.g., Claude, OpenAI)
+mcp_servers=[{
+    "type": "url",
+    "url": "https://api.contexthub.com/mcp",
+    "name": "contexthub",
+    "authorization_token": "sk_prod_your_api_key"  # Same API key as REST!
+}]
+```
 
 ## API Endpoints
 
@@ -181,30 +230,31 @@ The platform supports dual authentication methods:
 
 ## MCP Tools
 
-- `create_artifact` - Create new artifact
-- `list_artifacts` - List user's artifacts  
-- `search_artifacts` - Search by text
-- `get_artifact` - Get by ID
+The MCP server provides the following tools (all require API key authentication):
+
+- `create_artifact` - Create new artifact in your personal collection
+- `list_artifacts` - List your artifacts with pagination
+- `search_artifacts` - Search your artifacts by text
+- `get_artifact` - Get a specific artifact by ID
+- `update_artifact` - Update an existing artifact
+- `delete_artifact` - Delete an artifact
+
+Each tool operates within the context of the authenticated user, ensuring data isolation and security.
 
 ## Testing
 
-### Unit Tests
+### Testing with MCP Clients
+
+Test the MCP server with OpenAI or Anthropic SDKs:
 
 ```bash
-# Run all tests
-pytest
+# Start ngrok to expose local server
+ngrok http 8000
 
-# Run with coverage
-pytest --cov=app tests/
-
-# Run specific test file
-pytest tests/test_api.py
-
-# Run with verbose output
-pytest -v
-
-# Run only unit tests (fast)
-pytest -m "not integration"
+# Update test scripts with your ngrok URL and API key
+# Then run:
+python test_openai_mcp.py
+python test_anthropic_mcp.py
 ```
 
 ### Manual API Testing
@@ -223,72 +273,13 @@ API_KEY=$(curl -X POST http://localhost:8000/api/v1/api-keys \
   -d '{"name": "Test Key", "scopes": ["read", "write"]}' \
   | jq -r '.api_key')
 
-# Use API key for requests (title auto-generated from content)
+# Use API key for requests
 curl -X POST http://localhost:8000/api/v1/artifacts \
   -H "Content-Type: application/json" \
   -H "X-API-Key: $API_KEY" \
   -d '{
     "content": "# Test Artifact\n\nThis is a test context artifact."
   }'
-
-# List all artifacts (with authentication)
-curl http://localhost:8000/api/v1/artifacts \
-  -H "Authorization: Bearer $TOKEN"
-
-# Search artifacts
-curl "http://localhost:8000/api/v1/artifacts/search?q=React"
-
-# Get specific artifact (replace with actual ID)
-curl "http://localhost:8000/api/v1/artifacts/782dde8d-5cce-4427-a67c-9500d5b631ac"
-
-
-# Update an artifact
-curl -X PUT "http://localhost:8000/api/v1/artifacts/782dde8d-5cce-4427-a67c-9500d5b631ac" \
-  -H "Content-Type: application/json" \
-  -d '{"title": "Updated Title"}'
-
-# Delete an artifact
-curl -X DELETE "http://localhost:8000/api/v1/artifacts/782dde8d-5cce-4427-a67c-9500d5b631ac"
-
-# Health check
-curl http://localhost:8000/health
-```
-
-## Development
-
-```bash
-# Format code
-black app/ tests/
-
-# Lint
-pylint app/
-
-# Type checking
-mypy app/
-
-# Install dev dependencies
-pip install pytest pytest-cov pytest-asyncio httpx black pylint mypy
-```
-
-## MCP Client Configuration
-
-### Claude Desktop
-
-Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
-
-```json
-{
-  "mcpServers": {
-    "context-platform": {
-      "command": "python",
-      "args": ["/absolute/path/to/backend/app/mcp/server.py"],
-      "env": {
-        "PYTHONPATH": "/absolute/path/to/backend",
-        "USE_SUPABASE": "true"
-      }
-    }
-  }
-}
 ```
 
 ## Environment Variables
@@ -300,32 +291,48 @@ Located in `/backend/.env`:
 | `SUPABASE_URL` | Supabase project URL | Required |
 | `SUPABASE_KEY` | Supabase service role key | Required |
 | `SUPABASE_ANON_KEY` | Supabase anon key for auth | Required |
-| `USE_SUPABASE` | Enable Supabase storage | `false` |
-| `MCP_MODE` | Run as MCP server | `false` |
+| `USE_SUPABASE` | Enable Supabase storage | `true` |
 | `API_HOST` | API bind address | `0.0.0.0` |
 | `API_PORT` | API port | `8000` |
+| `API_BASE_URL` | Base URL for MCP auth | `https://api.contexthub.com` |
 
-## Architecture Notes
+## Technical Notes
 
-- **Service Layer Pattern**: Business logic separated from API/MCP layers
-- **Single Source of Truth**: Pydantic models define all data structures  
-- **Protocol Agnostic**: Same service methods power both REST and MCP
-- **Flexible Storage**: Easy switch between in-memory and Supabase
-- **Text ILIKE Search**: PostgreSQL text (partial) search capabilities in Supabase
+### Performance Optimizations
+- **API key validation**: Uses lookup_hash for O(1) filtering before bcrypt comparison
+- **Text search**: PostgreSQL full-text search with GIN indexes
+- **Stateless MCP**: No session persistence overhead, perfect for cloud deployment
 
-## Security Notes
-
+### Security Considerations
 - Using `service_role` key for backend operations (bypasses RLS)
 - Dual authentication: JWT tokens and API keys
 - API keys hashed with bcrypt before storage
 - All artifact endpoints require authentication
 - Row Level Security (RLS) policies ready in database
-- CORS configured for local development
-- Environment variables for sensitive data
+- CORS configured with `Mcp-Session-Id` exposed for browser MCP clients
+
+### Known Limitations
+- MCP SDK's stateless mode doesn't properly inject auth context into tools
+- Workaround: Using Python's `contextvars` for thread-safe request context
+- This is a framework limitation that may be fixed in future SDK versions
+
+## Contributing
+
+When contributing, please:
+1. Follow the existing code structure and patterns
+2. Add tests for new functionality
+3. Update documentation as needed
+4. Ensure all authentication flows work correctly
+5. Test both REST API and MCP endpoints
 
 ## Next Steps
 
 - [x] Add user authentication (Supabase Auth)
 - [x] Implement API keys for programmatic access
+- [x] Add MCP server with HTTP transport
+- [x] Optimize API key validation performance
+- [x] Fix MCP authentication context issue
 - [ ] Add rate limiting
-- [ ] Implement proper RLS policies
+- [ ] Implement proper versioning for artifacts
+- [ ] Add bulk operations
+- [ ] Add webhook support for artifact changes

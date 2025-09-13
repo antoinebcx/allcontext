@@ -2,6 +2,7 @@
 
 import secrets
 import bcrypt
+import hashlib
 from typing import List, Optional
 from uuid import UUID
 from datetime import datetime, timezone
@@ -42,12 +43,12 @@ class ApiKeyService:
         
         self.client: Client = create_client(url, key)
     
-    def _generate_api_key(self) -> tuple[str, str, str, str]:
+    def _generate_api_key(self) -> tuple[str, str, str, str, str]:
         """
-        Generate a new API key.
+        Generate a new API key with lookup hash.
         
         Returns:
-            Tuple of (full_key, key_hash, key_prefix, last_4)
+            Tuple of (full_key, key_hash, key_prefix, last_4, lookup_hash)
         """
         # Generate random part
         random_part = secrets.token_urlsafe(self.KEY_LENGTH)[:self.KEY_LENGTH]
@@ -58,10 +59,14 @@ class ApiKeyService:
         # Hash the key for storage
         key_hash = bcrypt.hashpw(full_key.encode(), bcrypt.gensalt()).decode()
         
+        # Create a lookup hash from the first 16 characters for faster filtering
+        # This significantly reduces the number of bcrypt comparisons needed
+        lookup_hash = hashlib.sha256(full_key[:16].encode()).hexdigest()[:16]
+        
         # Extract last 4 characters
         last_4 = random_part[-4:]
         
-        return full_key, key_hash, self.KEY_PREFIX, last_4
+        return full_key, key_hash, self.KEY_PREFIX, last_4, lookup_hash
     
     async def create(self, user_id: UUID, data: ApiKeyCreate) -> ApiKeyCreated:
         """Create a new API key."""
@@ -76,8 +81,8 @@ class ApiKeyService:
             if count_response.count and count_response.count >= self.MAX_KEYS_PER_USER:
                 raise ValueError(f"Maximum number of API keys ({self.MAX_KEYS_PER_USER}) reached")
             
-            # Generate the API key
-            full_key, key_hash, key_prefix, last_4 = self._generate_api_key()
+            # Generate the API key with lookup hash
+            full_key, key_hash, key_prefix, last_4, lookup_hash = self._generate_api_key()
             
             # Prepare data for insertion
             api_key_data = {
@@ -86,6 +91,7 @@ class ApiKeyService:
                 "key_hash": key_hash,
                 "key_prefix": key_prefix,
                 "last_4": last_4,
+                "lookup_hash": lookup_hash,  # Store for fast filtering
                 "scopes": [scope.value for scope in data.scopes],
                 "expires_at": data.expires_at.isoformat() if data.expires_at else None
             }
@@ -200,6 +206,8 @@ class ApiKeyService:
         """
         Validate an API key and return user information.
         
+        Optimized version that uses lookup_hash to reduce bcrypt comparisons.
+        
         Args:
             api_key: The API key to validate
             
@@ -214,11 +222,14 @@ class ApiKeyService:
                     error_message="Invalid key format"
                 )
             
-            # Get all active keys (we need to check the hash)
-            # In production, you might want to cache this or use a different approach
+            # Generate lookup hash from the provided key
+            lookup_hash = hashlib.sha256(api_key[:16].encode()).hexdigest()[:16]
+            
+            # Query only keys with matching lookup hash (much smaller set)
             response = self.client.table("api_keys") \
                 .select("*") \
                 .eq("is_active", True) \
+                .eq("lookup_hash", lookup_hash) \
                 .execute()
             
             if not response.data:
@@ -227,7 +238,7 @@ class ApiKeyService:
                     error_message="Invalid API key"
                 )
             
-            # Check each key's hash
+            # Now check the bcrypt hash (on a much smaller set of keys)
             for key_record in response.data:
                 if bcrypt.checkpw(api_key.encode(), key_record['key_hash'].encode()):
                     # Check if expired

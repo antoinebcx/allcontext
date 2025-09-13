@@ -45,6 +45,7 @@ CREATE TABLE IF NOT EXISTS api_keys (
     key_hash TEXT NOT NULL UNIQUE,
     key_prefix TEXT NOT NULL,
     last_4 TEXT NOT NULL,
+    lookup_hash VARCHAR(16),
     last_used_at TIMESTAMPTZ,
     expires_at TIMESTAMPTZ,
     scopes TEXT[] DEFAULT ARRAY['read', 'write']::TEXT[],
@@ -62,6 +63,7 @@ CREATE INDEX idx_api_keys_user_id ON api_keys(user_id);
 CREATE INDEX idx_api_keys_key_prefix ON api_keys(key_prefix);
 CREATE INDEX idx_api_keys_is_active ON api_keys(is_active);
 CREATE INDEX idx_api_keys_expires_at ON api_keys(expires_at) WHERE expires_at IS NOT NULL;
+CREATE INDEX idx_api_keys_lookup_hash ON api_keys(lookup_hash) WHERE is_active = true;
 
 -- ============================================================================
 -- TRIGGERS & FUNCTIONS
@@ -183,4 +185,5 @@ COMMENT ON TABLE api_keys IS 'Stores API keys for programmatic access to the pla
 COMMENT ON COLUMN api_keys.key_hash IS 'Bcrypt hash of the actual API key';
 COMMENT ON COLUMN api_keys.key_prefix IS 'Visible prefix for key identification (e.g., sk_prod_)';
 COMMENT ON COLUMN api_keys.last_4 IS 'Last 4 characters of the key for display purposes';
+COMMENT ON COLUMN api_keys.lookup_hash IS 'SHA256 hash of first 16 chars of API key for fast filtering during validation';
 COMMENT ON COLUMN api_keys.scopes IS 'Array of permissions: read, write, delete';
