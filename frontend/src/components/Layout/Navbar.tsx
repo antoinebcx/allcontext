@@ -11,7 +11,7 @@ import {
   Box,
   Divider,
 } from '@mui/material';
-import { User, LogOut, Settings, Moon, Sun } from 'lucide-react';
+import { User, LogOut, Settings, Moon, Sun, BookOpen } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
 
@@ -78,7 +78,7 @@ export const Navbar: React.FC = () => {
         transition: 'border-bottom 0.3s ease'
       }}
     >
-      <Toolbar sx={{ gap: 2 }}>
+      <Toolbar sx={{ gap: 1 }}>
         {/* Logo/Brand */}
         <Typography 
           variant="h6" 
@@ -99,6 +99,18 @@ export const Navbar: React.FC = () => {
         {user ? (
           <>
             {/* Authenticated user UI */}
+            <Button
+              startIcon={<BookOpen size={18} />}
+              onClick={() => navigate('/docs')}
+              sx={{
+                color: location.pathname.startsWith('/docs') ? 'primary.main' : 'text.secondary',
+                fontWeight: location.pathname.startsWith('/docs') ? 600 : 400,
+                mr: -0.75
+              }}
+            >
+              Docs
+            </Button>
+
             <Button
               startIcon={<Settings size={18} />}
               onClick={() => navigate('/settings')}
@@ -163,6 +175,16 @@ export const Navbar: React.FC = () => {
         ) : (
           <>
             {/* Non-authenticated user UI */}
+            <Button
+              startIcon={<BookOpen size={18} />}
+              onClick={() => navigate('/docs')}
+              sx={{
+                color: location.pathname.startsWith('/docs') ? 'primary.main' : 'text.secondary',
+                fontWeight: location.pathname.startsWith('/docs') ? 600 : 400
+              }}
+            >
+              Docs
+            </Button>
             <IconButton
               onClick={toggleTheme}
               size="small"

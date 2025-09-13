@@ -1,9 +1,10 @@
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { Box, Link } from '@mui/material';
+import { Box, Link, IconButton, Tooltip, useTheme } from '@mui/material';
+import { Copy, Check } from 'lucide-react';
 
 interface MarkdownRendererProps {
   content: string;
@@ -11,6 +12,15 @@ interface MarkdownRendererProps {
 }
 
 const MarkdownRendererComponent: React.FC<MarkdownRendererProps> = ({ content, preview = false }) => {
+  const theme = useTheme();
+  const [copiedCode, setCopiedCode] = useState<string | null>(null);
+
+  const handleCopyCode = async (code: string) => {
+    await navigator.clipboard.writeText(code);
+    setCopiedCode(code);
+    setTimeout(() => setCopiedCode(null), 2000);
+  };
+
   return (
     <Box
       sx={{
@@ -21,9 +31,11 @@ const MarkdownRendererComponent: React.FC<MarkdownRendererProps> = ({ content, p
         '& ul, & ol': { pl: 3, mb: 1 },
         '& li': { mb: 0.5 },
         '& code': {
-          backgroundColor: '#f5f5f5',
+          backgroundColor: theme.palette.mode === 'light'
+            ? theme.palette.grey[100]
+            : theme.palette.grey[900],
           padding: '2px 6px',
-          borderRadius: '8px',
+          borderRadius: '4px',
           fontSize: '0.875em',
           fontFamily: '"Fira Code", "Courier New", monospace',
         },
@@ -55,18 +67,47 @@ const MarkdownRendererComponent: React.FC<MarkdownRendererProps> = ({ content, p
         components={{
           code({ node, inline, className, children, ...props }: any) {
             const match = /language-(\w+)/.exec(className || '');
+            const codeString = String(children).replace(/\n$/, '');
+
             return !inline && match ? (
-              <SyntaxHighlighter
-                language={match[1]}
-                style={oneDark as any}
-                customStyle={{
-                  margin: 0,
-                  borderRadius: '8px',
-                  fontSize: '0.875rem',
-                }}
-              >
-                {String(children).replace(/\n$/, '')}
-              </SyntaxHighlighter>
+              <Box sx={{ position: 'relative', my: 2 }}>
+                <Tooltip title={copiedCode === codeString ? "Copied!" : "Copy code"}>
+                  <IconButton
+                    size="small"
+                    onClick={() => handleCopyCode(codeString)}
+                    sx={{
+                      position: 'absolute',
+                      top: 8,
+                      right: 8,
+                      zIndex: 1,
+                      color: 'grey.500',
+                      bgcolor: 'transparent',
+                      border: 'none',
+                      '&:hover': {
+                        bgcolor: 'transparent',
+                        color: 'grey.300',
+                      },
+                    }}
+                  >
+                    {copiedCode === codeString ? (
+                      <Check size={16} />
+                    ) : (
+                      <Copy size={16} />
+                    )}
+                  </IconButton>
+                </Tooltip>
+                <SyntaxHighlighter
+                  language={match[1]}
+                  style={oneDark as any}
+                  customStyle={{
+                    margin: 0,
+                    borderRadius: '8px',
+                    fontSize: '0.875rem',
+                  }}
+                >
+                  {codeString}
+                </SyntaxHighlighter>
+              </Box>
             ) : (
               <code className={className} {...props}>
                 {children}

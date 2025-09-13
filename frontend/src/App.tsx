@@ -10,6 +10,7 @@ import { createAppTheme } from './theme';
 import { Layout } from './components/Layout/Layout';
 import { Dashboard } from './pages/Dashboard';
 import { Settings } from './pages/Settings';
+import { Docs } from './pages/Docs';
 import { LoginPage } from './pages/LoginPage';
 import { useAuth } from './contexts/AuthContext';
 import { useTheme } from './contexts/ThemeContext';
@@ -59,6 +60,8 @@ function App() {
               <Layout>
                 <Routes>
                   <Route path="/" element={<Dashboard />} />
+                  <Route path="/docs" element={<Docs />} />
+                  <Route path="/docs/:docId" element={<Docs />} />
                   <Route
                     path="/settings"
                     element={user ? <Settings /> : <Navigate to="/login?redirect=/settings" replace />}

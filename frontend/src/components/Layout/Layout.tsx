@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 import { Box, Container, Toolbar } from '@mui/material';
 import { Navbar } from './Navbar';
 
@@ -7,19 +8,36 @@ interface LayoutProps {
 }
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
+  const location = useLocation();
+  const isDocsRoute = location.pathname.startsWith('/docs');
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Navbar />
-      
+
       {/* Toolbar spacer to push content below fixed navbar */}
       <Toolbar />
-      
+
       {/* Main content */}
-      <Box component="main" sx={{ flexGrow: 1, bgcolor: 'background.default', py: 3 }}>
-        <Container maxWidth="lg">
+      {isDocsRoute ? (
+        // Docs route - no container, full width, fixed height
+        <Box component="main" sx={{
+          flexGrow: 1,
+          bgcolor: 'background.default',
+          display: 'flex',
+          height: 'calc(100vh - 64px)',
+          overflow: 'hidden'
+        }}>
           {children}
-        </Container>
-      </Box>
+        </Box>
+      ) : (
+        // Other routes - with container and padding
+        <Box component="main" sx={{ flexGrow: 1, bgcolor: 'background.default', py: 3 }}>
+          <Container maxWidth="lg">
+            {children}
+          </Container>
+        </Box>
+      )}
     </Box>
   );
 };

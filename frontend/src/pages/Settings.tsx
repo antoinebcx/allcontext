@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   Container,
   Box,
@@ -9,8 +8,10 @@ import {
   CircularProgress,
   Tabs,
   Tab,
+  IconButton,
+  Tooltip,
 } from '@mui/material';
-import { Plus, Key, User, Shield, Palette } from 'lucide-react';
+import { Plus, Key, User, Shield, Palette, Copy, Check } from 'lucide-react';
 import { useApiKeys, useCreateApiKey, useDeleteApiKey } from '../hooks/useApiKeys';
 import { ApiKeysList } from '../components/ApiKeys/ApiKeysList';
 import { CreateApiKey } from '../components/ApiKeys/CreateApiKey';
@@ -42,11 +43,11 @@ function TabPanel(props: TabPanelProps) {
 }
 
 export const Settings: React.FC = () => {
-  const navigate = useNavigate();
   const [tabValue, setTabValue] = useState(0);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [displayDialogOpen, setDisplayDialogOpen] = useState(false);
   const [createdKey, setCreatedKey] = useState<ApiKeyCreated | null>(null);
+  const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
   const { user } = useAuth();
   const { mode, themeMode, setThemeMode } = useTheme();
@@ -54,7 +55,7 @@ export const Settings: React.FC = () => {
   const createMutation = useCreateApiKey();
   const deleteMutation = useDeleteApiKey();
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
 
@@ -80,8 +81,14 @@ export const Settings: React.FC = () => {
     setCreatedKey(null);
   };
 
+  const handleCopyCode = async (code: string, identifier: string) => {
+    await navigator.clipboard.writeText(code);
+    setCopiedCode(identifier);
+    setTimeout(() => setCopiedCode(null), 2000);
+  };
+
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Container maxWidth="lg" sx={{ py: 0 }}>
       {/* Header */}
       <Box sx={{ mb: 4 }}>
         <Typography variant="h4" gutterBottom>
@@ -158,28 +165,71 @@ export const Settings: React.FC = () => {
 
             {/* Usage Instructions */}
             <Box sx={{ mt: 4 }}>
-              <Typography variant="subtitle2" gutterBottom>
+              <Typography variant="subtitle2" gutterBottom sx={{ mb: 1 }}>
                 How to use API keys
               </Typography>
               <Typography variant="body2" color="text.secondary" component="div">
-                Include your API key in the request header:
-                <Box
-                  component="pre"
-                  sx={{
-                    mt: 1,
-                    p: 2,
-                    bgcolor: 'background.paper',
-                    border: 1,
-                    borderColor: 'divider',
-                    borderRadius: 1,
-                    fontSize: '0.875rem',
-                    fontFamily: 'monospace',
-                    overflow: 'auto'
-                  }}
-                >
-                  {`curl -H "X-API-Key: sk_prod_your_key_here" \\
-     https://api.contexthub.com/api/v1/artifacts`}
+                Add the MCP to Claude Code with this simple terminal command:
+                <Box sx={{ position: 'relative', mt: 1 }}>
+                  <Box component="pre" sx={{ p: 2, bgcolor: 'background.paper', borderRadius: 1, fontSize: '0.875rem', fontFamily: 'monospace', overflow: 'auto' }}>
+                    {`claude mcp add --transport http contexthub https://api.contexthub.com/mcp \\
+     --header "Authorization: Bearer your_api_key"`}
+                  </Box>
+                  <Tooltip title={copiedCode === 'mcp-command' ? "Copied!" : "Copy command"}>
+                    <IconButton
+                      size="small"
+                      onClick={() => {
+                        handleCopyCode(`claude mcp add --transport http contexthub https://api.contexthub.com/mcp \\\n     --header "Authorization: Bearer your_api_key"`, 'mcp-command');
+                      }}
+                      sx={{
+                        position: 'absolute',
+                        top: 8,
+                        right: 8,
+                        color: 'grey.500',
+                        bgcolor: 'transparent',
+                        '&:hover': {
+                          bgcolor: 'transparent',
+                          color: 'grey.300',
+                        },
+                      }}
+                    >
+                      {copiedCode === 'mcp-command' ? <Check size={16} /> : <Copy size={16} />}
+                    </IconButton>
+                  </Tooltip>
                 </Box>
+              </Typography>
+              <Typography variant="body2" color="text.secondary" component="div">
+                Include your API key in the API request header:
+                <Box sx={{ position: 'relative', mt: 1 }}>
+                  <Box component="pre" sx={{ p: 2, bgcolor: 'background.paper', borderRadius: 1, fontSize: '0.875rem', fontFamily: 'monospace', overflow: 'auto' }}>
+                    {`curl -H "X-API-Key: your_api_key" \\
+     https://api.contexthub.com/api/v1/artifacts`}
+                  </Box>
+                  <Tooltip title={copiedCode === 'curl-command' ? "Copied!" : "Copy command"}>
+                    <IconButton
+                      size="small"
+                      onClick={() => {
+                        handleCopyCode(`curl -H "X-API-Key: your_api_key" \\\n     https://api.contexthub.com/api/v1/artifacts`, 'curl-command');
+                      }}
+                      sx={{
+                        position: 'absolute',
+                        top: 8,
+                        right: 8,
+                        color: 'grey.500',
+                        bgcolor: 'transparent',
+                        '&:hover': {
+                          bgcolor: 'transparent',
+                          color: 'grey.300',
+                        },
+                      }}
+                    >
+                      {copiedCode === 'curl-command' ? <Check size={16} /> : <Copy size={16} />}
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                More information in the docs.
               </Typography>
             </Box>
         </Box>

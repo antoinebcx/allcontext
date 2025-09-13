@@ -31,6 +31,9 @@ A minimal, elegant React application for managing markdown-based AI artifacts (p
 - 📊 **Progressive Rendering** - Large documents load in chunks for better performance
 - 🎯 **Demo Mode** - Explore app with demo content before signing up
 - 🌓 **Dark Mode** - System-aware theme with manual override
+- 📚 **Documentation** - In-app docs viewer with MCP/API reference
+- 📋 **Code Copy** - Copy buttons on all code blocks
+- 🎨 **Dynamic Navbar** - Border appears on scroll
 
 ## API Documentation
 
@@ -57,8 +60,11 @@ frontend/
 │   │   │   ├── ApiKeysList.tsx     # API keys table
 │   │   │   ├── CreateApiKey.tsx    # Creation dialog
 │   │   │   └── ApiKeyDisplay.tsx   # One-time key display
+│   │   ├── Docs/
+│   │   │   ├── DocsSidebar.tsx     # Docs navigation
+│   │   │   └── DocsViewer.tsx      # Markdown viewer with copy
 │   │   ├── Layout/
-│   │   │   ├── Layout.tsx          # App layout wrapper
+│   │   │   ├── Layout.tsx          # App layout wrapper (conditional)
 │   │   │   └── Navbar.tsx          # Persistent navigation
 │   │   └── Markdown/
 │   │       ├── MarkdownRenderer.tsx         # Standard markdown renderer
@@ -77,11 +83,17 @@ frontend/
 │   │   └── markdown/
 │   │       └── chunking.ts     # Content splitting utilities
 │   ├── data/
-│   │   └── demoData.ts         # Demo artifacts for non-auth users
+│   │   ├── demoData.ts         # Demo artifacts for non-auth users
+│   │   └── docsRegistry.ts     # Docs imports & metadata
+│   ├── docs/                    # Documentation markdown files
+│   │   ├── API_REFERENCE.md
+│   │   ├── MCP_SPECIFICATION.md
+│   │   └── MCP_INTEGRATION.md
 │   ├── pages/
-│   │   ├── Dashboard.tsx       # Main page with search & demo mode
+│   │   ├── Dashboard.tsx       # Main page with unified search/new
 │   │   ├── LoginPage.tsx       # Two-step auth flow with signup mode
-│   │   └── Settings.tsx        # Settings with API keys & appearance
+│   │   ├── Settings.tsx        # Settings with API keys & appearance
+│   │   └── Docs.tsx            # Documentation page
 │   ├── theme/
 │   │   └── index.ts            # Light/dark theme definitions
 │   ├── App.tsx                 # Root component
@@ -182,6 +194,24 @@ The frontend expects a backend API at `VITE_API_URL` with these endpoints:
 - **Query Caching**: 5-minute stale time
 - **Lazy Loading**: Code splitting for modals
 - **Progressive Loading**: Content >10k chars loads in 5k chunks on scroll
+
+## Documentation
+
+Built-in documentation viewer at `/docs` with:
+- API Reference
+- MCP Specification
+- MCP Integration Guide
+
+Features:
+- Sidebar navigation
+- Copy entire document
+- Code block copy buttons
+- Progressive rendering for large docs
+
+## Keyboard Shortcuts
+
+- `⌘K` - Focus search
+- `⌘↵` - New artifact
 
 ## Browser Support
 
