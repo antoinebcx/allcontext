@@ -452,6 +452,7 @@ When contributing, please:
 
 ## Next Steps
 
+- [ ] Add proper logging, error handling, typing everywhere
 - [ ] Implement proper versioning for artifacts
 - [ ] Add `confirmation_required` flag to delete operations in MCP tools for safety and/or a warning in tool description doc
 - [ ] Add rate limiting

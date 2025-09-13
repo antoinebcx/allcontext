@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   AppBar,
@@ -21,6 +21,26 @@ export const Navbar: React.FC = () => {
   const { user, logout } = useAuth();
   const { mode, toggleTheme } = useTheme();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [scrolled, setScrolled] = useState(false);
+
+  // Handle scroll detection
+  useEffect(() => {
+    const handleScroll = () => {
+      const isScrolled = window.scrollY > 10;
+      setScrolled(isScrolled);
+    };
+
+    // Set initial state
+    handleScroll();
+
+    // Add event listener
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   const handleUserMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -51,10 +71,11 @@ export const Navbar: React.FC = () => {
       elevation={0}
       sx={{
         bgcolor: 'transparent',
-        borderBottom: 1,
+        borderBottom: scrolled ? 1 : 0,
         borderColor: 'divider',
         color: 'text.primary',
-        backdropFilter: 'blur(8px)'
+        backdropFilter: 'blur(8px)',
+        transition: 'border-bottom 0.3s ease'
       }}
     >
       <Toolbar sx={{ gap: 2 }}>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -34,6 +34,26 @@ export const Dashboard: React.FC = () => {
 
   // Debounce search query
   const debouncedSearch = useDebounce(searchQuery, 300);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Cmd/Ctrl + Enter for new artifact (common pattern in messaging apps)
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        e.preventDefault();
+        handleCreate();
+      }
+      // Cmd/Ctrl + K for search focus
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        const searchInput = document.querySelector('input[placeholder*="Search"]') as HTMLInputElement;
+        searchInput?.focus();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [user]);
 
   // Queries - only fetch if authenticated
   const { data, isLoading, error } = useArtifacts();
@@ -165,38 +185,44 @@ export const Dashboard: React.FC = () => {
         </Paper>
       )}
 
-      {/* Action Bar */}
-      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'flex-end' }}>
-        <Button
-          variant="contained"
-          startIcon={<Plus size={18} />}
-          onClick={handleCreate}
-        >
-          New Artifact
-        </Button>
-      </Box>
-
-      {/* Search Bar */}
-      <Box sx={{ mb: 5, display: 'flex', justifyContent: 'center' }}>
+      {/* Unified Search and Create Bar */}
+      <Box sx={{ mb: 5, display: 'flex', justifyContent: 'center', gap: 1.5, mt: 3 }}>
         <TextField
-          placeholder="Search artifacts..."
+          placeholder="Search artifacts... (⌘K)"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <Search size={20} />
-              </InputAdornment>
-            ),
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Search size={20} />
+                </InputAdornment>
+              ),
+            }
           }}
-          sx={{ 
-            width: 600,
+          sx={{
+            width: 520,
             '& .MuiOutlinedInput-root': {
               bgcolor: 'background.default',
-              height: 48
+              height: 58
             }
           }}
         />
+        <Button
+          variant="outlined"
+          startIcon={<Plus size={18} />}
+          onClick={handleCreate}
+          title="New Artifact (⌘↵)"
+          sx={{
+            height: 58,
+            px: 2.5,
+            minWidth: 'auto',
+            fontSize: '0.95rem',
+            fontWeight: 500
+          }}
+        >
+          New
+        </Button>
       </Box>
 
       {/* Content */}
