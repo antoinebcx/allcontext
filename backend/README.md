@@ -44,14 +44,24 @@ backend/
 │   └── mcp/
 │       ├── __init__.py
 │       └── server.py                # MCP server with stateless HTTP transport
+├── tests/
+│   ├── __init__.py
+│   ├── integration_tests/
+│   │   ├── __init__.py
+│   │   ├── test_openai_mcp.py      # OpenAI MCP integration tests
+│   │   └── test_anthropic_mcp.py   # Anthropic MCP integration tests
+│   └── unit_tests/
+│       ├── __init__.py
+│       ├── test_utils_markdown.py  # Markdown title extraction tests
+│       ├── test_models_validation.py # Pydantic model validation tests
+│       ├── test_services_artifacts.py # Artifact service logic tests
+│       └── test_api_key_hashing.py # API key security tests
 ├── schema/
 │   └── schema.sql                   # Consolidated database schema with lookup_hash
 ├── requirements.txt                  # Python dependencies
 ├── .env.example                     # Environment template
 ├── .env                            # Local environment (git ignored)
 ├── .gitignore                      # Git ignore rules
-├── test_openai_mcp.py              # OpenAI MCP testing script
-├── test_anthropic_mcp.py           # Anthropic MCP testing script
 └── README.md                       # This file
 ```
 
@@ -243,18 +253,35 @@ Each tool operates within the context of the authenticated user, ensuring data i
 
 ## Testing
 
-### Testing with MCP Clients
-
-Test the MCP server with OpenAI or Anthropic SDKs:
+### Unit Tests
 
 ```bash
-# Start ngrok to expose local server
+# From backend directory
+pytest tests/unit_tests/
+
+# Verbose output
+pytest tests/unit_tests/ -v
+
+# With coverage
+pytest tests/unit_tests/ --cov=app
+
+# Run specific test file
+pytest tests/unit_tests/test_utils_markdown.py -v
+```
+
+### Integration Tests
+
+```bash
+# For remote testing, start ngrok first
 ngrok http 8000
 
-# Update test scripts with your ngrok URL and API key
-# Then run:
+# From backend directory
+cd tests/integration_tests
 python test_openai_mcp.py
 python test_anthropic_mcp.py
+
+# Or with pytest
+pytest tests/integration_tests/
 ```
 
 ### Manual API Testing
@@ -273,14 +300,78 @@ API_KEY=$(curl -X POST http://localhost:8000/api/v1/api-keys \
   -d '{"name": "Test Key", "scopes": ["read", "write"]}' \
   | jq -r '.api_key')
 
-# Use API key for requests
+# Create an artifact
 curl -X POST http://localhost:8000/api/v1/artifacts \
   -H "Content-Type: application/json" \
   -H "X-API-Key: $API_KEY" \
   -d '{
     "content": "# Test Artifact\n\nThis is a test context artifact."
   }'
+
+# List all artifacts (with authentication)
+curl http://localhost:8000/api/v1/artifacts \
+  -H "Authorization: Bearer $TOKEN"
+
+# Search artifacts
+curl "http://localhost:8000/api/v1/artifacts/search?q=React" \
+  -H "X-API-Key: $API_KEY"
+
+# Get specific artifact (replace with actual ID)
+curl "http://localhost:8000/api/v1/artifacts/782dde8d-5cce-4427-a67c-9500d5b631ac" \
+  -H "X-API-Key: $API_KEY"
+
+# Update an artifact
+curl -X PUT "http://localhost:8000/api/v1/artifacts/782dde8d-5cce-4427-a67c-9500d5b631ac" \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: $API_KEY" \
+  -d '{"title": "Updated Title"}'
+
+# Delete an artifact
+curl -X DELETE "http://localhost:8000/api/v1/artifacts/782dde8d-5cce-4427-a67c-9500d5b631ac" \
+  -H "X-API-Key: $API_KEY"
+
+# Health check (no auth required)
+curl http://localhost:8000/health
 ```
+
+## Development
+
+### Code Quality Tools
+
+```bash
+# Format code with Black
+black app/ tests/
+
+# Lint code with Pylint
+pylint app/
+
+# Type checking with MyPy
+mypy app/
+
+# Run tests with pytest
+pytest
+
+# Run tests with coverage
+pytest --cov=app tests/
+
+# Run async tests
+pytest --asyncio-mode=auto tests/
+```
+
+### Development Workflow
+
+1. **Before committing:**
+   ```bash
+   black app/          # Format code
+   mypy app/          # Check types
+   pylint app/        # Lint code
+   pytest             # Run tests
+   ```
+
+2. **Watch mode for development:**
+   ```bash
+   uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+   ```
 
 ## Environment Variables
 
@@ -295,6 +386,10 @@ Located in `/backend/.env`:
 | `API_HOST` | API bind address | `0.0.0.0` |
 | `API_PORT` | API port | `8000` |
 | `API_BASE_URL` | Base URL for MCP auth | `https://api.contexthub.com` |
+| `CONTEXTHUB_API_KEY` | API key for testing | Required for tests |
+| `OPENAI_API_KEY` | OpenAI API key | Required for OpenAI tests |
+| `ANTHROPIC_API_KEY` | Anthropic API key | Required for Anthropic tests |
+| `NGROK_URL` | Ngrok tunnel URL | Optional for remote testing |
 
 ## Technical Notes
 

@@ -3,9 +3,9 @@
 Test ContextHub MCP server with OpenAI SDK.
 
 Before running:
-1. Start the MCP server: python run_mcp.py
-2. Start ngrok: ngrok http 3001
-3. Update NGROK_URL below with your ngrok URL
+1. Start the MCP server: python app/main.py
+2. (Optional) Start ngrok: ngrok http 8000
+3. Set NGROK_URL in .env if using ngrok
 4. Ensure .env has OPENAI_API_KEY and CONTEXTHUB_API_KEY
 """
 
@@ -15,7 +15,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 # Load environment variables
-backend_dir = Path(__file__).parent
+backend_dir = Path(__file__).parent.parent.parent  # Go up to backend/
 load_dotenv(backend_dir / ".env")
 
 # Add backend to path for imports
@@ -24,7 +24,7 @@ sys.path.insert(0, str(backend_dir))
 from openai import OpenAI
 
 # Configuration
-NGROK_URL = "https://29c7ff69d6e7.ngrok-free.app"  # Update with your ngrok URL
+NGROK_URL = os.getenv("NGROK_URL", "http://localhost:8000")
 MCP_URL = f"{NGROK_URL}/mcp"
 API_KEY = os.getenv("CONTEXTHUB_API_KEY")
 OPENAI_KEY = os.getenv("OPENAI_API_KEY")
@@ -170,8 +170,10 @@ def main():
     print(f"API Key: {API_KEY[:8]}...{API_KEY[-4:]}")
     
     # Note about ngrok
-    print("\n⚠️  Make sure ngrok is running and URL is updated!")
-    print(f"Current ngrok URL: {NGROK_URL}")
+    if NGROK_URL == "http://localhost:8000":
+        print("\n⚠️  Using localhost. Set NGROK_URL in .env for remote testing")
+    else:
+        print(f"\n🌐 Using ngrok URL: {NGROK_URL}")
     
     # Run tests
     tests = [
