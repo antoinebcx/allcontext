@@ -244,13 +244,6 @@ Deploy `dist/` folder to:
 
 ## Next Steps
 
-- [x] User authentication
-- [x] Auto-title generation from markdown
-- [x] Dark mode with system detection
-- [ ] Add keyboard shortcuts
-- [ ] Implement tags/categories
-- [ ] Add export/import functionality
-- [ ] Collaborative editing
 - [ ] Version history
 - [ ] Password reset flow
 - [ ] Email verification

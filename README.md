@@ -14,6 +14,7 @@ Your context, stored in the cloud, always accessible by any means (app, API, MCP
 
 - **[API Reference](./docs/API_REFERENCE.md)** - REST API endpoints
 - **[MCP Specification](./docs/MCP_SPECIFICATION.md)** - MCP server spec
+- **[MCP Integration](./docs/MCP_INTEGRATION.md)** - How to connect and use the MCP
 
 ## Future To-dos
 

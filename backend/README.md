@@ -452,13 +452,8 @@ When contributing, please:
 
 ## Next Steps
 
-- [x] Add user authentication (Supabase Auth)
-- [x] Implement API keys for programmatic access
-- [x] Add MCP server with HTTP transport
-- [x] Optimize API key validation performance
-- [x] Fix MCP authentication context issue
-- [x] Complete API and MCP documentation
-- [ ] Add rate limiting
 - [ ] Implement proper versioning for artifacts
+- [ ] Add `confirmation_required` flag to delete operations in MCP tools for safety and/or a warning in tool description doc
+- [ ] Add rate limiting
 - [ ] Add bulk operations
 - [ ] Add webhook support for artifact changes
