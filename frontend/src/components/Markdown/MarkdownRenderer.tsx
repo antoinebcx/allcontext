@@ -115,6 +115,24 @@ const MarkdownRendererComponent: React.FC<MarkdownRendererProps> = ({ content, p
             );
           },
           a({ href, children }) {
+            // Handle anchor links (table of contents)
+            if (href?.startsWith('#')) {
+              return (
+                <Link
+                  href={href}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    const element = document.querySelector(href);
+                    element?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  sx={{ cursor: 'pointer' }}
+                >
+                  {children}
+                </Link>
+              );
+            }
+
+            // External links open in new tab
             return (
               <Link href={href} target="_blank" rel="noopener noreferrer">
                 {children}

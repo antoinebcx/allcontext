@@ -13,7 +13,6 @@ Quick guide to integrate with the Allcontext REST API using curl, Python, or Jav
   - [Create an artifact](#create-an-artifact)
   - [Update an artifact](#update-an-artifact)
   - [Delete an artifact](#delete-an-artifact)
-- [Managing API Keys](#managing-api-keys)
 - [Error Handling](#error-handling)
 - [Complete Examples](#complete-examples)
 
@@ -280,71 +279,6 @@ const response = await fetch(`https://api.allcontext.dev/api/v1/artifacts/${arti
   headers: { 'X-API-Key': apiKey }
 });
 // Returns 204 No Content on success
-```
-
-## Managing API Keys
-
-### Create an API key
-
-**Note:** Requires JWT authentication (use the web app or authenticate first).
-
-**curl:**
-```bash
-curl -X POST https://api.allcontext.dev/api/v1/api-keys \
-  -H "Authorization: Bearer $JWT_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "My Integration",
-    "scopes": ["read", "write"]
-  }'
-```
-
-**Python:**
-```python
-key_data = {
-    "name": "My Integration",
-    "scopes": ["read", "write"]
-}
-response = requests.post(
-    "https://api.allcontext.dev/api/v1/api-keys",
-    headers={"Authorization": f"Bearer {jwt_token}"},
-    json=key_data
-)
-api_key = response.json()["api_key"]  # Save this! Only shown once
-```
-
-### List your API keys
-
-**curl:**
-```bash
-curl https://api.allcontext.dev/api/v1/api-keys \
-  -H "X-API-Key: $API_KEY"
-```
-
-**Python:**
-```python
-response = requests.get(
-    "https://api.allcontext.dev/api/v1/api-keys",
-    headers={"X-API-Key": api_key}
-)
-keys = response.json()
-```
-
-### Delete an API key
-
-**curl:**
-```bash
-curl -X DELETE "https://api.allcontext.dev/api/v1/api-keys/456e7890-e89b-12d3-a456-426614174000" \
-  -H "X-API-Key: $API_KEY"
-```
-
-**Python:**
-```python
-key_id = "456e7890-e89b-12d3-a456-426614174000"
-response = requests.delete(
-    f"https://api.allcontext.dev/api/v1/api-keys/{key_id}",
-    headers={"X-API-Key": api_key}
-)
 ```
 
 ## Error Handling
