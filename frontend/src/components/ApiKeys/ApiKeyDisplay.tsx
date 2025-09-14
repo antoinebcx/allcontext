@@ -13,6 +13,7 @@ import {
   Paper,
 } from '@mui/material';
 import { Copy, Eye, EyeOff } from 'lucide-react';
+import { MarkdownRenderer } from '../Markdown/MarkdownRenderer';
 import type { ApiKeyCreated } from '../../types';
 
 interface ApiKeyDisplayProps {
@@ -125,11 +126,19 @@ export const ApiKeyDisplay: React.FC<ApiKeyDisplayProps> = ({ open, onClose, api
             </Box>
           )}
 
-          <Alert severity="info">
-            <Typography variant="body2">
-              Use this key by adding the header <code>X-API-Key: {apiKey.api_key.substring(0, 12)}...</code> to your API requests.
+          <Box>
+            <Typography variant="body2" color="text.secondary" gutterBottom>
+              How to use
             </Typography>
-          </Alert>
+            <MarkdownRenderer content={`\`\`\`bash
+# Add to API request headers
+X-API-Key: ${apiKey.api_key.substring(0, 20)}...
+
+# Example with curl
+curl -H "X-API-Key: ${apiKey.api_key.substring(0, 20)}..." \\
+  https://api.allcontext.dev/api/v1/artifacts
+\`\`\``} />
+          </Box>
         </Box>
       </DialogContent>
       <DialogActions>

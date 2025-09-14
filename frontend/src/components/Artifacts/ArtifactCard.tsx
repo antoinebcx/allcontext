@@ -1,7 +1,9 @@
-import React from 'react';
-import { Card, CardContent, Typography, Box } from '@mui/material';
+import React, { useState } from 'react';
+import { Card, CardContent, Typography, Box, IconButton } from '@mui/material';
+import { Cable } from 'lucide-react';
 import type { Artifact, ArtifactSearchResult } from '../../types';
 import { MarkdownRenderer } from '../Markdown/MarkdownRenderer';
+import { ConnectPopover } from './ConnectPopover';
 
 interface ArtifactCardProps {
   artifact: Artifact | ArtifactSearchResult;
@@ -11,15 +13,25 @@ interface ArtifactCardProps {
 export const ArtifactCard: React.FC<ArtifactCardProps> = ({ artifact, onClick }) => {
   const { title, created_at } = artifact;
   const content = 'content' in artifact ? artifact.content : artifact.snippet;
-  
+  const [connectAnchorEl, setConnectAnchorEl] = useState<HTMLElement | null>(null);
+
   // Format date
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      month: 'short', 
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
       day: 'numeric',
       year: date.getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined
     });
+  };
+
+  const handleConnectClick = (event: React.MouseEvent<HTMLElement>) => {
+    event.stopPropagation(); // Prevent card click
+    setConnectAnchorEl(event.currentTarget);
+  };
+
+  const handleConnectClose = () => {
+    setConnectAnchorEl(null);
   };
 
   // Get preview content (first 150 chars or until first double newline)
@@ -42,7 +54,8 @@ export const ArtifactCard: React.FC<ArtifactCardProps> = ({ artifact, onClick })
   };
 
   return (
-    <Card
+    <>
+      <Card
       onClick={onClick}
       sx={{
         cursor: onClick ? 'pointer' : 'default',
@@ -95,18 +108,43 @@ export const ArtifactCard: React.FC<ArtifactCardProps> = ({ artifact, onClick })
           <MarkdownRenderer content={getPreview(content)} preview />
         </Box>
 
-        {/* Date at bottom */}
-        <Typography 
-          variant="caption" 
-          color="text.secondary"
-          sx={{ 
-            mt: 0.5,
-            fontSize: '0.75rem',
-          }}
-        >
-          {formatDate(created_at)}
-        </Typography>
+        {/* Date at bottom with Connect button */}
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 0.5 }}>
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{
+              fontSize: '0.75rem',
+            }}
+          >
+            {formatDate(created_at)}
+          </Typography>
+          <IconButton
+            size="small"
+            onClick={handleConnectClick}
+            sx={{
+              p: 0.75,
+              color: 'text.secondary',
+              '&:hover': {
+                color: 'primary.main',
+                bgcolor: 'action.hover',
+              },
+            }}
+            title="Connect"
+          >
+            <Cable size={16} />
+          </IconButton>
+        </Box>
       </CardContent>
-    </Card>
+      </Card>
+
+      {/* Connect Popover */}
+      <ConnectPopover
+        artifact={artifact}
+        anchorEl={connectAnchorEl}
+        open={Boolean(connectAnchorEl)}
+        onClose={handleConnectClose}
+      />
+    </>
   );
 };

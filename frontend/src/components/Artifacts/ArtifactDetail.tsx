@@ -18,11 +18,13 @@ import {
   Copy,
   Edit,
   Trash2,
-  Download
+  Download,
+  Cable
 } from 'lucide-react';
 import type { Artifact } from '../../types';
 import { MarkdownRenderer } from '../Markdown/MarkdownRenderer';
 import { ProgressiveMarkdownRenderer } from '../Markdown/ProgressiveMarkdownRenderer';
+import { ConnectPopover } from './ConnectPopover';
 
 interface ArtifactDetailProps {
   open: boolean;
@@ -41,6 +43,7 @@ export const ArtifactDetail: React.FC<ArtifactDetailProps> = ({
 }) => {
   const [showCopySuccess, setShowCopySuccess] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [connectAnchorEl, setConnectAnchorEl] = useState<HTMLElement | null>(null);
 
   if (!artifact) return null;
 
@@ -84,6 +87,14 @@ export const ArtifactDetail: React.FC<ArtifactDetailProps> = ({
     onDelete();
     setShowDeleteConfirm(false);
     onClose();
+  };
+
+  const handleConnectClick = (event: React.MouseEvent<HTMLElement>) => {
+    setConnectAnchorEl(event.currentTarget);
+  };
+
+  const handleConnectClose = () => {
+    setConnectAnchorEl(null);
   };
 
   return (
@@ -140,6 +151,11 @@ export const ArtifactDetail: React.FC<ArtifactDetailProps> = ({
                     <Copy size={16} />
                   </IconButton>
                 </Tooltip>
+                <Tooltip title="Connect">
+                  <IconButton size="small" onClick={handleConnectClick}>
+                    <Cable size={16} />
+                  </IconButton>
+                </Tooltip>
                 <Tooltip title="Download">
                   <IconButton size="small" onClick={handleDownload}>
                     <Download size={16} />
@@ -151,8 +167,8 @@ export const ArtifactDetail: React.FC<ArtifactDetailProps> = ({
                   </IconButton>
                 </Tooltip>
                 <Tooltip title="Delete">
-                  <IconButton 
-                    size="small" 
+                  <IconButton
+                    size="small"
                     onClick={() => setShowDeleteConfirm(true)}
                     sx={{ color: 'error.main' }}
                   >
@@ -220,14 +236,22 @@ export const ArtifactDetail: React.FC<ArtifactDetailProps> = ({
         onClose={() => setShowCopySuccess(false)}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
-        <Alert 
-          onClose={() => setShowCopySuccess(false)} 
-          severity="success" 
+        <Alert
+          onClose={() => setShowCopySuccess(false)}
+          severity="success"
           sx={{ width: '100%' }}
         >
           Copied to clipboard!
         </Alert>
       </Snackbar>
+
+      {/* Connect Popover */}
+      <ConnectPopover
+        artifact={artifact}
+        anchorEl={connectAnchorEl}
+        open={Boolean(connectAnchorEl)}
+        onClose={handleConnectClose}
+      />
     </>
   );
 };

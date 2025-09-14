@@ -8,14 +8,13 @@ import {
   CircularProgress,
   Tabs,
   Tab,
-  IconButton,
-  Tooltip,
 } from '@mui/material';
-import { Plus, Copy, Check } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useApiKeys, useCreateApiKey, useDeleteApiKey } from '../hooks/useApiKeys';
 import { ApiKeysList } from '../components/ApiKeys/ApiKeysList';
 import { CreateApiKey } from '../components/ApiKeys/CreateApiKey';
 import { ApiKeyDisplay } from '../components/ApiKeys/ApiKeyDisplay';
+import { MarkdownRenderer } from '../components/Markdown/MarkdownRenderer';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import type { ApiKey, ApiKeyCreated } from '../types';
@@ -47,7 +46,6 @@ export const Settings: React.FC = () => {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [displayDialogOpen, setDisplayDialogOpen] = useState(false);
   const [createdKey, setCreatedKey] = useState<ApiKeyCreated | null>(null);
-  const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
   const { user } = useAuth();
   const { mode, themeMode, setThemeMode } = useTheme();
@@ -79,12 +77,6 @@ export const Settings: React.FC = () => {
   const handleDisplayClose = () => {
     setDisplayDialogOpen(false);
     setCreatedKey(null);
-  };
-
-  const handleCopyCode = async (code: string, identifier: string) => {
-    await navigator.clipboard.writeText(code);
-    setCopiedCode(identifier);
-    setTimeout(() => setCopiedCode(null), 2000);
   };
 
   return (
@@ -168,67 +160,23 @@ export const Settings: React.FC = () => {
               <Typography variant="subtitle2" gutterBottom sx={{ mb: 1 }}>
                 How to use API keys
               </Typography>
-              <Typography variant="body2" color="text.secondary" component="div">
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                 Add the MCP to Claude Code with this simple terminal command:
-                <Box sx={{ position: 'relative', mt: 1 }}>
-                  <Box component="pre" sx={{ p: 2, bgcolor: 'background.paper', borderRadius: 1, fontSize: '0.875rem', fontFamily: 'monospace', overflow: 'auto' }}>
-                    {`claude mcp add --transport http allcontext https://api.allcontext.dev/mcp \\
-     --header "Authorization: Bearer your_api_key"`}
-                  </Box>
-                  <Tooltip title={copiedCode === 'mcp-command' ? "Copied!" : "Copy command"}>
-                    <IconButton
-                      size="small"
-                      onClick={() => {
-                        handleCopyCode(`claude mcp add --transport http allcontext https://api.allcontext.dev/mcp \\\n     --header "Authorization: Bearer your_api_key"`, 'mcp-command');
-                      }}
-                      sx={{
-                        position: 'absolute',
-                        top: 8,
-                        right: 8,
-                        color: 'grey.500',
-                        bgcolor: 'transparent',
-                        '&:hover': {
-                          bgcolor: 'transparent',
-                          color: 'grey.300',
-                        },
-                      }}
-                    >
-                      {copiedCode === 'mcp-command' ? <Check size={16} /> : <Copy size={16} />}
-                    </IconButton>
-                  </Tooltip>
-                </Box>
               </Typography>
-              <Typography variant="body2" color="text.secondary" component="div">
+              <MarkdownRenderer content={`\`\`\`bash
+claude mcp add --transport http allcontext https://api.allcontext.dev/mcp \\
+  --header "Authorization: Bearer your_api_key"
+\`\`\``} />
+
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1, mt: 2 }}>
                 Include your API key in the API request header:
-                <Box sx={{ position: 'relative', mt: 1 }}>
-                  <Box component="pre" sx={{ p: 2, bgcolor: 'background.paper', borderRadius: 1, fontSize: '0.875rem', fontFamily: 'monospace', overflow: 'auto' }}>
-                    {`curl -H "X-API-Key: your_api_key" \\
-     https://api.allcontext.dev/api/v1/artifacts`}
-                  </Box>
-                  <Tooltip title={copiedCode === 'curl-command' ? "Copied!" : "Copy command"}>
-                    <IconButton
-                      size="small"
-                      onClick={() => {
-                        handleCopyCode(`curl -H "X-API-Key: your_api_key" \\\n     https://api.allcontext.dev/api/v1/artifacts`, 'curl-command');
-                      }}
-                      sx={{
-                        position: 'absolute',
-                        top: 8,
-                        right: 8,
-                        color: 'grey.500',
-                        bgcolor: 'transparent',
-                        '&:hover': {
-                          bgcolor: 'transparent',
-                          color: 'grey.300',
-                        },
-                      }}
-                    >
-                      {copiedCode === 'curl-command' ? <Check size={16} /> : <Copy size={16} />}
-                    </IconButton>
-                  </Tooltip>
-                </Box>
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <MarkdownRenderer content={`\`\`\`bash
+curl -H "X-API-Key: your_api_key" \\
+  https://api.allcontext.dev/api/v1/artifacts
+\`\`\``} />
+
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
                 More information in the docs.
               </Typography>
             </Box>

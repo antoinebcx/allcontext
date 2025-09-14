@@ -30,9 +30,11 @@ A minimal, elegant React application for managing markdown-based AI artifacts (p
 - 👤 **User Management** - Profile menu with logout
 - 📊 **Progressive Rendering** - Large documents load in chunks for better performance
 - 🎯 **Demo Mode** - Explore app with demo content before signing up
+- 📱 **Mobile Responsive** - Optimized for all screen sizes
 - 🌓 **Dark Mode** - System-aware theme with manual override
 - 📚 **Documentation** - In-app docs viewer with MCP/API reference
 - 📋 **Code Copy** - Copy buttons on all code blocks
+- 🔌 **Connect Integration** - Quick access to API/MCP usage examples
 - 🎨 **Dynamic Navbar** - Border appears on scroll
 - 🛡️ **Error Boundaries** - Graceful crash recovery with auto-retry
 - 🔄 **Network Resilience** - Automatic retry with exponential backoff
@@ -60,9 +62,10 @@ frontend/
 │   │   └── logger.ts           # Logger types
 │   ├── components/
 │   │   ├── Artifacts/
-│   │   │   ├── ArtifactCard.tsx    # Grid card component
-│   │   │   ├── ArtifactDetail.tsx  # Detail view modal
-│   │   │   └── ArtifactForm.tsx    # Create/edit form (no title field)
+│   │   │   ├── ArtifactCard.tsx        # Grid card component with connect button
+│   │   │   ├── ArtifactDetail.tsx      # Detail view modal with connect button
+│   │   │   ├── ArtifactForm.tsx        # Create/edit form (no title field)
+│   │   │   └── ConnectPopover.tsx      # API/MCP usage examples popover
 │   │   ├── ApiKeys/
 │   │   │   ├── ApiKeysList.tsx     # API keys table
 │   │   │   ├── CreateApiKey.tsx    # Creation dialog
