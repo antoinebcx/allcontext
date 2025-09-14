@@ -96,7 +96,7 @@ export const ArtifactDetail: React.FC<ArtifactDetailProps> = ({
         slotProps={{
           paper: {
             sx: {
-              borderRadius: 2,
+              borderRadius: 1.5,
               height: '90vh',
             },
           },

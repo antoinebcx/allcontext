@@ -11,7 +11,7 @@ import {
   IconButton,
   Tooltip,
 } from '@mui/material';
-import { Plus, Key, User, Shield, Palette, Copy, Check } from 'lucide-react';
+import { Plus, Copy, Check } from 'lucide-react';
 import { useApiKeys, useCreateApiKey, useDeleteApiKey } from '../hooks/useApiKeys';
 import { ApiKeysList } from '../components/ApiKeys/ApiKeysList';
 import { CreateApiKey } from '../components/ApiKeys/CreateApiKey';
@@ -105,10 +105,10 @@ export const Settings: React.FC = () => {
         onChange={handleTabChange}
         sx={{ borderBottom: 1, borderColor: 'divider' }}
       >
-        <Tab icon={<Key size={18} />} iconPosition="start" label="API Keys" />
-        <Tab icon={<User size={18} />} iconPosition="start" label="Profile" />
-        <Tab icon={<Palette size={18} />} iconPosition="start" label="Appearance" />
-        <Tab icon={<Shield size={18} />} iconPosition="start" label="Security" />
+        <Tab label="API Keys" />
+        <Tab label="Profile" />
+        <Tab label="Appearance" />
+        <Tab label="Security" />
       </Tabs>
 
       {/* API Keys Tab */}

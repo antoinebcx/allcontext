@@ -1,24 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Box,
   useTheme,
   useMediaQuery,
-  IconButton,
-  Drawer,
+  Select,
+  MenuItem,
+  FormControl,
+  Paper,
 } from '@mui/material';
-import { Menu, X } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { DocsSidebar } from '../components/Docs/DocsSidebar';
 import { DocsViewer } from '../components/Docs/DocsViewer';
-import { getDocById, getDefaultDoc } from '../data/docsRegistry';
+import { getDocById, getDefaultDoc, docsRegistry } from '../data/docsRegistry';
 
 export const Docs: React.FC = () => {
   const { docId } = useParams<{ docId?: string }>();
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-
-  const [mobileOpen, setMobileOpen] = useState(false);
 
   // Get the current document
   const currentDoc = docId ? getDocById(docId) : getDefaultDoc();
@@ -33,14 +33,6 @@ export const Docs: React.FC = () => {
   // Handle document selection
   const handleDocSelect = (selectedDocId: string) => {
     navigate(`/docs/${selectedDocId}`);
-    if (isMobile) {
-      setMobileOpen(false);
-    }
-  };
-
-  // Toggle mobile drawer
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
   };
 
   if (!currentDoc) {
@@ -55,68 +47,75 @@ export const Docs: React.FC = () => {
   );
 
   return (
-    <Box sx={{ display: 'flex', width: '100%', height: '100%' }}>
-      {/* Mobile menu button */}
+    <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
+      {/* Mobile Doc Selector */}
       {isMobile && (
-        <IconButton
-          onClick={handleDrawerToggle}
+        <Paper
+          elevation={0}
           sx={{
-            position: 'fixed',
-            bottom: 24,
-            right: 24,
-            bgcolor: 'primary.main',
-            color: 'primary.contrastText',
-            zIndex: theme.zIndex.drawer + 2,
-            '&:hover': {
-              bgcolor: 'primary.dark',
-            },
-          }}
-        >
-          {mobileOpen ? <X size={24} /> : <Menu size={24} />}
-        </IconButton>
-      )}
-
-      {/* Desktop sidebar */}
-      {!isMobile && (
-        <Box
-          sx={{
-            width: 280,
-            flexShrink: 0,
-            borderRight: 1,
+            p: 2,
+            borderBottom: 1,
             borderColor: 'divider',
-            bgcolor: 'transparent',
-            height: '100%',
-            position: 'sticky',
-            top: 0,
-            overflowY: 'auto',
+            bgcolor: 'background.default',
           }}
         >
-          {sidebar}
-        </Box>
+          <FormControl fullWidth size="small">
+            <Select
+              value={currentDoc.id}
+              onChange={(e) => handleDocSelect(e.target.value)}
+              IconComponent={ChevronDown}
+              sx={{
+                bgcolor: 'background.paper',
+                '& .MuiSelect-select': {
+                  display: 'flex',
+                  alignItems: 'center',
+                  py: 1.5,
+                },
+                '& .MuiSelect-icon': {
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  right: 12,
+                },
+              }}
+            >
+              {docsRegistry.map((doc) => (
+                <MenuItem key={doc.id} value={doc.id}>
+                  <Box>
+                    <Box sx={{ fontWeight: 500 }}>{doc.title}</Box>
+                    <Box sx={{ fontSize: '0.75rem', color: 'text.secondary', mt: 0.25 }}>
+                      {doc.description}
+                    </Box>
+                  </Box>
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Paper>
       )}
 
-      {/* Mobile drawer */}
-      {isMobile && (
-        <Drawer
-          variant="temporary"
-          open={mobileOpen}
-          onClose={handleDrawerToggle}
-          ModalProps={{
-            keepMounted: true, // Better open performance on mobile
-          }}
-          sx={{
-            '& .MuiDrawer-paper': {
-              width: '80%',
-              maxWidth: 320,
-            },
-          }}
-        >
-          {sidebar}
-        </Drawer>
-      )}
+      <Box sx={{ display: 'flex', flexGrow: 1, overflow: 'hidden' }}>
+        {/* Desktop sidebar */}
+        {!isMobile && (
+          <Box
+            sx={{
+              width: 280,
+              flexShrink: 0,
+              borderRight: 1,
+              borderColor: 'divider',
+              bgcolor: 'transparent',
+              height: '100%',
+              position: 'sticky',
+              top: 0,
+              overflowY: 'auto',
+            }}
+          >
+            {sidebar}
+          </Box>
+        )}
 
-      {/* Main content */}
-      <DocsViewer doc={currentDoc} />
+        {/* Main content */}
+        <DocsViewer doc={currentDoc} />
+      </Box>
     </Box>
   );
 };

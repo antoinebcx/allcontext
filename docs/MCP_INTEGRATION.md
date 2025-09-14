@@ -152,8 +152,8 @@ Add to your Claude Desktop config:
 
 ### ChatGPT
 
-Incoming
+Coming soon
 
 ### Claude.ai
 
-Incoming
+Coming soon

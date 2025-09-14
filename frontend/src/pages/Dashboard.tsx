@@ -11,21 +11,19 @@ import {
   InputAdornment,
   Paper,
 } from '@mui/material';
-import { Plus, Search, Info } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
 import { useDebounce } from '../hooks/useDebounce';
 import { useArtifacts, useCreateArtifact, useUpdateArtifact, useDeleteArtifact, useSearchArtifacts } from '../hooks/useArtifacts';
 import { ArtifactCard } from '../components/Artifacts/ArtifactCard';
 import { ArtifactForm } from '../components/Artifacts/ArtifactForm';
 import { ArtifactDetail } from '../components/Artifacts/ArtifactDetail';
 import { useAuth } from '../contexts/AuthContext';
-import { useTheme } from '../contexts/ThemeContext';
-import { demoArtifacts, demoCreateMessage } from '../data/demoData';
+import { demoArtifacts } from '../data/demoData';
 import type { Artifact, ArtifactCreate, ArtifactUpdate, ArtifactSearchResult } from '../types';
 
 export const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { mode } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedArtifact, setSelectedArtifact] = useState<Artifact | null>(null);
   const [formOpen, setFormOpen] = useState(false);
@@ -73,7 +71,7 @@ export const Dashboard: React.FC = () => {
   if (user) {
     // Authenticated: use real data
     artifacts = debouncedSearch ? (searchResults || []) : (data?.items || []);
-    loading = isLoading || (debouncedSearch && isSearching);
+    loading = isLoading || (!!debouncedSearch && isSearching);
   } else {
     // Non-authenticated: use demo data
     artifacts = demoArtifacts;
@@ -150,34 +148,36 @@ export const Dashboard: React.FC = () => {
       {/* Welcome Banner for non-authenticated users */}
       {!user && (
         <Paper
+          elevation={0}
           sx={{
-            p: 2,
-            mb: 3,
-            bgcolor: 'primary.main',
-            color: 'primary.contrastText',
+            p: { xs: 2, sm: 2 },
+            mb: { xs: 4, sm: 7 },
+            border: '1px solid',
+            borderColor: 'divider',
             display: 'flex',
-            alignItems: 'center',
-            gap: 2
+            flexDirection: { xs: 'column', sm: 'row' },
+            alignItems: { xs: 'stretch', sm: 'center' },
+            gap: 2,
+            bgcolor: 'transparent'
           }}
         >
-          <Info size={20} />
           <Box sx={{ flexGrow: 1 }}>
             <Typography variant="body1" fontWeight={500}>
-              Welcome to Allcontext! Your context in the cloud — accessible anywhere, anytime, through any interface (app, API, MCP).
+              Welcome to Allcontext!
             </Typography>
-            <Typography variant="body2" sx={{ opacity: 0.9 }}>
-              You're viewing demo content. Sign up to create and save your own artifacts.
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+              Your context in the cloud — accessible anywhere, anytime, through any interface (app, API, MCP).
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+              You're viewing demo content. Sign up to create your own artifacts.
             </Typography>
           </Box>
           <Button
-            variant="contained"
+            variant="outlined"
             onClick={() => navigate('/login?signup=true')}
             sx={{
-              bgcolor: 'background.paper',
-              color: 'text.primary',
-              '&:hover': {
-                bgcolor: mode === 'light' ? 'grey.100' : 'grey.900'
-              }
+              width: { xs: '100%', sm: 'auto' },
+              mt: { xs: 1, sm: 0 }
             }}
           >
             Sign Up Free
@@ -186,7 +186,15 @@ export const Dashboard: React.FC = () => {
       )}
 
       {/* Unified Search and Create Bar */}
-      <Box sx={{ mb: 7, display: 'flex', justifyContent: 'center', gap: 1.5, mt: 3 }}>
+      <Box sx={{
+        mb: { xs: 4, sm: 7 },
+        display: 'flex',
+        flexDirection: { xs: 'column', sm: 'row' },
+        justifyContent: 'center',
+        gap: { xs: 1, sm: 1.5 },
+        mt: { xs: 2, sm: 3 },
+        px: { xs: 0, sm: 0 }
+      }}>
         <TextField
           placeholder="Search artifacts... (⌘K)"
           value={searchQuery}
@@ -201,10 +209,10 @@ export const Dashboard: React.FC = () => {
             }
           }}
           sx={{
-            width: 520,
+            width: { xs: '100%', sm: 520 },
             '& .MuiOutlinedInput-root': {
               bgcolor: 'background.default',
-              height: 58
+              height: { xs: 48, sm: 58 }
             }
           }}
         />
@@ -214,9 +222,9 @@ export const Dashboard: React.FC = () => {
           onClick={handleCreate}
           title="New Artifact (⌘↵)"
           sx={{
-            height: 58,
+            height: { xs: 48, sm: 58 },
             px: 2.5,
-            minWidth: 'auto',
+            minWidth: { xs: '100%', sm: 'auto' },
             fontSize: '0.95rem',
           }}
         >

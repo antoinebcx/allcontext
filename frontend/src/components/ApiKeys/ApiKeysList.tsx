@@ -79,7 +79,7 @@ export const ApiKeysList: React.FC<ApiKeysListProps> = ({ apiKeys, onDelete }) =
 
   return (
     <>
-      <TableContainer component={Paper} elevation={0} sx={{ border: 1, borderColor: 'divider' }}>
+      <TableContainer sx={{ border: 1, borderColor: 'divider', borderRadius: 1 }}>
         <Table>
           <TableHead>
             <TableRow>

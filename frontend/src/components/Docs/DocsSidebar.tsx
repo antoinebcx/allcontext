@@ -34,7 +34,7 @@ export const DocsSidebar: React.FC<DocsSidebarProps> = ({
         overflowY: 'auto',
       }}
     >
-      <Box sx={{ p: 2 }}>
+      <Box sx={{ p: 2, pl: { xs: 2, md: 3 } }}>
         <Typography variant="h6" fontWeight={600}>
           Documentation
         </Typography>
@@ -45,7 +45,7 @@ export const DocsSidebar: React.FC<DocsSidebarProps> = ({
 
       <Divider />
 
-      <List sx={{ px: 1, py: 2 }}>
+      <List sx={{ px: 1, pl: { xs: 1, md: 2 }, py: 2 }}>
         {docsRegistry.map((doc: DocItem) => (
           <ListItemButton
             key={doc.id}

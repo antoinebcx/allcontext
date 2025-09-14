@@ -99,7 +99,7 @@ export const ArtifactForm: React.FC<ArtifactFormProps> = ({
       slotProps={{
         paper: {
           sx: {
-            borderRadius: 2,
+            borderRadius: 1.5,
             height: '90vh',
           },
         },

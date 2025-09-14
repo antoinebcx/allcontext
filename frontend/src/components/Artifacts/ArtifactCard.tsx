@@ -24,18 +24,21 @@ export const ArtifactCard: React.FC<ArtifactCardProps> = ({ artifact, onClick })
 
   // Get preview content (first 150 chars or until first double newline)
   const getPreview = (text: string) => {
-    const firstBreak = text.indexOf('\n\n');
+    // Strip markdown headers and represent line breaks
+    const cleaned = text
+      .replace(/^#{1,6}\s+/gm, '')  // Remove markdown headers (# ## ### etc.)
+      .replace(/\n\n+/g, ' ___ ')    // Replace double line breaks with triple underscore
+      .replace(/\n/g, ' ')           // Replace single line breaks with space
+      .replace(/\s+/g, ' ')          // Replace multiple spaces with single
+      .trim();                       // Trim start/end
+
     const maxLength = 120;
-    
-    if (firstBreak > 0 && firstBreak < maxLength) {
-      return text.substring(0, firstBreak);
+
+    if (cleaned.length > maxLength) {
+      return cleaned.substring(0, maxLength) + '...';
     }
-    
-    if (text.length > maxLength) {
-      return text.substring(0, maxLength) + '...';
-    }
-    
-    return text;
+
+    return cleaned;
   };
 
   return (
@@ -82,6 +85,7 @@ export const ArtifactCard: React.FC<ArtifactCardProps> = ({ artifact, onClick })
             WebkitLineClamp: 3,
             WebkitBoxOrient: 'vertical',
             flexGrow: 1,
+            mt: 0.5,
             '& *': {
               margin: '0 !important',
               fontSize: '0.875rem !important',

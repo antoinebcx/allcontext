@@ -10,8 +10,16 @@ import {
   MenuItem,
   Box,
   Divider,
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  useMediaQuery,
+  useTheme as useMuiTheme,
 } from '@mui/material';
-import { User, LogOut, Settings, Moon, Sun, BookOpen } from 'lucide-react';
+import { User, LogOut, Settings, Moon, Sun, BookOpen, Menu as MenuIcon, X, Home } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
 
@@ -20,8 +28,11 @@ export const Navbar: React.FC = () => {
   const location = useLocation();
   const { user, logout } = useAuth();
   const { mode, toggleTheme } = useTheme();
+  const muiTheme = useMuiTheme();
+  const isMobile = useMediaQuery(muiTheme.breakpoints.down('sm'));
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Handle scroll detection
   useEffect(() => {
@@ -65,6 +76,19 @@ export const Navbar: React.FC = () => {
     handleUserMenuClose();
   };
 
+  const handleMobileMenuToggle = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
+
+  const handleMobileMenuClose = () => {
+    setMobileMenuOpen(false);
+  };
+
+  const handleMobileNavigation = (path: string) => {
+    navigate(path);
+    handleMobileMenuClose();
+  };
+
   return (
     <AppBar
       position="fixed"
@@ -80,9 +104,9 @@ export const Navbar: React.FC = () => {
     >
       <Toolbar sx={{ gap: 1 }}>
         {/* Logo/Brand */}
-        <Typography 
-          variant="h6" 
-          sx={{ 
+        <Typography
+          variant="h6"
+          sx={{
             fontWeight: 600,
             cursor: 'pointer',
             mr: 2
@@ -95,8 +119,8 @@ export const Navbar: React.FC = () => {
         {/* Spacer */}
         <Box sx={{ flexGrow: 1 }} />
 
-        {/* Navigation */}
-        {user ? (
+        {/* Desktop Navigation */}
+        {!isMobile && user ? (
           <>
             {/* Authenticated user UI */}
             <Button
@@ -172,9 +196,9 @@ export const Navbar: React.FC = () => {
               </MenuItem>
             </Menu>
           </>
-        ) : (
+        ) : !isMobile && !user ? (
           <>
-            {/* Non-authenticated user UI */}
+            {/* Non-authenticated Desktop UI */}
             <Button
               startIcon={<BookOpen size={18} />}
               onClick={() => navigate('/docs')}
@@ -211,8 +235,162 @@ export const Navbar: React.FC = () => {
               Sign Up
             </Button>
           </>
+        ) : null}
+
+        {/* Mobile Menu Button - Right Side */}
+        {isMobile && (
+          <IconButton
+            edge="end"
+            onClick={handleMobileMenuToggle}
+            sx={{
+              ml: 1,
+              mr: -0.5,
+              color: 'text.secondary'
+            }}
+          >
+            {mobileMenuOpen ? <X size={24} /> : <MenuIcon size={24} />}
+          </IconButton>
         )}
       </Toolbar>
+
+      {/* Mobile Drawer */}
+      <Drawer
+        anchor="left"
+        open={mobileMenuOpen}
+        onClose={handleMobileMenuClose}
+        sx={{
+          '& .MuiDrawer-paper': {
+            width: 280,
+            bgcolor: 'background.default',
+            display: 'flex',
+            flexDirection: 'column',
+          },
+        }}
+      >
+        <Box sx={{ p: 2, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+          <Typography variant="h6" fontWeight={600} sx={{ mb: 3 }}>
+            Menu
+          </Typography>
+
+          <List sx={{ flexGrow: 1 }}>
+            {/* Home Link */}
+            <ListItem disablePadding sx={{ mb: 1 }}>
+              <ListItemButton
+                onClick={() => handleMobileNavigation('/')}
+                selected={location.pathname === '/'}
+                sx={{ borderRadius: 1 }}
+              >
+                <ListItemIcon>
+                  <Home size={20} />
+                </ListItemIcon>
+                <ListItemText primary="Home" />
+              </ListItemButton>
+            </ListItem>
+
+            {/* Docs Link */}
+            <ListItem disablePadding sx={{ mb: 1 }}>
+              <ListItemButton
+                onClick={() => handleMobileNavigation('/docs')}
+                selected={location.pathname.startsWith('/docs')}
+                sx={{ borderRadius: 1 }}
+              >
+                <ListItemIcon>
+                  <BookOpen size={20} />
+                </ListItemIcon>
+                <ListItemText primary="Documentation" />
+              </ListItemButton>
+            </ListItem>
+
+            {/* Settings Link (authenticated only) */}
+            {user && (
+              <ListItem disablePadding sx={{ mb: 1 }}>
+                <ListItemButton
+                  onClick={() => handleMobileNavigation('/settings')}
+                  selected={location.pathname === '/settings'}
+                  sx={{ borderRadius: 1 }}
+                >
+                  <ListItemIcon>
+                    <Settings size={20} />
+                  </ListItemIcon>
+                  <ListItemText primary="Settings" />
+                </ListItemButton>
+              </ListItem>
+            )}
+
+            {/* Theme Toggle */}
+            <ListItem disablePadding sx={{ mb: 1 }}>
+              <ListItemButton
+                onClick={() => {
+                  toggleTheme();
+                  handleMobileMenuClose();
+                }}
+                sx={{ borderRadius: 1 }}
+              >
+                <ListItemIcon>
+                  {mode === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+                </ListItemIcon>
+                <ListItemText primary={mode === 'light' ? 'Dark Mode' : 'Light Mode'} />
+              </ListItemButton>
+            </ListItem>
+
+            {/* Auth Links */}
+            {!user && (
+              <>
+                <Divider sx={{ my: 2 }} />
+                <ListItem disablePadding sx={{ mb: 1 }}>
+                  <ListItemButton
+                    onClick={() => handleMobileNavigation('/login')}
+                    sx={{ borderRadius: 1 }}
+                  >
+                    <ListItemText primary="Sign In" />
+                  </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                  <ListItemButton
+                    onClick={() => handleMobileNavigation('/login?signup=true')}
+                    sx={{
+                      borderRadius: 1,
+                      bgcolor: 'primary.main',
+                      color: 'primary.contrastText',
+                      '&:hover': {
+                        bgcolor: 'primary.dark',
+                      },
+                    }}
+                  >
+                    <ListItemText primary="Sign Up" />
+                  </ListItemButton>
+                </ListItem>
+              </>
+            )}
+          </List>
+
+          {/* User Section at Bottom */}
+          {user && (
+            <>
+              <Divider sx={{ mt: 2, mb: 2 }} />
+              <Box sx={{ px: 1 }}>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5, px: 1 }}>
+                  {user.email}
+                </Typography>
+                <ListItem disablePadding>
+                  <ListItemButton
+                    onClick={() => {
+                      handleLogout();
+                      handleMobileMenuClose();
+                    }}
+                    sx={{ borderRadius: 1 }}
+                  >
+                    <ListItemIcon>
+                      <LogOut size={20} />
+                    </ListItemIcon>
+                    <ListItemText primary="Logout" />
+                  </ListItemButton>
+                </ListItem>
+              </Box>
+            </>
+          )}
+        </Box>
+      </Drawer>
     </AppBar>
   );
 };
