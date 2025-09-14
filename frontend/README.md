@@ -34,6 +34,9 @@ A minimal, elegant React application for managing markdown-based AI artifacts (p
 - 📚 **Documentation** - In-app docs viewer with MCP/API reference
 - 📋 **Code Copy** - Copy buttons on all code blocks
 - 🎨 **Dynamic Navbar** - Border appears on scroll
+- 🛡️ **Error Boundaries** - Graceful crash recovery with auto-retry
+- 🔄 **Network Resilience** - Automatic retry with exponential backoff
+- ⚠️ **Error Recovery** - User-friendly messages and recovery options
 
 ## API Documentation
 
@@ -45,12 +48,16 @@ A minimal, elegant React application for managing markdown-based AI artifacts (p
 frontend/
 ├── src/
 │   ├── api/
-│   │   └── client.ts           # API client & axios config
+│   │   └── client.ts           # API client with retry logic
+│   ├── config/
+│   │   └── env.ts              # Environment validation
 │   ├── types/
 │   │   ├── index.ts            # Re-exports all types
 │   │   ├── artifact.ts         # Artifact types
 │   │   ├── auth.ts             # Auth types
-│   │   └── api-key.ts          # API key types
+│   │   ├── api-key.ts          # API key types
+│   │   ├── error.ts            # Error types
+│   │   └── logger.ts           # Logger types
 │   ├── components/
 │   │   ├── Artifacts/
 │   │   │   ├── ArtifactCard.tsx    # Grid card component
@@ -63,6 +70,9 @@ frontend/
 │   │   ├── Docs/
 │   │   │   ├── DocsSidebar.tsx     # Docs navigation
 │   │   │   └── DocsViewer.tsx      # Markdown viewer with copy
+│   │   ├── Errors/
+│   │   │   ├── ErrorBoundary.tsx   # Global error boundary
+│   │   │   └── ErrorFallback.tsx   # Error display component
 │   │   ├── Layout/
 │   │   │   ├── Layout.tsx          # App layout wrapper (conditional)
 │   │   │   └── Navbar.tsx          # Persistent navigation
@@ -80,6 +90,8 @@ frontend/
 │   │   ├── useIntersectionObserver.ts # Viewport detection for lazy loading
 │   │   └── useProgressiveContent.ts   # Chunk loading management
 │   ├── utils/
+│   │   ├── errors.ts           # Error handling utilities
+│   │   ├── logger.ts           # Logging utility (dev-only)
 │   │   └── markdown/
 │   │       └── chunking.ts     # Content splitting utilities
 │   ├── data/
@@ -186,6 +198,7 @@ The frontend expects a backend API at `VITE_API_URL` with these endpoints:
 - **Auth State**: Context provider with Supabase session
 - **Theme State**: Context provider with localStorage sync
 - **Local State**: React hooks for UI state
+- **Error State**: Global error boundary with recovery
 - **Type Safety**: Centralized types in `src/types/`
 
 ## Performance
@@ -195,6 +208,8 @@ The frontend expects a backend API at `VITE_API_URL` with these endpoints:
 - **Query Caching**: 5-minute stale time
 - **Lazy Loading**: Code splitting for modals
 - **Progressive Loading**: Content >10k chars loads in 5k chunks on scroll
+- **Retry Logic**: Exponential backoff for failed requests
+- **Timeout Handling**: 30-second timeout with user feedback
 
 ## Documentation
 
@@ -214,6 +229,14 @@ Features:
 - `⌘K` - Focus search
 - `⌘↵` - New artifact
 
+## Error Handling & Resilience
+
+- **Global Error Boundary**: Catches all React errors with auto-recovery
+- **Network Resilience**: 3 retry attempts with exponential backoff
+- **Environment Validation**: Clear errors for missing configuration
+- **User-Friendly Messages**: Technical errors translated to clear guidance
+- **Production Ready**: Clean console, no crashes, always recoverable
+
 ## Browser Support
 
 - Chrome/Edge 90+
@@ -227,8 +250,19 @@ Features:
 1. Create component in appropriate folder
 2. Define types in `src/types/`
 3. Add API function to `client.ts`
-4. Create React Query hook
+4. Create React Query hook with error handling
 5. Import and use in Dashboard
+
+### Error Handling
+```typescript
+// Use logger for dev debugging
+import { logger } from '@/utils/logger';
+logger.error('Operation failed', { context });
+
+// Get user-friendly error messages
+import { getErrorMessage } from '@/utils/errors';
+const message = getErrorMessage(error);
+```
 
 ### Modifying Theme
 Edit `src/theme/index.ts`:
@@ -271,7 +305,9 @@ Set these in your deployment platform:
 
 ### Static Hosting
 Deploy `dist/` folder to:
-- Netlify  
+- **Netlify** (production-ready with error recovery)
+- Vercel
+- GitHub Pages  
 
 ## Next Steps
 

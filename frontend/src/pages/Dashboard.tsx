@@ -186,7 +186,7 @@ export const Dashboard: React.FC = () => {
       )}
 
       {/* Unified Search and Create Bar */}
-      <Box sx={{ mb: 5, display: 'flex', justifyContent: 'center', gap: 1.5, mt: 3 }}>
+      <Box sx={{ mb: 7, display: 'flex', justifyContent: 'center', gap: 1.5, mt: 3 }}>
         <TextField
           placeholder="Search artifacts... (⌘K)"
           value={searchQuery}

@@ -63,7 +63,8 @@ export const ArtifactDetail: React.FC<ArtifactDetailProps> = ({
       await navigator.clipboard.writeText(textToCopy);
       setShowCopySuccess(true);
     } catch (error) {
-      console.error('Failed to copy:', error);
+      // Clipboard API might not be available
+      setShowCopySuccess(false);
     }
   };
 

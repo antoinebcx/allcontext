@@ -2,3 +2,5 @@
 export * from './artifact';
 export * from './api-key';
 export * from './auth';
+export * from './error';
+export * from './logger';

@@ -84,7 +84,7 @@ export const ArtifactForm: React.FC<ArtifactFormProps> = ({
       });
       setTabValue(0);
     } catch (error) {
-      console.error('Failed to save artifact:', error);
+      // Error is handled by the mutation hook
     } finally {
       setLoading(false);
     }

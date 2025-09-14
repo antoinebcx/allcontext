@@ -21,7 +21,7 @@ export function useIntersectionObserver<T extends Element = Element>(
 
     const hasSupport = !!window.IntersectionObserver;
     if (!hasSupport) {
-      console.warn('IntersectionObserver not supported');
+      // IntersectionObserver not supported in this browser
       return;
     }
 
