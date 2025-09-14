@@ -1,17 +1,10 @@
 """Authentication endpoints for the Context Platform."""
 
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException
 from supabase import create_client, Client
 from typing import Dict, Any
 from app.models import AuthRequest, EmailCheckRequest
-import os
-from pathlib import Path
-from dotenv import load_dotenv
-
-# Load environment variables from backend/.env
-backend_dir = Path(__file__).parent.parent.parent
-env_path = backend_dir / '.env'
-load_dotenv(env_path)
+from app.config import settings
 
 router = APIRouter(
     prefix="/api/v1/auth",
@@ -19,13 +12,7 @@ router = APIRouter(
 )
 
 # Supabase client using anon key for auth operations
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
-
-if not SUPABASE_URL or not SUPABASE_ANON_KEY:
-    raise ValueError("SUPABASE_URL and SUPABASE_ANON_KEY must be set")
-
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
+supabase: Client = create_client(settings.supabase_url, settings.supabase_anon_key)
 
 
 @router.post("/login")

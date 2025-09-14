@@ -218,7 +218,6 @@ export const Dashboard: React.FC = () => {
             px: 2.5,
             minWidth: 'auto',
             fontSize: '0.95rem',
-            fontWeight: 500
           }}
         >
           New

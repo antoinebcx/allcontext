@@ -21,14 +21,28 @@ from fastapi.responses import JSONResponse
 
 from app.api import artifacts, auth, api_keys
 from app.mcp.server import mcp
+from app.config import settings
+from app.database import Database
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Manage application lifecycle - start/stop MCP session manager."""
+    # Startup
+    logger.info(f"Starting Contexthub API - Environment: {settings.environment}")
+
+    # Verify database connection
+    if not Database.health_check():
+        logger.warning("Database connection failed at startup - will retry on requests")
+    else:
+        logger.info("Database connection verified")
+
     # Start the MCP session manager
     async with mcp.session_manager.run():
         yield
+
+    # Shutdown
+    logger.info("Shutting down Contexthub API")
 
 
 # OpenAPI configuration
@@ -69,11 +83,9 @@ servers = [
 ]
 
 # Add ngrok server if configured
-import os
-ngrok_url = os.getenv("NGROK_URL")
-if ngrok_url:
+if hasattr(settings, 'ngrok_url') and settings.ngrok_url:
     servers.append({
-        "url": ngrok_url,
+        "url": settings.ngrok_url,
         "description": "Development tunnel (ngrok)"
     })
 
@@ -133,15 +145,25 @@ Built with FastAPI, Supabase, and following OpenAPI 3.1 standards.
     lifespan=lifespan
 )
 
-# Configure CORS for frontend and MCP clients
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
+# Configure CORS based on environment
+if settings.is_production:
+    # Production: restrictive CORS
+    origins = [
+        "https://contexthub.com",
+        "https://www.contexthub.com",
+        # Add your production frontend domain here
+    ]
+else:
+    # Development: allow local origins
+    origins = [
         "http://localhost:5173",  # Vite dev server
         "http://localhost:3000",  # Alternative dev port
-        "http://localhost:8000",  # Production frontend
-        "*",  # For MCP clients - configure more restrictively in production
-    ],
+        "http://localhost:8000",  # Local API
+    ]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -151,8 +173,26 @@ app.add_middleware(
 # Health check endpoint
 @app.get("/health")
 async def health_check():
-    """Check if the service is running."""
-    return {"status": "healthy", "service": "context-platform"}
+    """Enhanced health check with dependency status."""
+    health = {
+        "status": "healthy",
+        "service": "contexthub",
+        "environment": settings.environment,
+        "checks": {
+            "api": "ok",
+            "database": "ok" if Database.health_check() else "degraded",
+            "mcp": "ok"
+        }
+    }
+
+    # Return 503 if any critical service is down
+    if health["checks"]["database"] != "ok":
+        return JSONResponse(
+            status_code=503,
+            content={**health, "status": "degraded"}
+        )
+
+    return health
 
 # Root endpoint
 @app.get("/")
@@ -210,11 +250,11 @@ async def internal_error_handler(request: Request, exc):
 # For running directly
 if __name__ == "__main__":
     import uvicorn
-    
+
     # Run the combined REST API and MCP server
     uvicorn.run(
         "app.main:app",
-        host="0.0.0.0",
-        port=8000,
-        reload=True
+        host=settings.api_host,
+        port=settings.port,
+        reload=settings.is_development
     )

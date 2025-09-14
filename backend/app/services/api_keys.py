@@ -6,21 +6,17 @@ import hashlib
 from typing import List, Optional
 from uuid import UUID
 from datetime import datetime, timezone
-from supabase import create_client, Client
-from dotenv import load_dotenv
-import os
+from supabase import Client
 import logging
+from app.database import db
 
 from app.models.api_key import (
-    ApiKeyCreate, 
-    ApiKeyUpdate, 
-    ApiKeyResponse, 
+    ApiKeyCreate,
+    ApiKeyUpdate,
+    ApiKeyResponse,
     ApiKeyCreated,
     ApiKeyValidation
 )
-
-# Load environment variables
-load_dotenv()
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -34,14 +30,10 @@ class ApiKeyService:
     KEY_LENGTH = 32  # Random part length
     MAX_KEYS_PER_USER = 10
     
-    def __init__(self):
-        url = os.getenv("SUPABASE_URL")
-        key = os.getenv("SUPABASE_KEY")
-        
-        if not url or not key:
-            raise ValueError("SUPABASE_URL and SUPABASE_KEY must be set in environment")
-        
-        self.client: Client = create_client(url, key)
+    @property
+    def client(self) -> Client:
+        """Get database client from singleton."""
+        return db()
     
     def _generate_api_key(self) -> tuple[str, str, str, str, str]:
         """

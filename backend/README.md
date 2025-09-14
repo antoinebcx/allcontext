@@ -20,7 +20,8 @@ backend/
 ├── app/
 │   ├── __init__.py
 │   ├── main.py                      # FastAPI app entry point with MCP mounting
-│   ├── config.py                    # Configuration management
+│   ├── config.py                    # Configuration management with Pydantic Settings
+│   ├── database.py                  # Singleton database connection
 │   ├── api/
 │   │   ├── __init__.py
 │   │   ├── artifacts.py             # REST API endpoints
@@ -94,7 +95,8 @@ FastMCP(
 **Authentication Context Management**: Due to limitations in the MCP SDK's stateless mode, we use Python's `contextvars` to maintain thread-safe, request-scoped authentication context. This ensures proper user isolation in concurrent requests while working within the framework's constraints.
 
 ### Service Layer Pattern
-- Service layer using Supabase for persistence
+- Singleton database client for connection reuse
+- Services use @property pattern for client access
 - Shared Pydantic models ensure consistency
 - Business logic isolated from transport layers
 
@@ -145,7 +147,7 @@ SUPABASE_ANON_KEY=your-anon-key     # For auth endpoints
 API_BASE_URL=https://api.contexthub.com  # Your API URL
 ```
 
-**Note:** Environment file must be in `/backend/.env` (not root). Config loads explicitly from backend directory.
+**Note:** Uses Pydantic Settings - loads from `.env` in development, environment variables in production (Heroku). Config auto-detects environment.
 
 ### 3. Setup Database
 
@@ -168,7 +170,7 @@ The schema includes:
 # Start the combined REST API and MCP server
 python app/main.py
 
-# Or with auto-reload for development
+# Or with uvicorn (respects settings.port)
 uvicorn app.main:app --reload
 ```
 
@@ -186,7 +188,7 @@ The backend serves both REST API and MCP from a single deployment:
 - `http://localhost:8000/mcp` - MCP server for AI assistants
 
 ### Health Check
-- `http://localhost:8000/health` - Service health status
+- `http://localhost:8000/health` - Enhanced health with database status
 
 ## Authentication
 
@@ -407,6 +409,8 @@ Located in `/backend/.env`:
 | `SUPABASE_ANON_KEY` | Supabase anon key for auth | Required |
 | `API_HOST` | API bind address | `0.0.0.0` |
 | `API_PORT` | API port | `8000` |
+| `PORT` | Override port (Heroku) | Uses API_PORT |
+| `ENVIRONMENT` | Environment (development/production) | `development` |
 | `API_BASE_URL` | Base URL for MCP auth | `https://api.contexthub.com` |
 | `CONTEXTHUB_API_KEY` | API key for testing | Required for tests |
 | `OPENAI_API_KEY` | OpenAI API key | Required for OpenAI tests |
@@ -416,6 +420,7 @@ Located in `/backend/.env`:
 ## Technical Notes
 
 ### Performance Optimizations
+- **Database connection**: Singleton pattern for connection reuse
 - **API key validation**: Uses lookup_hash for O(1) filtering before bcrypt comparison
 - **Text search**: PostgreSQL full-text search with GIN indexes
 - **Stateless MCP**: No session persistence overhead, perfect for cloud deployment
@@ -432,6 +437,32 @@ Located in `/backend/.env`:
 - MCP SDK's stateless mode doesn't properly inject auth context into tools
 - Workaround: Using Python's `contextvars` for thread-safe request context
 - This is a framework limitation that may be fixed in future SDK versions
+
+## Deployment
+
+### Heroku Deployment
+
+The backend is configured for Heroku deployment with:
+- `Procfile` for web process definition
+- `runtime.txt` specifying Python 3.11.10
+- Pydantic Settings handling environment variables
+- Database singleton for connection efficiency
+
+1. **Set Heroku environment variables:**
+```bash
+heroku config:set SUPABASE_URL=your_url
+heroku config:set SUPABASE_KEY=your_key
+heroku config:set SUPABASE_ANON_KEY=your_anon_key
+heroku config:set ENVIRONMENT=production
+heroku config:set API_BASE_URL=https://your-app.herokuapp.com
+```
+
+2. **Deploy:**
+```bash
+git add .
+git commit -m "Add production deployment configuration"
+git push heroku main
+```
 
 ## Documentation
 
@@ -452,7 +483,6 @@ When contributing, please:
 
 ## Next Steps
 
-- [ ] Add proper logging, error handling, typing everywhere
 - [ ] Implement proper versioning for artifacts
 - [ ] Add `confirmation_required` flag to delete operations in MCP tools for safety and/or a warning in tool description doc
 - [ ] Add rate limiting

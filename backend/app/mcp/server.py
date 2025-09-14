@@ -75,13 +75,16 @@ def get_authenticated_user_id() -> Optional[UUID]:
 def create_mcp_server() -> FastMCP:
     """
     Create the MCP server with stateless configuration for cloud deployment.
-    
+
     Returns:
         Configured FastMCP server instance
     """
-    import os
-    base_url = os.getenv("API_BASE_URL", "https://api.contexthub.com")
-    
+    from app.config import settings
+
+    base_url = settings.api_base_url
+    if settings.is_development:
+        base_url = f"http://localhost:{settings.port}"
+
     return FastMCP(
         name="ContextHub",
         instructions=(

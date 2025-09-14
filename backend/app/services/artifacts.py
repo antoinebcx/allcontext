@@ -1,30 +1,22 @@
 """Service layer for artifact operations using Supabase."""
 
-import os
 from typing import List, Optional
 from uuid import UUID
-from supabase import create_client, Client
-from dotenv import load_dotenv
+from supabase import Client
 from app.models.artifacts import Artifact, ArtifactCreate, ArtifactUpdate, ArtifactSearchResult
 from app.utils import extract_title_from_content, generate_snippet
-
-# Load environment variables
-load_dotenv()
+from app.database import db
 
 
 class ArtifactService:
     """
     Service class for artifact operations using Supabase.
     """
-    
-    def __init__(self):
-        url = os.getenv("SUPABASE_URL")
-        key = os.getenv("SUPABASE_KEY")
-        
-        if not url or not key:
-            raise ValueError("SUPABASE_URL and SUPABASE_KEY must be set in environment")
-        
-        self.client: Client = create_client(url, key)
+
+    @property
+    def client(self) -> Client:
+        """Get database client from singleton."""
+        return db()
     
     async def create(self, user_id: UUID, data: ArtifactCreate) -> Artifact:
         """Create a new artifact in Supabase."""
