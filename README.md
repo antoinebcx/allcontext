@@ -17,12 +17,14 @@ Your context in the cloud — accessible anywhere, anytime, through any interfac
 - **[MCP Specification](./docs/MCP_SPECIFICATION.md)** - MCP server spec
 - **[MCP Integration](./docs/MCP_INTEGRATION.md)** - How to connect and use the MCP
 
+## Community
+
+- [Contributing Guidelines](./CONTRIBUTING.md)
+- [Code of Conduct](./CODE_OF_CONDUCT.md)
+- [Security Policy](./SECURITY.md)
+- [License](./LICENSE)
+
 ## Future To-dos
 
-Add:
-- LICENSE file
 - Docker files / docker-compose and deployment documentation
 - CI/CD pipelines - GitHub Actions with automated testing
-- Contributing guidelines - CONTRIBUTING.md
-- Security policy - SECURITY.md
-- Code of Conduct - CODE_OF_CONDUCT.md
