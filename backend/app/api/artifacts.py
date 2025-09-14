@@ -72,12 +72,6 @@ async def search_artifacts(
     Returns preview snippets instead of full content (best practice).
     Use GET /artifacts/{id} to retrieve full content.
     """
-    if len(q) < 2:
-        raise HTTPException(
-            status_code=400,
-            detail="Search query must be at least 2 characters"
-        )
-
     results = await artifact_service.search(
         user_id=user_id,
         query=q
