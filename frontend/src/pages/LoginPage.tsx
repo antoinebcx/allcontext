@@ -160,7 +160,7 @@ export const LoginPage: React.FC = () => {
           )}
           
           <Typography component="h1" variant="h5" sx={{ mb: 1, textAlign: 'center' }}>
-            {isSignupMode ? 'Create Account' : 'Welcome to Contexthub'}
+            {isSignupMode ? 'Create Account' : 'Welcome to Allcontext'}
           </Typography>
 
           <Typography

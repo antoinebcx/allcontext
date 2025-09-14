@@ -1,4 +1,4 @@
-# Contexthub
+# Allcontext
 
 Personal AI context management platform.
 

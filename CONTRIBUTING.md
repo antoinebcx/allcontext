@@ -1,12 +1,12 @@
-# Contributing to Contexthub
+# Contributing to Allcontext
 
-Thank you for your interest in contributing to Contexthub. This project follows a philosophy of simplicity, minimalism, and effectiveness.
+Thank you for your interest in contributing to Allcontext. This project follows a philosophy of simplicity, minimalism, and effectiveness.
 
 ## How to Contribute
 
 ### Reporting Issues
 
-- Use [GitHub Issues](https://github.com/yourusername/contexthub/issues)
+- Use [GitHub Issues](https://github.com/yourusername/allcontext/issues)
 - Check existing issues first
 - Include: clear description, steps to reproduce, expected vs actual behavior
 - For bugs: include environment details (OS, Python version, etc.)
@@ -84,7 +84,7 @@ npm run dev
 
 ## Questions?
 
-Open a [Discussion](https://github.com/yourusername/contexthub/discussions) on GitHub.
+Open a [Discussion](https://github.com/yourusername/allcontext/discussions) on GitHub.
 
 ## License
 

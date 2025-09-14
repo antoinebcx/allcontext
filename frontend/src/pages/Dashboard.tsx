@@ -163,7 +163,7 @@ export const Dashboard: React.FC = () => {
           <Info size={20} />
           <Box sx={{ flexGrow: 1 }}>
             <Typography variant="body1" fontWeight={500}>
-              Welcome to Contexthub! Your context in the cloud — accessible anywhere, anytime, through any interface (app, API, MCP).
+              Welcome to Allcontext! Your context in the cloud — accessible anywhere, anytime, through any interface (app, API, MCP).
             </Typography>
             <Typography variant="body2" sx={{ opacity: 0.9 }}>
               You're viewing demo content. Sign up to create and save your own artifacts.

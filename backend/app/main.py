@@ -29,7 +29,7 @@ from app.database import Database
 async def lifespan(app: FastAPI):
     """Manage application lifecycle - start/stop MCP session manager."""
     # Startup
-    logger.info(f"Starting Contexthub API - Environment: {settings.environment}")
+    logger.info(f"Starting Allcontext API - Environment: {settings.environment}")
 
     # Verify database connection
     if not Database.health_check():
@@ -42,7 +42,7 @@ async def lifespan(app: FastAPI):
         yield
 
     # Shutdown
-    logger.info("Shutting down Contexthub API")
+    logger.info("Shutting down Allcontext API")
 
 
 # OpenAPI configuration
@@ -77,7 +77,7 @@ servers = [
         "description": "Local development server"
     },
     {
-        "url": "https://api.contexthub.com",
+        "url": "https://api.allcontext.dev",
         "description": "Production server"
     }
 ]
@@ -91,11 +91,11 @@ if hasattr(settings, 'ngrok_url') and settings.ngrok_url:
 
 # Create FastAPI app with enhanced OpenAPI configuration
 app = FastAPI(
-    title="Contexthub API",
+    title="Allcontext API",
     description="""
 ## Personal AI Context Management Platform
 
-Contexthub provides a unified platform for storing and managing AI context artifacts through multiple access patterns:
+Allcontext provides a unified platform for storing and managing AI context artifacts through multiple access patterns:
 
 ### 🔗 **Dual Access Architecture**
 - **REST API** (`/api/v1/*`) - Traditional HTTP endpoints for web applications
@@ -129,9 +129,9 @@ Built with FastAPI, Supabase, and following OpenAPI 3.1 standards.
     """.strip(),
     version="1.0.0",
     contact={
-        "name": "Contexthub",
-        "url": "https://github.com/contexthub/api",
-        "email": "support@contexthub.com"
+        "name": "Allcontext",
+        "url": "https://github.com/allcontext/api",
+        "email": "support@allcontext.dev"
     },
     license_info={
         "name": "MIT",
@@ -149,8 +149,8 @@ Built with FastAPI, Supabase, and following OpenAPI 3.1 standards.
 if settings.is_production:
     # Production: restrictive CORS
     origins = [
-        "https://contexthub.com",
-        "https://www.contexthub.com",
+        "https://allcontext.dev",
+        "https://www.allcontext.dev",
         # Add your production frontend domain here
     ]
 else:
@@ -176,7 +176,7 @@ async def health_check():
     """Enhanced health check with dependency status."""
     health = {
         "status": "healthy",
-        "service": "contexthub",
+        "service": "allcontext",
         "environment": settings.environment,
         "checks": {
             "api": "ok",

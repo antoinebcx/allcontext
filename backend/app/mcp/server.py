@@ -86,7 +86,7 @@ def create_mcp_server() -> FastMCP:
         base_url = f"http://localhost:{settings.port}"
 
     return FastMCP(
-        name="ContextHub",
+        name="Allcontext",
         instructions=(
             "A cloud-based platform for storing and managing AI context artifacts. "
             "Store prompts, documentation, and markdown content that can be accessed "

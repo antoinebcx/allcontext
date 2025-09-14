@@ -89,7 +89,7 @@ export const Navbar: React.FC = () => {
           }}
           onClick={() => navigate('/')}
         >
-          Contexthub
+          Allcontext
         </Typography>
 
         {/* Spacer */}

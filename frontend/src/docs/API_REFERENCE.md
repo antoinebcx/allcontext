@@ -1,6 +1,6 @@
-# Contexthub API Reference
+# Allcontext API Reference
 
-Comprehensive reference for the Contexthub REST API - your personal AI context management platform.
+Comprehensive reference for the Allcontext REST API - your personal AI context management platform.
 
 ## Table of Contents
 
@@ -19,13 +19,13 @@ Comprehensive reference for the Contexthub REST API - your personal AI context m
 
 ## Overview
 
-The Contexthub API provides REST endpoints for managing AI context artifacts. All endpoints return JSON and follow RESTful conventions.
+The Allcontext API provides REST endpoints for managing AI context artifacts. All endpoints return JSON and follow RESTful conventions.
 
 ### Base URLs
 
 | Environment | URL | Description |
 |-------------|-----|-------------|
-| **Production** | `https://api.contexthub.com` | Live production API |
+| **Production** | `https://api.allcontext.dev` | Live production API |
 | **Development** | `http://localhost:8000` | Local development server |
 | **Tunnel** | `https://your-tunnel.ngrok-free.app` | Development tunnel (ngrok) |
 
@@ -42,7 +42,7 @@ Current version: **v1** (all endpoints prefixed with `/api/v1/`)
 
 ## Authentication
 
-Contexthub supports dual authentication methods:
+Allcontext supports dual authentication methods:
 
 ### 1. JWT Bearer Tokens (Web Sessions)
 
@@ -162,7 +162,7 @@ Check if the service is running.
 
 **Example**:
 ```bash
-curl https://api.contexthub.com/health
+curl https://api.allcontext.dev/health
 ```
 
 ---
@@ -200,7 +200,7 @@ Authenticate user with email and password.
 
 **Example**:
 ```bash
-curl -X POST https://api.contexthub.com/api/v1/auth/login \
+curl -X POST https://api.allcontext.dev/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "user@example.com",
@@ -327,7 +327,7 @@ Create a new artifact.
 
 **Example**:
 ```bash
-curl -X POST https://api.contexthub.com/api/v1/artifacts \
+curl -X POST https://api.allcontext.dev/api/v1/artifacts \
   -H "Content-Type: application/json" \
   -H "X-API-Key: sk_prod_your_api_key" \
   -d '{
@@ -376,7 +376,7 @@ List artifacts (user's artifacts + public artifacts).
 
 **Example**:
 ```bash
-curl https://api.contexthub.com/api/v1/artifacts?limit=10&offset=0 \
+curl https://api.allcontext.dev/api/v1/artifacts?limit=10&offset=0 \
   -H "X-API-Key: sk_prod_your_api_key"
 ```
 
@@ -413,7 +413,7 @@ Search artifacts by text in title and content.
 
 **Example**:
 ```bash
-curl "https://api.contexthub.com/api/v1/artifacts/search?q=API%20guidelines" \
+curl "https://api.allcontext.dev/api/v1/artifacts/search?q=API%20guidelines" \
   -H "X-API-Key: sk_prod_your_api_key"
 ```
 
@@ -447,7 +447,7 @@ Get a specific artifact by ID.
 
 **Example**:
 ```bash
-curl https://api.contexthub.com/api/v1/artifacts/123e4567-e89b-12d3-a456-426614174000 \
+curl https://api.allcontext.dev/api/v1/artifacts/123e4567-e89b-12d3-a456-426614174000 \
   -H "X-API-Key: sk_prod_your_api_key"
 ```
 
@@ -501,7 +501,7 @@ Update an existing artifact.
 
 **Example**:
 ```bash
-curl -X PUT https://api.contexthub.com/api/v1/artifacts/123e4567-e89b-12d3-a456-426614174000 \
+curl -X PUT https://api.allcontext.dev/api/v1/artifacts/123e4567-e89b-12d3-a456-426614174000 \
   -H "Content-Type: application/json" \
   -H "X-API-Key: sk_prod_your_api_key" \
   -d '{
@@ -527,7 +527,7 @@ Delete an artifact.
 
 **Example**:
 ```bash
-curl -X DELETE https://api.contexthub.com/api/v1/artifacts/123e4567-e89b-12d3-a456-426614174000 \
+curl -X DELETE https://api.allcontext.dev/api/v1/artifacts/123e4567-e89b-12d3-a456-426614174000 \
   -H "X-API-Key: sk_prod_your_api_key"
 ```
 
@@ -582,7 +582,7 @@ Create a new API key.
 
 **Example**:
 ```bash
-curl -X POST https://api.contexthub.com/api/v1/api-keys \
+curl -X POST https://api.allcontext.dev/api/v1/api-keys \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." \
   -d '{
@@ -705,7 +705,7 @@ Delete (revoke) an API key.
 1. **Register and get JWT token**:
 ```bash
 # Register
-TOKEN=$(curl -X POST https://api.contexthub.com/api/v1/auth/signup \
+TOKEN=$(curl -X POST https://api.allcontext.dev/api/v1/auth/signup \
   -H "Content-Type: application/json" \
   -d '{"email": "dev@example.com", "password": "securepass123"}' \
   | jq -r '.access_token')
@@ -714,7 +714,7 @@ TOKEN=$(curl -X POST https://api.contexthub.com/api/v1/auth/signup \
 2. **Create an API key**:
 ```bash
 # Create API key
-API_KEY=$(curl -X POST https://api.contexthub.com/api/v1/api-keys \
+API_KEY=$(curl -X POST https://api.allcontext.dev/api/v1/api-keys \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d '{"name": "My Integration", "scopes": ["read", "write"]}' \
@@ -724,11 +724,11 @@ API_KEY=$(curl -X POST https://api.contexthub.com/api/v1/api-keys \
 3. **Create your first artifact**:
 ```bash
 # Create artifact
-ARTIFACT_ID=$(curl -X POST https://api.contexthub.com/api/v1/artifacts \
+ARTIFACT_ID=$(curl -X POST https://api.allcontext.dev/api/v1/artifacts \
   -H "Content-Type: application/json" \
   -H "X-API-Key: $API_KEY" \
   -d '{
-    "content": "# My First Context\n\nThis is my personal AI context artifact.\n\n## Key Information\n- Project: Contexthub\n- Type: Documentation\n- Purpose: Testing the API",
+    "content": "# My First Context\n\nThis is my personal AI context artifact.\n\n## Key Information\n- Project: Allcontext\n- Type: Documentation\n- Purpose: Testing the API",
     "metadata": {"category": "personal", "priority": "high"}
   }' \
   | jq -r '.id')
@@ -739,11 +739,11 @@ echo "Created artifact: $ARTIFACT_ID"
 4. **Search and retrieve**:
 ```bash
 # Search artifacts
-curl "https://api.contexthub.com/api/v1/artifacts/search?q=context" \
+curl "https://api.allcontext.dev/api/v1/artifacts/search?q=context" \
   -H "X-API-Key: $API_KEY"
 
 # Get specific artifact
-curl "https://api.contexthub.com/api/v1/artifacts/$ARTIFACT_ID" \
+curl "https://api.allcontext.dev/api/v1/artifacts/$ARTIFACT_ID" \
   -H "X-API-Key: $API_KEY"
 ```
 
@@ -754,8 +754,8 @@ curl "https://api.contexthub.com/api/v1/artifacts/$ARTIFACT_ID" \
 ```python
 import requests
 
-class ContexthubClient:
-    def __init__(self, api_key: str, base_url: str = "https://api.contexthub.com"):
+class AllcontextClient:
+    def __init__(self, api_key: str, base_url: str = "https://api.allcontext.dev"):
         self.api_key = api_key
         self.base_url = base_url
         self.session = requests.Session()
@@ -784,7 +784,7 @@ class ContexthubClient:
         return response.json()
 
 # Usage
-client = ContexthubClient("sk_prod_your_api_key")
+client = AllcontextClient("sk_prod_your_api_key")
 artifact = client.create_artifact(
     "# Project Notes\n\nKey insights from today's meeting...",
     metadata={"project": "alpha", "meeting_date": "2024-01-15"}
@@ -794,8 +794,8 @@ artifact = client.create_artifact(
 #### Node.js Example
 
 ```javascript
-class ContexthubClient {
-  constructor(apiKey, baseUrl = 'https://api.contexthub.com') {
+class AllcontextClient {
+  constructor(apiKey, baseUrl = 'https://api.allcontext.dev') {
     this.apiKey = apiKey;
     this.baseUrl = baseUrl;
   }
@@ -831,7 +831,7 @@ class ContexthubClient {
 }
 
 // Usage
-const client = new ContexthubClient('sk_prod_your_api_key');
+const client = new AllcontextClient('sk_prod_your_api_key');
 const artifact = await client.createArtifact(
   '# Project Notes\n\nKey insights...',
   { metadata: { project: 'beta' } }
@@ -850,4 +850,4 @@ const artifact = await client.createArtifact(
 
 ---
 
-*This reference covers Contexthub API v1.0.0. For the latest updates, check the interactive documentation.*
+*This reference covers Allcontext API v1.0.0. For the latest updates, check the interactive documentation.*

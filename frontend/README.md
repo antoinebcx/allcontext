@@ -1,4 +1,4 @@
-# Context Platform Frontend
+# Allcontext Frontend
 
 A minimal, elegant React application for managing markdown-based AI artifacts (prompts and documents).
 

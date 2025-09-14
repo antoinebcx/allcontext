@@ -4,10 +4,10 @@ export const demoArtifacts: Artifact[] = [
   {
     id: 'demo-1',
     user_id: 'demo-user',
-    title: 'Welcome to Contexthub',
-    content: `# Welcome to Contexthub
+    title: 'Welcome to Allcontext',
+    content: `# Welcome to Allcontext
 
-Contexthub is your personal AI context management platform. Store, organize, and access your prompts, documentation, and markdown content from anywhere.
+Allcontext is your personal AI context management platform. Store, organize, and access your prompts, documentation, and markdown content from anywhere.
 
 ## Key Features
 

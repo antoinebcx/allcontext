@@ -2,7 +2,7 @@
 
 ## Our Pledge
 
-We as members, contributors, and leaders pledge to make participation in **Contexthub** a harassment‑free experience for everyone, regardless of age, body size, visible or invisible disability, ethnicity, sex characteristics, gender identity and expression, level of experience, education, socio‑economic status, nationality, personal appearance, race, religion, or sexual identity and orientation. We act with empathy and respect, reflecting the project’s values of simplicity, minimalism, and first‑principles thinking.
+We as members, contributors, and leaders pledge to make participation in **Allcontext** a harassment‑free experience for everyone, regardless of age, body size, visible or invisible disability, ethnicity, sex characteristics, gender identity and expression, level of experience, education, socio‑economic status, nationality, personal appearance, race, religion, or sexual identity and orientation. We act with empathy and respect, reflecting the project’s values of simplicity, minimalism, and first‑principles thinking.
 
 ## Our Standards
 
@@ -30,9 +30,9 @@ This Code applies within all project spaces and also applies when an individual 
 
 ## Enforcement
 
-Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the maintainers at **[conduct@contexthub.com](mailto:conduct@contexthub.com)**. All complaints will be reviewed and investigated promptly and fairly, with respect for the reporter’s privacy. We will acknowledge receipt within **48 hours**.
+Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the maintainers at **[conduct@allcontext.dev](mailto:conduct@allcontext.dev)**. All complaints will be reviewed and investigated promptly and fairly, with respect for the reporter’s privacy. We will acknowledge receipt within **48 hours**.
 
-**Security vulnerabilities** must **not** be reported through this channel. Please follow our [Security Policy](SECURITY.md) and email **[security@contexthub.com](mailto:security@contexthub.com)**.
+**Security vulnerabilities** must **not** be reported through this channel. Please follow our [Security Policy](SECURITY.md) and email **[security@allcontext.dev](mailto:security@allcontext.dev)**.
 
 ## Enforcement Guidelines
 

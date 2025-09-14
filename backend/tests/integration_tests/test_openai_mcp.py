@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 """
-Test ContextHub MCP server with OpenAI SDK.
+Test Allcontext MCP server with OpenAI SDK.
 
 Before running:
 1. Start the MCP server: python app/main.py
 2. (Optional) Start ngrok: ngrok http 8000
 3. Set NGROK_URL in .env if using ngrok
-4. Ensure .env has OPENAI_API_KEY and CONTEXTHUB_API_KEY
+4. Ensure .env has OPENAI_API_KEY and ALLCONTEXT_API_KEY
 """
 
 import os
@@ -26,11 +26,11 @@ from openai import OpenAI
 # Configuration
 NGROK_URL = os.getenv("NGROK_URL", "http://localhost:8000")
 MCP_URL = f"{NGROK_URL}/mcp"
-API_KEY = os.getenv("CONTEXTHUB_API_KEY")
+API_KEY = os.getenv("ALLCONTEXT_API_KEY")
 OPENAI_KEY = os.getenv("OPENAI_API_KEY")
 
 if not API_KEY:
-    print("Error: CONTEXTHUB_API_KEY not found in .env")
+    print("Error: ALLCONTEXT_API_KEY not found in .env")
     sys.exit(1)
 
 if not OPENAI_KEY:
@@ -51,7 +51,7 @@ def test_list_artifacts():
             model="gpt-4o",
             tools=[{
                 "type": "mcp",
-                "server_label": "ContextHub",
+                "server_label": "Allcontext",
                 "server_description": "Personal AI context management platform",
                 "server_url": MCP_URL,
                 "authorization": API_KEY,
@@ -96,7 +96,7 @@ def test_create_artifact():
             model="gpt-4o",
             tools=[{
                 "type": "mcp",
-                "server_label": "ContextHub",
+                "server_label": "Allcontext",
                 "server_description": "Personal AI context management platform",
                 "server_url": MCP_URL,
                 "authorization": API_KEY,
@@ -134,7 +134,7 @@ def test_search_artifacts():
             model="gpt-4o",
             tools=[{
                 "type": "mcp",
-                "server_label": "ContextHub",
+                "server_label": "Allcontext",
                 "server_description": "Personal AI context management platform",
                 "server_url": MCP_URL,
                 "authorization": API_KEY,
@@ -164,7 +164,7 @@ def test_search_artifacts():
 def main():
     """Run all tests."""
     print("\n" + "=" * 60)
-    print("ContextHub MCP Server - OpenAI SDK Test Suite")
+    print("Allcontext MCP Server - OpenAI SDK Test Suite")
     print("=" * 60)
     print(f"MCP Server URL: {MCP_URL}")
     print(f"API Key: {API_KEY[:8]}...{API_KEY[-4:]}")

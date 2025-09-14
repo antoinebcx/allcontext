@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 """
-Test ContextHub MCP server with Anthropic SDK.
+Test Allcontext MCP server with Anthropic SDK.
 
 Before running:
 1. Start the MCP server: python app/main.py
 2. (Optional) Start ngrok: ngrok http 8000
 3. Set NGROK_URL in .env if using ngrok
-4. Ensure .env has ANTHROPIC_API_KEY and CONTEXTHUB_API_KEY
+4. Ensure .env has ANTHROPIC_API_KEY and ALLCONTEXT_API_KEY
 """
 
 import os
@@ -26,11 +26,11 @@ from anthropic import Anthropic
 # Configuration
 NGROK_URL = os.getenv("NGROK_URL", "http://localhost:8000")
 MCP_URL = f"{NGROK_URL}/mcp"
-API_KEY = os.getenv("CONTEXTHUB_API_KEY")
+API_KEY = os.getenv("ALLCONTEXT_API_KEY")
 ANTHROPIC_KEY = os.getenv("ANTHROPIC_API_KEY")
 
 if not API_KEY:
-    print("Error: CONTEXTHUB_API_KEY not found in .env")
+    print("Error: ALLCONTEXT_API_KEY not found in .env")
     sys.exit(1)
 
 if not ANTHROPIC_KEY:
@@ -57,7 +57,7 @@ def test_list_artifacts():
             mcp_servers=[{
                 "type": "url",
                 "url": MCP_URL,
-                "name": "contexthub",
+                "name": "allcontext",
                 "authorization_token": API_KEY
             }],
             betas=["mcp-client-2025-04-04"]
@@ -100,7 +100,7 @@ def test_create_artifact():
             mcp_servers=[{
                 "type": "url",
                 "url": MCP_URL,
-                "name": "contexthub",
+                "name": "allcontext",
                 "authorization_token": API_KEY
             }],
             betas=["mcp-client-2025-04-04"]
@@ -139,7 +139,7 @@ def test_search_artifacts():
             mcp_servers=[{
                 "type": "url",
                 "url": MCP_URL,
-                "name": "contexthub",
+                "name": "allcontext",
                 "authorization_token": API_KEY
             }],
             betas=["mcp-client-2025-04-04"]
@@ -178,7 +178,7 @@ def test_get_specific_artifact():
             mcp_servers=[{
                 "type": "url",
                 "url": MCP_URL,
-                "name": "contexthub",
+                "name": "allcontext",
                 "authorization_token": API_KEY
             }],
             betas=["mcp-client-2025-04-04"]
@@ -202,7 +202,7 @@ def test_get_specific_artifact():
 def main():
     """Run all tests."""
     print("\n" + "=" * 60)
-    print("ContextHub MCP Server - Anthropic SDK Test Suite")
+    print("Allcontext MCP Server - Anthropic SDK Test Suite")
     print("=" * 60)
     print(f"MCP Server URL: {MCP_URL}")
     print(f"API Key: {API_KEY[:8]}...{API_KEY[-4:]}")

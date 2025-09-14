@@ -1,6 +1,6 @@
-# Contexthub MCP Server Specification
+# Allcontext MCP Server Specification
 
-Model Context Protocol (MCP) server specification for Contexthub - enabling AI assistants to manage personal context artifacts.
+Model Context Protocol (MCP) server specification for Allcontext - enabling AI assistants to manage personal context artifacts.
 
 ## Table of Contents
 
@@ -15,7 +15,7 @@ Model Context Protocol (MCP) server specification for Contexthub - enabling AI a
 
 ## Overview
 
-The Contexthub MCP server provides AI assistants with direct access to personal context artifacts through the Model Context Protocol. This enables seamless integration with AI tools like Claude Desktop, OpenAI assistants, and other MCP-compatible clients.
+The Allcontext MCP server provides AI assistants with direct access to personal context artifacts through the Model Context Protocol. This enables seamless integration with AI tools like Claude Desktop, OpenAI assistants, and other MCP-compatible clients.
 
 ### MCP Version Compliance
 
@@ -28,7 +28,7 @@ The Contexthub MCP server provides AI assistants with direct access to personal 
 
 ```json
 {
-  "name": "ContextHub",
+  "name": "Allcontext",
   "version": "1.0.0",
   "instructions": "A cloud-based platform for storing and managing AI context artifacts. Store prompts, documentation, and markdown content that can be accessed by AI assistants through multiple interfaces."
 }
@@ -65,7 +65,7 @@ The Contexthub MCP server provides AI assistants with direct access to personal 
       "description": "Local development"
     },
     {
-      "url": "https://api.contexthub.com/mcp",
+      "url": "https://api.allcontext.dev/mcp",
       "description": "Production server"
     },
     {
@@ -82,14 +82,14 @@ The server uses **stateless HTTP** configuration optimized for cloud deployment:
 
 ```python
 FastMCP(
-    name="ContextHub",
+    name="Allcontext",
     stateless_http=True,        # No session persistence
     json_response=True,         # Pure JSON responses
     streamable_http_path="/",   # Prevents path issues
     token_verifier=ApiKeyVerifier(),
     auth=AuthSettings(
-        issuer_url="https://api.contexthub.com",
-        resource_server_url="https://api.contexthub.com/mcp",
+        issuer_url="https://api.allcontext.dev",
+        resource_server_url="https://api.allcontext.dev/mcp",
         required_scopes=["read", "write"]
     )
 )
@@ -101,7 +101,7 @@ FastMCP(
 
 ### OAuth Resource Server Configuration
 
-Contexthub MCP server operates as an **OAuth Resource Server** following MCP 2025 security specifications.
+Allcontext MCP server operates as an **OAuth Resource Server** following MCP 2025 security specifications.
 
 ### Authentication Method
 
@@ -146,7 +146,7 @@ def get_authenticated_user_id() -> Optional[UUID]:
 
 ## Tools
 
-The Contexthub MCP server provides 6 core tools for complete artifact management.
+The Allcontext MCP server provides 6 core tools for complete artifact management.
 
 ### 1. create_artifact
 
@@ -567,7 +567,7 @@ AI Assistant (Claude/OpenAI)
         ↓ MCP JSON-RPC
     FastMCP Framework
         ↓ HTTP Transport
-    Contexthub MCP Server (/mcp)
+    Allcontext MCP Server (/mcp)
         ↓ API Key Authentication
     FastAPI Application
         ↓ Service Layer
@@ -587,17 +587,17 @@ AI Assistant (Claude/OpenAI)
 ```yaml
 # Docker Compose Example
 services:
-  contexthub:
-    image: contexthub/api:latest
+  allcontext:
+    image: allcontext/api:latest
     environment:
       - USE_SUPABASE=true
       - SUPABASE_URL=https://your-project.supabase.co
       - SUPABASE_KEY=your-service-key
-      - API_BASE_URL=https://api.contexthub.com
+      - API_BASE_URL=https://api.allcontext.dev
     ports:
       - "8000:8000"
 ```
 
 ---
 
-*This specification covers Contexthub MCP Server v1.0.0 following MCP 2025-03-26 standards.*
+*This specification covers Allcontext MCP Server v1.0.0 following MCP 2025-03-26 standards.*

@@ -39,7 +39,7 @@ export const DocsSidebar: React.FC<DocsSidebarProps> = ({
           Documentation
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-          Learn how to use Contexthub
+          Learn how to use Allcontext
         </Typography>
       </Box>
 

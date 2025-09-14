@@ -172,14 +172,14 @@ export const Settings: React.FC = () => {
                 Add the MCP to Claude Code with this simple terminal command:
                 <Box sx={{ position: 'relative', mt: 1 }}>
                   <Box component="pre" sx={{ p: 2, bgcolor: 'background.paper', borderRadius: 1, fontSize: '0.875rem', fontFamily: 'monospace', overflow: 'auto' }}>
-                    {`claude mcp add --transport http contexthub https://api.contexthub.com/mcp \\
+                    {`claude mcp add --transport http allcontext https://api.allcontext.dev/mcp \\
      --header "Authorization: Bearer your_api_key"`}
                   </Box>
                   <Tooltip title={copiedCode === 'mcp-command' ? "Copied!" : "Copy command"}>
                     <IconButton
                       size="small"
                       onClick={() => {
-                        handleCopyCode(`claude mcp add --transport http contexthub https://api.contexthub.com/mcp \\\n     --header "Authorization: Bearer your_api_key"`, 'mcp-command');
+                        handleCopyCode(`claude mcp add --transport http allcontext https://api.allcontext.dev/mcp \\\n     --header "Authorization: Bearer your_api_key"`, 'mcp-command');
                       }}
                       sx={{
                         position: 'absolute',
@@ -203,13 +203,13 @@ export const Settings: React.FC = () => {
                 <Box sx={{ position: 'relative', mt: 1 }}>
                   <Box component="pre" sx={{ p: 2, bgcolor: 'background.paper', borderRadius: 1, fontSize: '0.875rem', fontFamily: 'monospace', overflow: 'auto' }}>
                     {`curl -H "X-API-Key: your_api_key" \\
-     https://api.contexthub.com/api/v1/artifacts`}
+     https://api.allcontext.dev/api/v1/artifacts`}
                   </Box>
                   <Tooltip title={copiedCode === 'curl-command' ? "Copied!" : "Copy command"}>
                     <IconButton
                       size="small"
                       onClick={() => {
-                        handleCopyCode(`curl -H "X-API-Key: your_api_key" \\\n     https://api.contexthub.com/api/v1/artifacts`, 'curl-command');
+                        handleCopyCode(`curl -H "X-API-Key: your_api_key" \\\n     https://api.allcontext.dev/api/v1/artifacts`, 'curl-command');
                       }}
                       sx={{
                         position: 'absolute',
@@ -267,7 +267,7 @@ export const Settings: React.FC = () => {
               Appearance
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-              Customize how Contexthub looks on your device
+              Customize how Allcontext looks on your device
             </Typography>
 
             <Box>

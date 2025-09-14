@@ -1,4 +1,4 @@
-# Context Platform Backend
+# Allcontext Backend
 
 AI context management platform with dual REST API and MCP (Model Context Protocol) support, backed by Supabase for persistent storage.
 
@@ -144,7 +144,7 @@ cp .env.example .env
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_KEY=your-service-role-key  # Use service_role key for backend
 SUPABASE_ANON_KEY=your-anon-key     # For auth endpoints
-API_BASE_URL=https://api.contexthub.com  # Your API URL
+API_BASE_URL=https://api.allcontext.dev  # Your API URL
 ```
 
 **Note:** Uses Pydantic Settings - loads from `.env` in development, environment variables in production (Heroku). Config auto-detects environment.
@@ -285,7 +285,7 @@ python tests/integration_tests/test_api_endpoints.py
 
 **Prerequisites:**
 - Server running on localhost:8000 or ngrok
-- `CONTEXTHUB_API_KEY` in `.env`
+- `ALLCONTEXT_API_KEY` in `.env`
 - Optional: `NGROK_URL` for remote testing
 
 **Output:** Detailed test report with timing, pass/fail status, and cleanup verification.
@@ -411,8 +411,8 @@ Located in `/backend/.env`:
 | `API_PORT` | API port | `8000` |
 | `PORT` | Override port (Heroku) | Uses API_PORT |
 | `ENVIRONMENT` | Environment (development/production) | `development` |
-| `API_BASE_URL` | Base URL for MCP auth | `https://api.contexthub.com` |
-| `CONTEXTHUB_API_KEY` | API key for testing | Required for tests |
+| `API_BASE_URL` | Base URL for MCP auth | `https://api.allcontext.dev` |
+| `ALLCONTEXT_API_KEY` | API key for testing | Required for tests |
 | `OPENAI_API_KEY` | OpenAI API key | Required for OpenAI tests |
 | `ANTHROPIC_API_KEY` | Anthropic API key | Required for Anthropic tests |
 | `NGROK_URL` | Ngrok tunnel URL | Optional for remote testing |

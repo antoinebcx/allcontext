@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 """
-Comprehensive integration test for Contexthub API endpoints.
+Comprehensive integration test for Allcontext API endpoints.
 
 Tests the full API lifecycle that developers would use when integrating
-with the Contexthub service programmatically via Python requests.
+with the Allcontext service programmatically via Python requests.
 
 Before running:
 1. Start the API server: python app/main.py
-2. Ensure .env has CONTEXTHUB_API_KEY set
+2. Ensure .env has ALLCONTEXT_API_KEY set
 3. (Optional) Set NGROK_URL in .env for remote testing
 
 Usage:
@@ -30,10 +30,10 @@ load_dotenv(backend_dir / ".env")
 
 # Configuration
 BASE_URL = os.getenv("NGROK_URL", "http://localhost:8000")
-API_KEY = os.getenv("CONTEXTHUB_API_KEY")
+API_KEY = os.getenv("ALLCONTEXT_API_KEY")
 
 if not API_KEY:
-    print("❌ Error: CONTEXTHUB_API_KEY not found in .env")
+    print("❌ Error: ALLCONTEXT_API_KEY not found in .env")
     sys.exit(1)
 
 # Test configuration
@@ -723,7 +723,7 @@ def test_delete_artifacts():
 def main():
     """Run the complete API integration test suite."""
     print("=" * 80)
-    print("CONTEXTHUB API INTEGRATION TEST SUITE")
+    print("ALLCONTEXT API INTEGRATION TEST SUITE")
     print("=" * 80)
     print(f"Base URL: {BASE_URL}")
     print(f"API Key: {API_KEY[:12]}...{API_KEY[-4:]}")

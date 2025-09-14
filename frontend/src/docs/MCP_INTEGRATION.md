@@ -1,4 +1,4 @@
-# Contexthub MCP Integration & Configuration
+# Allcontext MCP Integration & Configuration
 
 ## Table of Contents
 
@@ -12,23 +12,23 @@
 
 ## Quick Start
 
-Generate your Contexthub API key in Settings and connect via MCP using any of these methods:
+Generate your Allcontext API key in Settings and connect via MCP using any of these methods:
 
 ### Claude Code
 
 Add the MCP to Claude Code with this simple terminal command:
 ```zsh
-claude mcp add --transport http contexthub https://api.contexthub.com/mcp \
+claude mcp add --transport http allcontext https://api.allcontext.dev/mcp \
   --header "Authorization: Bearer your_api_key"
 ```
 
-You can then ask Claude to interact with your Contexthub (search, read, write...).
+You can then ask Claude to interact with your Allcontext (search, read, write...).
 
 Learn more about MCP connectors with Claude Code: https://docs.anthropic.com/en/docs/claude-code/mcp
 
 ### OpenAI SDK
 
-Use the Contexthub MCP with the OpenAI SDK:
+Use the Allcontext MCP with the OpenAI SDK:
 
 **Python:**
 ```python
@@ -41,9 +41,9 @@ resp = client.responses.create(
     tools=[
         {
             "type": "mcp",
-            "server_label": "Contexthub",
+            "server_label": "Allcontext",
             "server_description": "Personal context management platform",
-            "server_url": "https://api.contexthub.com/mcp",
+            "server_url": "https://api.allcontext.dev/mcp",
             "authorization": "YOUR_API_KEY",
             "require_approval": "never",
         },
@@ -64,9 +64,9 @@ const resp = await client.responses.create({
   tools: [
     {
       type: "mcp",
-      server_label: "Contexthub",
+      server_label: "Allcontext",
       server_description: "Personal context management platform",
-      server_url: "https://api.contexthub.com/mcp",
+      server_url: "https://api.allcontext.dev/mcp",
       authorization: "YOUR_API_KEY",
       require_approval: "never",
     },
@@ -81,7 +81,7 @@ Learn more about MCP connectors with the OpenAI SDK: https://platform.openai.com
 
 ### Anthropic SDK
 
-Use the Contexthub MCP with the Anthropic SDK:
+Use the Allcontext MCP with the Anthropic SDK:
 
 **Python:**
 ```python
@@ -97,8 +97,8 @@ response = client.beta.messages.create(
     }],
     mcp_servers=[{
         "type": "url",
-        "url": "https://api.contexthub.com/mcp",
-        "name": "Contexthub",
+        "url": "https://api.allcontext.dev/mcp",
+        "name": "Allcontext",
         "authorization_token": "YOUR_API_KEY"
     }],
     betas=["mcp-client-2025-04-04"]
@@ -122,8 +122,8 @@ const response = await anthropic.beta.messages.create({
   mcp_servers: [
     {
       type: "url",
-      url: "https://api.contexthub.com/mcp",
-      name: "Contexthub",
+      url: "https://api.allcontext.dev/mcp",
+      name: "Allcontext",
       authorization_token: "YOUR_API_KEY",
     },
   ],
@@ -139,8 +139,8 @@ Add to your Claude Desktop config:
 ```json
 {
   "mcpServers": {
-    "contexthub": {
-      "url": "https://api.contexthub.com/mcp",
+    "allcontext": {
+      "url": "https://api.allcontext.dev/mcp",
       "transport": "http",
       "headers": {
         "Authorization": "Bearer YOUR_API_KEY"

@@ -22,7 +22,7 @@ class Settings(BaseSettings):
     debug: bool = False
 
     # API Base URL for MCP
-    api_base_url: str = "https://api.contexthub.com"
+    api_base_url: str = "https://api.allcontext.dev"
 
     @property
     def port(self) -> int:
