@@ -2,7 +2,7 @@
 
 Personal AI context management platform.
 
-Your context, stored in the cloud, always accessible by any means (app, API, MCP).
+Your context in the cloud — accessible anywhere, anytime, through any interface (app, API, MCP).
 
 ## Structure
 
@@ -13,6 +13,7 @@ Your context, stored in the cloud, always accessible by any means (app, API, MCP
 ## Documentation
 
 - **[API Reference](./docs/API_REFERENCE.md)** - REST API endpoints
+- **[API Integration](./docs/API_INTEGRATION.md)** - Quick integration guide with examples
 - **[MCP Specification](./docs/MCP_SPECIFICATION.md)** - MCP server spec
 - **[MCP Integration](./docs/MCP_INTEGRATION.md)** - How to connect and use the MCP
 

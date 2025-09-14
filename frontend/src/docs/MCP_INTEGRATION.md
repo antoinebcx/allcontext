@@ -1,8 +1,18 @@
-# Contexthub MCP Client Integration & Configuration
+# Contexthub MCP Integration & Configuration
+
+## Table of Contents
+
+- [Quick Start](#quick-start)
+  - [Claude Code](#claude-code)
+  - [OpenAI SDK](#openai-sdk)
+  - [Anthropic SDK](#anthropic-sdk)
+  - [Claude Desktop](#claude-desktop)
+  - [ChatGPT](#chatgpt)
+  - [Claude.ai](#claudeai)
 
 ## Quick Start
 
-Create an API key in Contexthub, then connect via MCP using one of these methods.
+Generate your Contexthub API key in Settings and connect via MCP using any of these methods:
 
 ### Claude Code
 
@@ -12,13 +22,15 @@ claude mcp add --transport http contexthub https://api.contexthub.com/mcp \
   --header "Authorization: Bearer your_api_key"
 ```
 
-You can then ask to Claude to interact with your Contexthub (search, read, write...).
+You can then ask Claude to interact with your Contexthub (search, read, write...).
+
+Learn more about MCP connectors with Claude Code: https://docs.anthropic.com/en/docs/claude-code/mcp
 
 ### OpenAI SDK
 
 Use the Contexthub MCP with the OpenAI SDK:
 
-Python:
+**Python:**
 ```python
 from openai import OpenAI
 
@@ -30,7 +42,7 @@ resp = client.responses.create(
         {
             "type": "mcp",
             "server_label": "Contexthub",
-            "server_description": "Personal AI context management platform",
+            "server_description": "Personal context management platform",
             "server_url": "https://api.contexthub.com/mcp",
             "authorization": "YOUR_API_KEY",
             "require_approval": "never",
@@ -42,7 +54,7 @@ resp = client.responses.create(
 print(resp)
 ```
 
-TypeScript:
+**TypeScript:**
 ```typescript
 import OpenAI from "openai";
 const client = new OpenAI();
@@ -53,7 +65,7 @@ const resp = await client.responses.create({
     {
       type: "mcp",
       server_label: "Contexthub",
-      server_description: "Personal AI context management platform",
+      server_description: "Personal context management platform",
       server_url: "https://api.contexthub.com/mcp",
       authorization: "YOUR_API_KEY",
       require_approval: "never",
@@ -65,11 +77,13 @@ const resp = await client.responses.create({
 console.log(resp);
 ```
 
+Learn more about MCP connectors with the OpenAI SDK: https://platform.openai.com/docs/guides/tools-connectors-mcp?lang=python
+
 ### Anthropic SDK
 
 Use the Contexthub MCP with the Anthropic SDK:
 
-Python:
+**Python:**
 ```python
 import anthropic
 
@@ -91,7 +105,7 @@ response = client.beta.messages.create(
 )
 ```
 
-TypeScript:
+**TypeScript:**
 ```typescript
 import { Anthropic } from '@anthropic-ai/sdk';
 
@@ -116,6 +130,8 @@ const response = await anthropic.beta.messages.create({
   betas: ["mcp-client-2025-04-04"],
 });
 ```
+
+Learn more about MCP connectors with the Anthropic SDK: https://docs.anthropic.com/en/docs/agents-and-tools/mcp-connector
 
 ### Claude Desktop
 

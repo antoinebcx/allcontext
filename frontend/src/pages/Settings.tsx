@@ -125,7 +125,7 @@ export const Settings: React.FC = () => {
                 </Typography>
               </Box>
               <Button
-                variant="contained"
+                variant="outlined"
                 startIcon={<Plus size={18} />}
                 onClick={handleCreateClick}
                 disabled={data?.items && data.items.length >= 10}

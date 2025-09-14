@@ -87,6 +87,7 @@ frontend/
 │   │   └── docsRegistry.ts     # Docs imports & metadata
 │   ├── docs/                    # Documentation markdown files
 │   │   ├── API_REFERENCE.md
+│   │   ├── API_INTEGRATION.md
 │   │   ├── MCP_SPECIFICATION.md
 │   │   └── MCP_INTEGRATION.md
 │   ├── pages/

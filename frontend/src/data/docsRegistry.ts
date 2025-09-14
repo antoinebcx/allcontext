@@ -1,6 +1,8 @@
 // @ts-ignore
 import ApiReference from '../docs/API_REFERENCE.md?raw';
 // @ts-ignore
+import ApiIntegration from '../docs/API_INTEGRATION.md?raw';
+// @ts-ignore
 import McpSpecification from '../docs/MCP_SPECIFICATION.md?raw';
 // @ts-ignore
 import McpIntegration from '../docs/MCP_INTEGRATION.md?raw';
@@ -18,6 +20,12 @@ export const docsRegistry: DocItem[] = [
     title: 'MCP Integration',
     description: 'How to connect and use the MCP server with various AI clients',
     content: McpIntegration,
+  },
+  {
+    id: 'api-integration',
+    title: 'API Integration',
+    description: 'Quick guide to integrate with the REST API using curl, Python, or JavaScript',
+    content: ApiIntegration,
   },
   {
     id: 'mcp-specification',
