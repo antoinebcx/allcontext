@@ -39,6 +39,7 @@ A minimal, elegant React application for managing markdown-based AI artifacts (p
 - 🛡️ **Error Boundaries** - Graceful crash recovery with auto-retry
 - 🔄 **Network Resilience** - Automatic retry with exponential backoff
 - ⚠️ **Error Recovery** - User-friendly messages and recovery options
+- 📜 **Version History** - Track last 20 versions with restore capability
 
 ## API Documentation
 
@@ -63,9 +64,10 @@ frontend/
 │   ├── components/
 │   │   ├── Artifacts/
 │   │   │   ├── ArtifactCard.tsx        # Grid card component with connect button
-│   │   │   ├── ArtifactDetail.tsx      # Detail view modal with connect button
+│   │   │   ├── ArtifactDetail.tsx      # Detail view modal with version history
 │   │   │   ├── ArtifactForm.tsx        # Create/edit form (no title field)
-│   │   │   └── ConnectPopover.tsx      # API/MCP usage examples popover
+│   │   │   ├── ConnectPopover.tsx      # API/MCP usage examples popover
+│   │   │   └── VersionHistory.tsx      # Version history sidebar panel
 │   │   ├── ApiKeys/
 │   │   │   ├── ApiKeysList.tsx     # API keys table
 │   │   │   ├── CreateApiKey.tsx    # Creation dialog
@@ -87,7 +89,8 @@ frontend/
 │   │   ├── AuthContext.tsx     # Auth state management
 │   │   └── ThemeContext.tsx    # Theme mode & localStorage
 │   ├── hooks/
-│   │   ├── useArtifacts.ts     # React Query hooks
+│   │   ├── useArtifacts.ts     # React Query hooks for artifacts
+│   │   ├── useArtifactVersions.ts # Version history hooks
 │   │   ├── useApiKeys.ts       # API key hooks
 │   │   ├── useDebounce.ts      # Debounce utility
 │   │   ├── useIntersectionObserver.ts # Viewport detection for lazy loading
@@ -186,6 +189,10 @@ The frontend expects a backend API at `VITE_API_URL` with these endpoints:
 - `PUT /api/v1/artifacts/{id}` - Update artifact
 - `DELETE /api/v1/artifacts/{id}` - Delete artifact
 - `GET /api/v1/artifacts/search?q=` - Search artifacts
+- `GET /api/v1/artifacts/{id}/versions` - Get version history
+- `GET /api/v1/artifacts/{id}/versions/{version}` - Get specific version
+- `POST /api/v1/artifacts/{id}/restore/{version}` - Restore to version
+- `GET /api/v1/artifacts/{id}/diff?from_version=X&to_version=Y` - Compare versions
 
 ### API Key Management Endpoints
 - `POST /api/v1/api-keys` - Create API key
@@ -314,6 +321,5 @@ Deploy `dist/` folder to:
 
 ## Next Steps
 
-- [ ] Version history
 - [ ] Password reset flow
 - [ ] Email verification

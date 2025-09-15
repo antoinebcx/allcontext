@@ -10,6 +10,8 @@ import type {
   ArtifactUpdate,
   ArtifactList,
   ArtifactSearchResult,
+  ArtifactVersion,
+  ArtifactVersionsResponse,
   ApiKey,
   ApiKeyCreate,
   ApiKeyCreated,
@@ -161,6 +163,43 @@ export const artifactApi = {
       const response = await apiClient.get<ArtifactSearchResult[]>(
         '/api/v1/artifacts/search',
         { params, signal }
+      );
+      return response.data;
+    });
+  },
+
+  getVersions: async (id: string) => {
+    return retryRequest(async () => {
+      const response = await apiClient.get<ArtifactVersionsResponse>(
+        `/api/v1/artifacts/${id}/versions`
+      );
+      return response.data;
+    });
+  },
+
+  getVersion: async (id: string, versionNumber: number) => {
+    return retryRequest(async () => {
+      const response = await apiClient.get<ArtifactVersion>(
+        `/api/v1/artifacts/${id}/versions/${versionNumber}`
+      );
+      return response.data;
+    });
+  },
+
+  restoreVersion: async (id: string, versionNumber: number) => {
+    // Don't retry mutations
+    const response = await apiClient.post<Artifact>(
+      `/api/v1/artifacts/${id}/restore/${versionNumber}`
+    );
+    return response.data;
+  },
+
+  compareVersions: async (id: string, fromVersion: number, toVersion: number) => {
+    return retryRequest(async () => {
+      const params = { from_version: fromVersion, to_version: toVersion };
+      const response = await apiClient.get(
+        `/api/v1/artifacts/${id}/diff`,
+        { params }
       );
       return response.data;
     });

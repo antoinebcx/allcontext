@@ -143,6 +143,12 @@ export const Dashboard: React.FC = () => {
     setFormOpen(false);
   };
 
+  const handleArtifactUpdate = (updatedArtifact: Artifact) => {
+    // Update the selected artifact with the restored version
+    setSelectedArtifact(updatedArtifact);
+    // The artifacts list will be refreshed via React Query invalidation
+  };
+
   return (
     <>
       {/* Welcome Banner for non-authenticated users */}
@@ -294,6 +300,7 @@ export const Dashboard: React.FC = () => {
         artifact={selectedArtifact}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        onUpdate={handleArtifactUpdate}
       />
     </>
   );

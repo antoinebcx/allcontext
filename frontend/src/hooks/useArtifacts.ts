@@ -87,6 +87,8 @@ export const useUpdateArtifact = () => {
       queryClient.setQueryData([ARTIFACT_KEY, updatedArtifact.id], updatedArtifact);
       // Invalidate list
       queryClient.invalidateQueries({ queryKey: [ARTIFACTS_KEY] });
+      // Invalidate version queries since the artifact was updated
+      queryClient.invalidateQueries({ queryKey: ['artifact-versions', updatedArtifact.id] });
       logger.info('Artifact updated successfully', { id: updatedArtifact.id });
     },
     onError: (error: unknown, variables) => {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -12,6 +12,8 @@ import {
   Tooltip,
   Snackbar,
   Alert,
+  Chip,
+  CircularProgress,
 } from '@mui/material';
 import {
   X,
@@ -19,12 +21,15 @@ import {
   Edit,
   Trash2,
   Download,
-  Cable
+  Cable,
+  History,
 } from 'lucide-react';
 import type { Artifact } from '../../types';
 import { MarkdownRenderer } from '../Markdown/MarkdownRenderer';
 import { ProgressiveMarkdownRenderer } from '../Markdown/ProgressiveMarkdownRenderer';
 import { ConnectPopover } from './ConnectPopover';
+import { VersionHistory } from './VersionHistory';
+import { useArtifactVersion } from '../../hooks/useArtifactVersions';
 
 interface ArtifactDetailProps {
   open: boolean;
@@ -32,6 +37,7 @@ interface ArtifactDetailProps {
   artifact: Artifact | null;
   onEdit: () => void;
   onDelete: () => void;
+  onUpdate?: (updatedArtifact: Artifact) => void;
 }
 
 export const ArtifactDetail: React.FC<ArtifactDetailProps> = ({
@@ -40,12 +46,33 @@ export const ArtifactDetail: React.FC<ArtifactDetailProps> = ({
   artifact,
   onEdit,
   onDelete,
+  onUpdate,
 }) => {
   const [showCopySuccess, setShowCopySuccess] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [connectAnchorEl, setConnectAnchorEl] = useState<HTMLElement | null>(null);
+  const [showVersionHistory, setShowVersionHistory] = useState(false);
+  const [viewingVersion, setViewingVersion] = useState<number | null>(null);
+
+  // Version queries
+  const { data: versionData, isLoading: isLoadingVersion } = useArtifactVersion(
+    artifact?.id || '',
+    viewingVersion
+  );
+
+  // Reset viewing version when artifact changes or dialog closes
+  useEffect(() => {
+    if (!open || !artifact) {
+      setViewingVersion(null);
+      setShowVersionHistory(false);
+    }
+  }, [open, artifact?.id]);
 
   if (!artifact) return null;
+
+  // Determine what content to show (current or historical version)
+  const displayContent = viewingVersion && versionData ? versionData : artifact;
+  const isViewingHistory = viewingVersion !== null;
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -58,9 +85,9 @@ export const ArtifactDetail: React.FC<ArtifactDetailProps> = ({
   };
 
   const handleCopy = async (format: 'markdown' | 'plain') => {
-    const textToCopy = format === 'markdown' 
-      ? artifact.content 
-      : artifact.content.replace(/[#*`_~\[\]()]/g, ''); // Strip markdown
+    const textToCopy = format === 'markdown'
+      ? displayContent.content
+      : displayContent.content.replace(/[#*`_~\[\]()]/g, ''); // Strip markdown
 
     try {
       await navigator.clipboard.writeText(textToCopy);
@@ -72,15 +99,33 @@ export const ArtifactDetail: React.FC<ArtifactDetailProps> = ({
   };
 
   const handleDownload = () => {
-    const blob = new Blob([artifact.content], { type: 'text/markdown' });
+    const blob = new Blob([displayContent.content], { type: 'text/markdown' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${artifact.title.toLowerCase().replace(/\s+/g, '-')}.md`;
+    a.download = `${displayContent.title.toLowerCase().replace(/\s+/g, '-')}.md`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+  };
+
+  const handleViewVersion = (versionNumber: number) => {
+    // If clicking on current version, clear the viewing version to show current
+    if (versionNumber === artifact.version) {
+      setViewingVersion(null);
+    } else {
+      setViewingVersion(versionNumber);
+    }
+  };
+
+  const handleRestore = (restoredArtifact: Artifact) => {
+    // Update the parent component if callback provided
+    if (onUpdate) {
+      onUpdate(restoredArtifact);
+    }
+    // Clear viewing version to show the newly restored current version
+    setViewingVersion(null);
   };
 
   const handleDelete = () => {
@@ -115,9 +160,19 @@ export const ArtifactDetail: React.FC<ArtifactDetailProps> = ({
       >
         <DialogTitle sx={{ p: 2, pb: 1 }}>
           <Stack direction="row" alignItems="center" justifyContent="space-between">
-            <Typography variant="h6" sx={{ fontWeight: 600 }}>
-              {artifact.title}
-            </Typography>
+            <Stack direction="row" alignItems="center" spacing={1}>
+              <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                {displayContent.title}
+              </Typography>
+              {isViewingHistory && (
+                <Chip
+                  label={`Version ${viewingVersion}`}
+                  size="small"
+                  color="warning"
+                  variant="outlined"
+                />
+              )}
+            </Stack>
             <IconButton onClick={onClose} size="small">
               <X size={20} />
             </IconButton>
@@ -135,15 +190,24 @@ export const ArtifactDetail: React.FC<ArtifactDetailProps> = ({
               backgroundColor: 'background.default',
             }}
           >
-            <Stack direction="row" spacing={2} alignItems="center">
+            <Stack direction="row" spacing={1.5} alignItems="center">
               <Typography variant="caption" color="text.secondary">
-              Created {formatDate(artifact.created_at)}
-            </Typography>
+                Created {formatDate(artifact.created_at)}
+              </Typography>
               {artifact.updated_at !== artifact.created_at && (
-                <Typography variant="caption" color="text.secondary">
-                  • Updated {formatDate(artifact.updated_at)}
-                </Typography>
+                <>
+                  <Typography variant="caption" color="text.secondary">|</Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    Updated {formatDate(artifact.updated_at)}
+                  </Typography>
+                </>
               )}
+              <>
+                <Typography variant="caption" color="text.secondary">|</Typography>
+                <Typography variant="caption" color="text.secondary">
+                  Version {artifact.version}
+                </Typography>
+              </>
               <Box sx={{ flexGrow: 1 }} />
               <Stack direction="row" spacing={0.5}>
                 <Tooltip title="Copy as Markdown">
@@ -161,8 +225,22 @@ export const ArtifactDetail: React.FC<ArtifactDetailProps> = ({
                     <Download size={16} />
                   </IconButton>
                 </Tooltip>
+                {artifact.version > 1 && (
+                  <Tooltip title="Version History">
+                    <IconButton
+                      size="small"
+                      onClick={() => setShowVersionHistory(!showVersionHistory)}
+                    >
+                      <History size={16} />
+                    </IconButton>
+                  </Tooltip>
+                )}
                 <Tooltip title="Edit">
-                  <IconButton size="small" onClick={onEdit}>
+                  <IconButton
+                    size="small"
+                    onClick={onEdit}
+                    disabled={isViewingHistory}
+                  >
                     <Edit size={16} />
                   </IconButton>
                 </Tooltip>
@@ -171,6 +249,7 @@ export const ArtifactDetail: React.FC<ArtifactDetailProps> = ({
                     size="small"
                     onClick={() => setShowDeleteConfirm(true)}
                     sx={{ color: 'error.main' }}
+                    disabled={isViewingHistory}
                   >
                     <Trash2 size={16} />
                   </IconButton>
@@ -182,21 +261,54 @@ export const ArtifactDetail: React.FC<ArtifactDetailProps> = ({
           {/* Content */}
           <Box
             sx={{
-              p: 3,
+              position: 'relative',
               height: 'calc(90vh - 120px)',
-              overflowY: 'auto',
+              display: 'flex',
             }}
           >
-            {/* Use progressive rendering for content over 10k chars */}
-            {artifact.content.length > 10000 ? (
-              <ProgressiveMarkdownRenderer
-                content={artifact.content}
-                chunkSize={5000}
-                initialChunks={2}
-              />
-            ) : (
-              <MarkdownRenderer content={artifact.content} />
-            )}
+            <Box
+              sx={{
+                p: 3,
+                flexGrow: 1,
+                overflowY: 'auto',
+                pr: showVersionHistory ? 0 : 3,
+              }}
+            >
+              {isLoadingVersion ? (
+                <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                  <CircularProgress size={32} thickness={2} />
+                </Box>
+              ) : (
+                <>
+                  {isViewingHistory && (
+                    <Alert severity="info" sx={{ mb: 2 }}>
+                      Viewing Version {viewingVersion} | This is a read-only historical version
+                    </Alert>
+                  )}
+                  {/* Use progressive rendering for content over 10k chars */}
+                  {displayContent.content.length > 10000 ? (
+                    <ProgressiveMarkdownRenderer
+                      content={displayContent.content}
+                      chunkSize={5000}
+                      initialChunks={2}
+                    />
+                  ) : (
+                    <MarkdownRenderer content={displayContent.content} />
+                  )}
+                </>
+              )}
+            </Box>
+
+            {/* Version History Panel */}
+            <VersionHistory
+              open={showVersionHistory}
+              onClose={() => setShowVersionHistory(false)}
+              artifactId={artifact.id}
+              currentVersion={artifact.version}
+              viewingVersion={viewingVersion}
+              onViewVersion={handleViewVersion}
+              onRestore={handleRestore}
+            />
           </Box>
         </DialogContent>
       </Dialog>
