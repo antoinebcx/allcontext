@@ -2,7 +2,7 @@
 
 from pydantic import BaseModel, Field, ConfigDict
 from datetime import datetime, timezone
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 from uuid import UUID, uuid4
 
 
@@ -72,3 +72,32 @@ class ArtifactSearchResult(BaseModel):
     metadata: Dict[str, Any] = Field(default_factory=dict)
     created_at: datetime
     updated_at: datetime
+
+
+class ArtifactVersion(BaseModel):
+    """Historical version of an artifact."""
+    version: int
+    title: str
+    content: str
+    metadata: Dict[str, Any]
+    updated_at: datetime
+    content_length: int
+    title_changed: bool = False
+    content_changed: bool = False
+
+
+class ArtifactVersionSummary(BaseModel):
+    """Summary of a version for API responses."""
+    version: int
+    title: str
+    updated_at: datetime
+    content_length: int
+    changes: List[str] = []  # ["title", "content"]
+
+
+class ArtifactVersionsResponse(BaseModel):
+    """Response model for version history endpoint."""
+    id: UUID
+    current_version: int
+    version_count: int
+    versions: List[ArtifactVersionSummary]

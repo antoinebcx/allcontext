@@ -456,6 +456,24 @@ class AllcontextClient {
       method: 'DELETE',
     });
   }
+
+  async getVersions(artifactId: string) {
+    return this.request(`/artifacts/${artifactId}/versions`);
+  }
+
+  async getVersion(artifactId: string, versionNumber: number) {
+    return this.request(`/artifacts/${artifactId}/versions/${versionNumber}`);
+  }
+
+  async restoreVersion(artifactId: string, versionNumber: number) {
+    return this.request(`/artifacts/${artifactId}/restore/${versionNumber}`, {
+      method: 'POST',
+    });
+  }
+
+  async compareVersions(artifactId: string, fromVersion: number, toVersion: number) {
+    return this.request(`/artifacts/${artifactId}/diff?from_version=${fromVersion}&to_version=${toVersion}`);
+  }
 }
 
 // Usage
@@ -470,6 +488,16 @@ console.log('Created:', artifact.id);
 
 const results = await client.searchArtifacts('meeting');
 console.log('Found:', results.length, 'artifacts');
+
+// Version management
+const versions = await client.getVersions(artifact.id);
+console.log('Version history:', versions.version_count, 'edits');
+
+// Restore to previous version
+if (versions.versions.length > 0) {
+  await client.restoreVersion(artifact.id, versions.versions[0].version);
+  console.log('Restored to version:', versions.versions[0].version);
+}
 ```
 
 ## Next Steps

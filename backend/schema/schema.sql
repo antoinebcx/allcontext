@@ -15,7 +15,9 @@ CREATE TABLE IF NOT EXISTS artifacts (
     metadata JSONB DEFAULT '{}',
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
-    version INTEGER DEFAULT 1
+    version INTEGER DEFAULT 1,
+    version_history JSONB DEFAULT '[]'::jsonb,
+    version_count INTEGER DEFAULT 0
 );
 
 -- Create indexes for performance
@@ -67,26 +69,72 @@ CREATE INDEX idx_api_keys_lookup_hash ON api_keys(lookup_hash) WHERE is_active =
 -- TRIGGERS & FUNCTIONS
 -- ============================================================================
 
--- Create updated_at trigger function
-CREATE OR REPLACE FUNCTION update_updated_at_column()
+-- Versioning trigger function for artifacts table
+CREATE OR REPLACE FUNCTION archive_artifact_version()
 RETURNS TRIGGER AS $$
+DECLARE
+    version_entry JSONB;
+    history_limit INTEGER := 20;
+    new_history JSONB;
 BEGIN
+    -- Only archive if content or title actually changed
+    IF OLD.content IS DISTINCT FROM NEW.content OR
+       OLD.title IS DISTINCT FROM NEW.title THEN
+
+        -- Create version entry with metadata
+        version_entry := jsonb_build_object(
+            'version', OLD.version,
+            'title', OLD.title,
+            'content', OLD.content,
+            'metadata', OLD.metadata,
+            'updated_at', OLD.updated_at,
+            'content_length', length(OLD.content),
+            'title_changed', OLD.title IS DISTINCT FROM NEW.title,
+            'content_changed', OLD.content IS DISTINCT FROM NEW.content
+        );
+
+        -- Prepend new version and limit to history_limit entries
+        new_history := version_entry || COALESCE(OLD.version_history, '[]'::jsonb);
+
+        -- Keep only the first history_limit versions
+        NEW.version_history := (
+            SELECT jsonb_agg(elem)
+            FROM (
+                SELECT elem
+                FROM jsonb_array_elements(new_history) AS elem
+                LIMIT history_limit
+            ) AS limited_history
+        );
+
+        -- Increment counters
+        NEW.version_count := COALESCE(OLD.version_count, 0) + 1;
+        NEW.version := OLD.version + 1;
+    END IF;
+
     NEW.updated_at = NOW();
-    NEW.version = OLD.version + 1;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
--- Apply trigger to artifacts table
-CREATE TRIGGER update_artifacts_updated_at 
-    BEFORE UPDATE ON artifacts 
-    FOR EACH ROW 
-    EXECUTE FUNCTION update_updated_at_column();
+-- Simple updated_at trigger function for other tables
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
--- Apply trigger to api_keys table
-CREATE TRIGGER update_api_keys_updated_at 
-    BEFORE UPDATE ON api_keys 
-    FOR EACH ROW 
+-- Apply versioning trigger to artifacts table
+CREATE TRIGGER archive_artifact_version_trigger
+    BEFORE UPDATE ON artifacts
+    FOR EACH ROW
+    EXECUTE FUNCTION archive_artifact_version();
+
+-- Apply simple trigger to api_keys table
+CREATE TRIGGER update_api_keys_updated_at
+    BEFORE UPDATE ON api_keys
+    FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
 -- Function to clean up expired API keys
@@ -155,6 +203,8 @@ COMMENT ON TABLE artifacts IS 'Stores markdown-based AI context artifacts';
 COMMENT ON COLUMN artifacts.title IS 'Auto-generated from content if not provided';
 COMMENT ON COLUMN artifacts.content IS 'Markdown content, max 100k characters';
 COMMENT ON COLUMN artifacts.metadata IS 'Flexible JSON metadata for categorization';
+COMMENT ON COLUMN artifacts.version_history IS 'JSONB array storing last 20 versions for rollback capability';
+COMMENT ON COLUMN artifacts.version_count IS 'Total number of edits made to this artifact (lifetime count)';
 
 COMMENT ON TABLE api_keys IS 'Stores API keys for programmatic access to the platform';
 COMMENT ON COLUMN api_keys.key_hash IS 'Bcrypt hash of the actual API key';

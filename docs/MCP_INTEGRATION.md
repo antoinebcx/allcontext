@@ -3,6 +3,7 @@
 ## Table of Contents
 
 - [Quick Start](#quick-start)
+  - [Available MCP Tools](#available-mcp-tools)
   - [Claude Code](#claude-code)
   - [OpenAI SDK](#openai-sdk)
   - [Anthropic SDK](#anthropic-sdk)
@@ -12,7 +13,20 @@
 
 ## Quick Start
 
-Generate your Allcontext API key in Settings and connect via MCP using any of these methods:
+Generate your Allcontext API key in Settings and connect via MCP using any of these methods.
+
+### Available MCP Tools
+
+Your AI assistant will have access to these artifact management tools:
+- `create_artifact` - Create new artifacts
+- `list_artifacts` - List your artifacts with pagination
+- `search_artifacts` - Search artifacts by text
+- `get_artifact` - Get specific artifact by ID
+- `update_artifact` - Update existing artifacts
+- `delete_artifact` - Delete artifacts
+- `list_artifact_versions` - View version history
+- `get_artifact_version` - Get specific version
+- `restore_artifact_version` - Restore to previous version
 
 ### Claude Code
 

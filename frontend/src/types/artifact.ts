@@ -36,3 +36,29 @@ export interface ArtifactSearchResult {
   created_at: string;
   updated_at: string;
 }
+
+export interface ArtifactVersion {
+  version: number;
+  title: string;
+  content: string;
+  metadata: Record<string, any>;
+  updated_at: string;
+  content_length: number;
+  title_changed: boolean;
+  content_changed: boolean;
+}
+
+export interface ArtifactVersionSummary {
+  version: number;
+  title: string;
+  updated_at: string;
+  content_length: number;
+  changes: string[];  // ["title", "content"]
+}
+
+export interface ArtifactVersionsResponse {
+  id: string;
+  current_version: number;
+  version_count: number;
+  versions: ArtifactVersionSummary[];
+}

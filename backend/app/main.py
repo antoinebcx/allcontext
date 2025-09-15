@@ -97,29 +97,30 @@ app = FastAPI(
 
 Allcontext provides a unified platform for storing and managing AI context artifacts through multiple access patterns:
 
-### 🔗 **Dual Access Architecture**
+### Dual Access Architecture
 - **REST API** (`/api/v1/*`) - Traditional HTTP endpoints for web applications
 - **MCP Server** (`/mcp`) - Model Context Protocol for AI assistants (Claude, OpenAI, etc.)
 
-### 📄 **Artifacts**
+### Artifacts
 Store markdown-based content with:
 - **Auto-title generation** from H1/H2 headings or content
 - **Flexible metadata** as JSON objects
 - **Full-text search** across title and content
-- **Public/private** visibility controls
-- **Version tracking** with automatic timestamps
+- **Version history** with last 20 versions stored
+- **Automatic rollback** to any previous version
+- **Change detection** for efficient storage
 
-### 🔐 **Authentication**
+### Authentication
 - **JWT tokens** for web UI sessions (Bearer authentication)
 - **API keys** for programmatic access (`X-API-Key` header)
 - Both methods work for REST API and MCP access
 
-### 🔍 **Search & Discovery**
+### Search & Discovery
 - PostgreSQL full-text search with GIN indexes
 - ILIKE pattern matching for flexible queries
 - User-scoped results only
 
-### 📊 **Pagination & Limits**
+### Pagination & Limits**
 - Configurable page sizes (1-100 items)
 - Offset-based pagination
 - Content limits: 100k characters per artifact

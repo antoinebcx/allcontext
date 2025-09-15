@@ -524,6 +524,146 @@ curl -X DELETE https://api.allcontext.dev/api/v1/artifacts/123e4567-e89b-12d3-a4
 
 ---
 
+#### GET `/api/v1/artifacts/{artifact_id}/versions`
+
+Get version history for an artifact.
+
+**Authentication**: Required (JWT or API Key)
+
+**Parameters**:
+- `artifact_id` (path): Artifact UUID
+
+**Response** (200):
+```json
+{
+  "id": "123e4567-e89b-12d3-a456-426614174000",
+  "current_version": 5,
+  "version_count": 4,
+  "versions": [
+    {
+      "version": 4,
+      "title": "Previous Title",
+      "updated_at": "2024-01-01T00:00:00Z",
+      "content_length": 1500,
+      "changes": ["title", "content"]
+    }
+  ]
+}
+```
+
+**Errors**:
+- `404`: Artifact not found or access denied
+
+**Example**:
+```bash
+curl https://api.allcontext.dev/api/v1/artifacts/123e4567-e89b-12d3-a456-426614174000/versions \
+  -H "X-API-Key: sk_prod_your_api_key"
+```
+
+---
+
+#### GET `/api/v1/artifacts/{artifact_id}/versions/{version_number}`
+
+Get a specific version of an artifact with full content.
+
+**Authentication**: Required (JWT or API Key)
+
+**Parameters**:
+- `artifact_id` (path): Artifact UUID
+- `version_number` (path): Version number (>= 1)
+
+**Response** (200):
+```json
+{
+  "version": 4,
+  "title": "Previous Title",
+  "content": "Full content of the version...",
+  "metadata": {"key": "value"},
+  "updated_at": "2024-01-01T00:00:00Z",
+  "content_length": 1500,
+  "title_changed": true,
+  "content_changed": true
+}
+```
+
+**Errors**:
+- `404`: Version not found
+
+**Example**:
+```bash
+curl https://api.allcontext.dev/api/v1/artifacts/123e4567-e89b-12d3-a456-426614174000/versions/4 \
+  -H "X-API-Key: sk_prod_your_api_key"
+```
+
+---
+
+#### POST `/api/v1/artifacts/{artifact_id}/restore/{version_number}`
+
+Restore an artifact to a previous version.
+
+**Authentication**: Required (JWT or API Key)
+
+**Parameters**:
+- `artifact_id` (path): Artifact UUID
+- `version_number` (path): Version to restore (>= 1)
+
+**Response** (200):
+```json
+{
+  "id": "123e4567-e89b-12d3-a456-426614174000",
+  "title": "Restored Title",
+  "content": "Restored content...",
+  "version": 6,
+  "updated_at": "2024-01-02T00:00:00Z"
+}
+```
+
+**Errors**:
+- `404`: Cannot restore version
+
+**Example**:
+```bash
+curl -X POST https://api.allcontext.dev/api/v1/artifacts/123e4567-e89b-12d3-a456-426614174000/restore/4 \
+  -H "X-API-Key: sk_prod_your_api_key"
+```
+
+---
+
+#### GET `/api/v1/artifacts/{artifact_id}/diff`
+
+Compare two versions of an artifact.
+
+**Authentication**: Required (JWT or API Key)
+
+**Parameters**:
+- `artifact_id` (path): Artifact UUID
+- `from_version` (query): Starting version (>= 1)
+- `to_version` (query): Ending version (>= 1)
+
+**Response** (200):
+```json
+{
+  "from_version": 3,
+  "to_version": 5,
+  "title_changed": true,
+  "old_title": "Old Title",
+  "new_title": "New Title",
+  "content_length_change": 250,
+  "metadata_changed": false
+}
+```
+
+**Errors**:
+- `404`: Cannot compare versions
+
+**Example**:
+```bash
+curl "https://api.allcontext.dev/api/v1/artifacts/123e4567-e89b-12d3-a456-426614174000/diff?from_version=3&to_version=5" \
+  -H "X-API-Key: sk_prod_your_api_key"
+```
+
+---
+
 ### API Keys Endpoints
 
 #### POST `/api/v1/api-keys`

@@ -386,31 +386,31 @@ async def delete_artifact(
 ) -> Dict[str, Any]:
     """
     Delete an artifact.
-    
+
     Args:
         artifact_id: UUID of the artifact to delete
         ctx: Context object (injected by FastMCP)
-    
+
     Returns:
         Confirmation of deletion
     """
     try:
         user_id = get_authenticated_user_id()
-        
+
         if not user_id:
             logger.warning("Tool called without authentication")
             return {"error": "Authentication required. Please provide a valid API key."}
-        
+
         try:
             artifact_uuid = UUID(artifact_id)
         except ValueError:
             return {"error": "Invalid artifact ID format. Must be a valid UUID."}
-        
+
         success = await artifact_service.delete(artifact_uuid, user_id)
-        
+
         if not success:
             return {"error": f"Artifact {artifact_id} not found or access denied"}
-        
+
         return {
             "success": True,
             "message": f"Artifact {artifact_id} deleted successfully"
@@ -420,6 +420,145 @@ async def delete_artifact(
     except Exception as e:
         logger.error(f"Error deleting artifact: {e}", exc_info=True)
         return {"error": "Failed to delete artifact"}
+
+
+@mcp.tool()
+async def list_artifact_versions(
+    artifact_id: str,
+    ctx: Context = None
+) -> Dict[str, Any]:
+    """
+    Get version history for an artifact.
+
+    Args:
+        artifact_id: UUID of the artifact
+        ctx: Context object (injected by FastMCP)
+
+    Returns:
+        Version history summary
+    """
+    try:
+        user_id = get_authenticated_user_id()
+
+        if not user_id:
+            return {"error": "Authentication required. Please provide a valid API key."}
+
+        try:
+            artifact_uuid = UUID(artifact_id)
+        except ValueError:
+            return {"error": "Invalid artifact ID format. Must be a valid UUID."}
+
+        versions = await artifact_service.get_versions(artifact_uuid, user_id)
+
+        if not versions:
+            return {"error": f"Artifact {artifact_id} not found or access denied"}
+
+        return {
+            "artifact_id": str(versions.id),
+            "current_version": versions.current_version,
+            "total_edits": versions.version_count,
+            "recent_versions": [
+                {
+                    "version": v.version,
+                    "title": v.title,
+                    "updated_at": v.updated_at.isoformat(),
+                    "changes": v.changes
+                }
+                for v in versions.versions
+            ]
+        }
+    except Exception as e:
+        logger.error(f"Error listing versions: {e}", exc_info=True)
+        return {"error": "Failed to retrieve version history"}
+
+
+@mcp.tool()
+async def get_artifact_version(
+    artifact_id: str,
+    version_number: int,
+    ctx: Context = None
+) -> Dict[str, Any]:
+    """
+    Get a specific version of an artifact.
+
+    Args:
+        artifact_id: UUID of the artifact
+        version_number: Version number to retrieve
+        ctx: Context object (injected by FastMCP)
+
+    Returns:
+        The specified version with full content
+    """
+    try:
+        user_id = get_authenticated_user_id()
+
+        if not user_id:
+            return {"error": "Authentication required. Please provide a valid API key."}
+
+        try:
+            artifact_uuid = UUID(artifact_id)
+        except ValueError:
+            return {"error": "Invalid artifact ID format. Must be a valid UUID."}
+
+        version = await artifact_service.get_version(artifact_uuid, user_id, version_number)
+
+        if not version:
+            return {"error": f"Version {version_number} not found for artifact {artifact_id}"}
+
+        return {
+            "version": version.version,
+            "title": version.title,
+            "content": version.content,
+            "metadata": version.metadata,
+            "updated_at": version.updated_at.isoformat()
+        }
+    except Exception as e:
+        logger.error(f"Error getting version: {e}", exc_info=True)
+        return {"error": "Failed to retrieve version"}
+
+
+@mcp.tool()
+async def restore_artifact_version(
+    artifact_id: str,
+    version_number: int,
+    ctx: Context = None
+) -> Dict[str, Any]:
+    """
+    Restore an artifact to a previous version.
+
+    Args:
+        artifact_id: UUID of the artifact
+        version_number: Version number to restore
+        ctx: Context object (injected by FastMCP)
+
+    Returns:
+        Confirmation of restoration
+    """
+    try:
+        user_id = get_authenticated_user_id()
+
+        if not user_id:
+            return {"error": "Authentication required. Please provide a valid API key."}
+
+        try:
+            artifact_uuid = UUID(artifact_id)
+        except ValueError:
+            return {"error": "Invalid artifact ID format. Must be a valid UUID."}
+
+        restored = await artifact_service.restore_version(artifact_uuid, user_id, version_number)
+
+        if not restored:
+            return {"error": f"Cannot restore version {version_number} for artifact {artifact_id}"}
+
+        return {
+            "success": True,
+            "message": f"Artifact restored to version {version_number}",
+            "current_version": restored.version,
+            "title": restored.title
+        }
+    except Exception as e:
+        logger.error(f"Error restoring version: {e}", exc_info=True)
+        return {"error": "Failed to restore version"}
 
 
 # Export for use in main.py

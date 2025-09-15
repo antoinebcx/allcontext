@@ -1,9 +1,13 @@
 """Service layer for artifact operations using Supabase."""
 
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from uuid import UUID
+from datetime import datetime, timezone
 from supabase import Client
-from app.models.artifacts import Artifact, ArtifactCreate, ArtifactUpdate, ArtifactSearchResult
+from app.models.artifacts import (
+    Artifact, ArtifactCreate, ArtifactUpdate, ArtifactSearchResult,
+    ArtifactVersion, ArtifactVersionSummary, ArtifactVersionsResponse
+)
 from app.utils import extract_title_from_content, generate_snippet
 from app.database import db
 
@@ -168,12 +172,137 @@ class ArtifactService:
     async def count(self, user_id: Optional[UUID] = None) -> int:
         """Count artifacts in Supabase."""
         query = self.client.table("artifacts").select("id", count="exact")
-        
+
         if user_id:
             query = query.eq("user_id", str(user_id))
-        
+
         response = query.execute()
         return response.count if response.count else 0
+
+    async def get_versions(self, artifact_id: UUID, user_id: UUID) -> Optional[ArtifactVersionsResponse]:
+        """Get artifact with version history summary."""
+        response = self.client.table("artifacts") \
+            .select("id, version, version_count, version_history, title") \
+            .eq("id", str(artifact_id)) \
+            .eq("user_id", str(user_id)) \
+            .execute()
+
+        if not response.data:
+            return None
+
+        artifact = response.data[0]
+
+        # Parse version history and create summaries
+        versions = []
+        if artifact.get("version_history"):
+            for v in artifact["version_history"][:10]:  # Return last 10 for API
+                changes = []
+                if v.get("title_changed"):
+                    changes.append("title")
+                if v.get("content_changed"):
+                    changes.append("content")
+
+                versions.append(ArtifactVersionSummary(
+                    version=v["version"],
+                    title=v["title"],
+                    updated_at=datetime.fromisoformat(v["updated_at"]) if isinstance(v["updated_at"], str) else v["updated_at"],
+                    content_length=v.get("content_length", 0),
+                    changes=changes
+                ))
+
+        return ArtifactVersionsResponse(
+            id=UUID(artifact["id"]),
+            current_version=artifact["version"],
+            version_count=artifact.get("version_count", 0),
+            versions=versions
+        )
+
+    async def get_version(self, artifact_id: UUID, user_id: UUID, version_number: int) -> Optional[ArtifactVersion]:
+        """Get specific version content by version number."""
+        response = self.client.table("artifacts") \
+            .select("version, title, content, metadata, version_history") \
+            .eq("id", str(artifact_id)) \
+            .eq("user_id", str(user_id)) \
+            .execute()
+
+        if not response.data:
+            return None
+
+        artifact = response.data[0]
+
+        # Check if requesting current version
+        if version_number == artifact["version"]:
+            return ArtifactVersion(
+                version=artifact["version"],
+                title=artifact["title"],
+                content=artifact["content"],
+                metadata=artifact["metadata"],
+                updated_at=datetime.now(timezone.utc),
+                content_length=len(artifact["content"]),
+                title_changed=False,
+                content_changed=False
+            )
+
+        # Search in history
+        if artifact.get("version_history"):
+            for v in artifact["version_history"]:
+                if v["version"] == version_number:
+                    return ArtifactVersion(
+                        version=v["version"],
+                        title=v["title"],
+                        content=v["content"],
+                        metadata=v["metadata"],
+                        updated_at=datetime.fromisoformat(v["updated_at"]) if isinstance(v["updated_at"], str) else v["updated_at"],
+                        content_length=v.get("content_length", len(v["content"])),
+                        title_changed=v.get("title_changed", False),
+                        content_changed=v.get("content_changed", False)
+                    )
+
+        return None
+
+    async def restore_version(self, artifact_id: UUID, user_id: UUID, version_number: int) -> Optional[Artifact]:
+        """Restore artifact to a previous version by version number."""
+        # First get the version to restore
+        version = await self.get_version(artifact_id, user_id, version_number)
+
+        if not version:
+            return None
+
+        # Update with the old version's content
+        # This will trigger the versioning system to save current as history
+        update_data = {
+            "title": version.title,
+            "content": version.content,
+            "metadata": version.metadata
+        }
+
+        response = self.client.table("artifacts") \
+            .update(update_data) \
+            .eq("id", str(artifact_id)) \
+            .eq("user_id", str(user_id)) \
+            .execute()
+
+        if response.data:
+            return Artifact(**response.data[0])
+        return None
+
+    async def get_version_diff(self, artifact_id: UUID, user_id: UUID, from_version: int, to_version: int) -> Optional[Dict[str, Any]]:
+        """Get differences between two versions."""
+        from_v = await self.get_version(artifact_id, user_id, from_version)
+        to_v = await self.get_version(artifact_id, user_id, to_version)
+
+        if not from_v or not to_v:
+            return None
+
+        return {
+            "from_version": from_version,
+            "to_version": to_version,
+            "title_changed": from_v.title != to_v.title,
+            "old_title": from_v.title if from_v.title != to_v.title else None,
+            "new_title": to_v.title if from_v.title != to_v.title else None,
+            "content_length_change": to_v.content_length - from_v.content_length,
+            "metadata_changed": from_v.metadata != to_v.metadata
+        }
 
 
 # Create service instance

@@ -419,6 +419,134 @@ async def delete_artifact(
 
 ---
 
+### 7. list_artifact_versions
+
+Get version history for an artifact.
+
+**Function Signature**:
+```python
+async def list_artifact_versions(
+    artifact_id: str
+) -> Dict[str, Any]
+```
+
+**Parameters**:
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `artifact_id` | string | ✅ | UUID of the artifact |
+
+**Success Response**:
+```json
+{
+  "artifact_id": "123e4567-e89b-12d3-a456-426614174000",
+  "current_version": 5,
+  "total_edits": 4,
+  "recent_versions": [
+    {
+      "version": 4,
+      "title": "Previous Title",
+      "updated_at": "2024-01-01T00:00:00Z",
+      "changes": ["title", "content"]
+    },
+    {
+      "version": 3,
+      "title": "Earlier Title",
+      "updated_at": "2023-12-31T00:00:00Z",
+      "changes": ["content"]
+    }
+  ]
+}
+```
+
+**Error Response**:
+```json
+{
+  "error": "Artifact 123e4567-e89b-12d3-a456-426614174000 not found or access denied"
+}
+```
+
+---
+
+### 8. get_artifact_version
+
+Get a specific version of an artifact.
+
+**Function Signature**:
+```python
+async def get_artifact_version(
+    artifact_id: str,
+    version_number: int
+) -> Dict[str, Any]
+```
+
+**Parameters**:
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `artifact_id` | string | ✅ | UUID of the artifact |
+| `version_number` | integer | ✅ | Version number to retrieve |
+
+**Success Response**:
+```json
+{
+  "version": 4,
+  "title": "Previous Title",
+  "content": "Full content of the previous version...",
+  "metadata": {"key": "value"},
+  "updated_at": "2024-01-01T00:00:00Z"
+}
+```
+
+**Error Response**:
+```json
+{
+  "error": "Version 4 not found for artifact 123e4567-e89b-12d3-a456-426614174000"
+}
+```
+
+---
+
+### 9. restore_artifact_version
+
+Restore an artifact to a previous version.
+
+**Function Signature**:
+```python
+async def restore_artifact_version(
+    artifact_id: str,
+    version_number: int
+) -> Dict[str, Any]
+```
+
+**Parameters**:
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `artifact_id` | string | ✅ | UUID of the artifact |
+| `version_number` | integer | ✅ | Version to restore |
+
+**Success Response**:
+```json
+{
+  "success": true,
+  "message": "Artifact restored to version 4",
+  "current_version": 6,
+  "title": "Restored Title"
+}
+```
+
+**Error Response**:
+```json
+{
+  "error": "Cannot restore version 4 for artifact 123e4567-e89b-12d3-a456-426614174000"
+}
+```
+
+**Note**: Restoring creates a new version with content from the specified version.
+
+---
+
 ## Error Handling
 
 ### Error Response Format

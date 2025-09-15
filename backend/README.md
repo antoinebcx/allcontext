@@ -109,6 +109,9 @@ Core content units with:
 - **Flexible JSON metadata**
 - **Full-text search** capability via PostgreSQL
 - **Version tracking** with auto-incrementing version numbers
+- **Version history** storing last 20 versions automatically
+- **Rollback capability** to any stored version
+- **Change detection** only archives when content/title changes
 
 ### API Keys
 - **bcrypt hashed** with lookup_hash optimization
@@ -222,6 +225,10 @@ API keys created through the UI work for both REST API and MCP access. Configure
 | PUT | `/api/v1/artifacts/{id}` | Update artifact |
 | DELETE | `/api/v1/artifacts/{id}` | Delete artifact |
 | GET | `/api/v1/artifacts/search?q=` | Search (returns 200-char snippets) |
+| GET | `/api/v1/artifacts/{id}/versions` | Get version history (last 10) |
+| GET | `/api/v1/artifacts/{id}/versions/{version}` | Get specific version content |
+| POST | `/api/v1/artifacts/{id}/restore/{version}` | Restore to previous version |
+| GET | `/api/v1/artifacts/{id}/diff` | Compare two versions |
 
 ### API Key Management (Require JWT Authentication)
 | Method | Endpoint | Description |
@@ -241,6 +248,9 @@ The MCP server provides the following tools (all require API key authentication)
 - `get_artifact` - Get a specific artifact by ID
 - `update_artifact` - Update an existing artifact
 - `delete_artifact` - Delete an artifact
+- `list_artifact_versions` - Get version history for an artifact
+- `get_artifact_version` - Get specific historical version
+- `restore_artifact_version` - Restore artifact to previous version
 
 Each tool operates within the context of the authenticated user, ensuring data isolation and security.
 
@@ -434,9 +444,7 @@ Located in `/backend/.env`:
 - CORS configured with `Mcp-Session-Id` exposed for browser MCP clients
 
 ### Known Limitations
-- MCP SDK's stateless mode doesn't properly inject auth context into tools
-- Workaround: Using Python's `contextvars` for thread-safe request context
-- This is a framework limitation that may be fixed in future SDK versions
+Due to current limitations in the MCP Python SDK's stateless HTTP mode, we use contextvars for thread-safe auth context injection into tools - a temporary but robust solution until native support arrives. We're monitoring SDK releases for proper auth parameter propagation in stateless configurations.
 
 ## Deployment
 
@@ -484,7 +492,8 @@ When contributing, please:
 ## Next Steps
 
 - [ ] Try `uv` and `pyproject.toml` for env/package management
-- [ ] Implement proper versioning for artifacts
+- [x] Implement version history for artifacts (JSONB-based, last 20 versions)
+- [ ] Add version diff visualization
 - [ ] Add `confirmation_required` flag to delete operations in MCP tools for safety and/or a warning in tool description doc
 - [ ] Add rate limiting
 - [ ] Add bulk operations

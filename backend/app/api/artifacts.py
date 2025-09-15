@@ -1,9 +1,12 @@
 """REST API endpoints for artifacts."""
 
 from fastapi import APIRouter, HTTPException, Query, Path, Depends
-from typing import List
+from typing import List, Dict, Any
 from uuid import UUID
-from app.models.artifacts import Artifact, ArtifactCreate, ArtifactUpdate, ArtifactList, ArtifactSearchResult
+from app.models.artifacts import (
+    Artifact, ArtifactCreate, ArtifactUpdate, ArtifactList, ArtifactSearchResult,
+    ArtifactVersion, ArtifactVersionsResponse
+)
 from app.dependencies.auth import get_current_user
 from app.services.artifacts import artifact_service
 
@@ -134,15 +137,101 @@ async def delete_artifact(
 ):
     """
     Delete an artifact.
-    
+
     Only the owner can delete their artifacts.
     """
     success = await artifact_service.delete(artifact_id, user_id)
-    
+
     if not success:
         raise HTTPException(
             status_code=404,
             detail=f"Artifact {artifact_id} not found or access denied"
         )
-    
+
     return None
+
+
+@router.get("/{artifact_id}/versions", response_model=ArtifactVersionsResponse)
+async def get_artifact_versions(
+    artifact_id: UUID = Path(..., description="Artifact ID"),
+    user_id: UUID = Depends(get_current_user)
+):
+    """
+    Get version history for an artifact.
+
+    Returns summary of last 10 versions without full content.
+    """
+    versions = await artifact_service.get_versions(artifact_id, user_id)
+
+    if not versions:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Artifact {artifact_id} not found or access denied"
+        )
+
+    return versions
+
+
+@router.get("/{artifact_id}/versions/{version_number}", response_model=ArtifactVersion)
+async def get_artifact_version(
+    artifact_id: UUID = Path(..., description="Artifact ID"),
+    version_number: int = Path(..., description="Version number", ge=1),
+    user_id: UUID = Depends(get_current_user)
+):
+    """
+    Get specific version of an artifact with full content.
+    """
+    version = await artifact_service.get_version(artifact_id, user_id, version_number)
+
+    if not version:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Version {version_number} not found for artifact {artifact_id}"
+        )
+
+    return version
+
+
+@router.post("/{artifact_id}/restore/{version_number}", response_model=Artifact)
+async def restore_artifact_version(
+    artifact_id: UUID = Path(..., description="Artifact ID"),
+    version_number: int = Path(..., description="Version to restore", ge=1),
+    user_id: UUID = Depends(get_current_user)
+):
+    """
+    Restore artifact to a previous version.
+
+    This creates a new version with the content from the specified version.
+    """
+    restored = await artifact_service.restore_version(artifact_id, user_id, version_number)
+
+    if not restored:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Cannot restore version {version_number} for artifact {artifact_id}"
+        )
+
+    return restored
+
+
+@router.get("/{artifact_id}/diff")
+async def get_version_diff(
+    artifact_id: UUID = Path(..., description="Artifact ID"),
+    from_version: int = Query(..., description="Starting version", ge=1),
+    to_version: int = Query(..., description="Ending version", ge=1),
+    user_id: UUID = Depends(get_current_user)
+) -> Dict[str, Any]:
+    """
+    Get differences between two versions of an artifact.
+    """
+    diff = await artifact_service.get_version_diff(
+        artifact_id, user_id, from_version, to_version
+    )
+
+    if not diff:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Cannot compare versions {from_version} and {to_version}"
+        )
+
+    return diff
