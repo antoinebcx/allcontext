@@ -80,7 +80,8 @@ frontend/
 │   │   │   └── ErrorFallback.tsx   # Error display component
 │   │   ├── Layout/
 │   │   │   ├── Layout.tsx          # App layout wrapper (conditional)
-│   │   │   └── Navbar.tsx          # Persistent navigation
+│   │   │   ├── Navbar.tsx          # Persistent navigation
+│   │   │   └── Footer.tsx          # Legal links footer
 │   │   └── Markdown/
 │   │       ├── MarkdownRenderer.tsx         # Standard markdown renderer
 │   │       ├── ProgressiveMarkdownRenderer.tsx # Chunked renderer for large content (>10k chars)
@@ -108,11 +109,16 @@ frontend/
 │   │   ├── API_INTEGRATION.md
 │   │   ├── MCP_SPECIFICATION.md
 │   │   └── MCP_INTEGRATION.md
+│   ├── legal/                  # Legal documents
+│   │   ├── legalRegistry.ts    # Legal document registry
+│   │   ├── TERMS_OF_SERVICE.md
+│   │   └── PRIVACY_POLICY.md
 │   ├── pages/
 │   │   ├── Dashboard.tsx       # Main page with unified search/new
 │   │   ├── LoginPage.tsx       # Two-step auth flow with signup mode
-│   │   ├── Settings.tsx        # Settings with API keys & appearance
-│   │   └── Docs.tsx            # Documentation page
+│   │   ├── Settings.tsx        # Settings with API keys, appearance & terms
+│   │   ├── Docs.tsx            # Documentation page
+│   │   └── LegalPage.tsx       # Legal document viewer
 │   ├── theme/
 │   │   └── index.ts            # Light/dark theme definitions
 │   ├── App.tsx                 # Root component

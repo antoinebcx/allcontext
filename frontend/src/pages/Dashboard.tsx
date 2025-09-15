@@ -19,6 +19,7 @@ import { ArtifactForm } from '../components/Artifacts/ArtifactForm';
 import { ArtifactDetail } from '../components/Artifacts/ArtifactDetail';
 import { useAuth } from '../contexts/AuthContext';
 import { demoArtifacts } from '../data/demoData';
+import { Footer } from '../components/Layout/Footer';
 import type { Artifact, ArtifactCreate, ArtifactUpdate, ArtifactSearchResult } from '../types';
 
 export const Dashboard: React.FC = () => {
@@ -150,9 +151,10 @@ export const Dashboard: React.FC = () => {
   };
 
   return (
-    <>
-      {/* Welcome Banner for non-authenticated users */}
-      {!user && (
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight:  user ? '' : 'calc(100vh - 100px)' }}>
+      <Box sx={{ flex: 1 }}>
+        {/* Welcome Banner for non-authenticated users */}
+        {!user && (
         <Paper
           elevation={0}
           sx={{
@@ -284,24 +286,28 @@ export const Dashboard: React.FC = () => {
         </Grid>
       )}
 
-      {/* Create/Edit Form */}
-      <ArtifactForm
-        open={formOpen}
-        onClose={() => setFormOpen(false)}
-        onSubmit={handleFormSubmit}
-        artifact={selectedArtifact}
-        mode={formMode}
-      />
+        {/* Create/Edit Form */}
+        <ArtifactForm
+          open={formOpen}
+          onClose={() => setFormOpen(false)}
+          onSubmit={handleFormSubmit}
+          artifact={selectedArtifact}
+          mode={formMode}
+        />
 
-      {/* Detail View */}
-      <ArtifactDetail
-        open={detailOpen}
-        onClose={() => setDetailOpen(false)}
-        artifact={selectedArtifact}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        onUpdate={handleArtifactUpdate}
-      />
-    </>
+        {/* Detail View */}
+        <ArtifactDetail
+          open={detailOpen}
+          onClose={() => setDetailOpen(false)}
+          artifact={selectedArtifact}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onUpdate={handleArtifactUpdate}
+        />
+      </Box>
+
+      {/* Footer - only for non-authenticated users */}
+      {!user && <Footer />}
+    </Box>
   );
 };

@@ -12,6 +12,7 @@ import { Dashboard } from './pages/Dashboard';
 import { Settings } from './pages/Settings';
 import { Docs } from './pages/Docs';
 import { LoginPage } from './pages/LoginPage';
+import { LegalPage } from './pages/LegalPage';
 import { useAuth } from './contexts/AuthContext';
 import { useTheme } from './contexts/ThemeContext';
 
@@ -54,6 +55,9 @@ function App() {
           <Routes>
             {/* Login route without layout */}
             <Route path="/login" element={<LoginPage />} />
+
+            {/* Legal routes without layout */}
+            <Route path="/legal/:documentId" element={<LegalPage />} />
 
             {/* All other routes with layout */}
             <Route path="*" element={

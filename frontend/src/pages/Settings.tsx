@@ -8,8 +8,12 @@ import {
   CircularProgress,
   Tabs,
   Tab,
+  FormControl,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
 } from '@mui/material';
-import { Plus } from 'lucide-react';
+import { Plus, Monitor, Sun, Moon } from 'lucide-react';
 import { useApiKeys, useCreateApiKey, useDeleteApiKey } from '../hooks/useApiKeys';
 import { ApiKeysList } from '../components/ApiKeys/ApiKeysList';
 import { CreateApiKey } from '../components/ApiKeys/CreateApiKey';
@@ -48,7 +52,7 @@ export const Settings: React.FC = () => {
   const [createdKey, setCreatedKey] = useState<ApiKeyCreated | null>(null);
 
   const { user } = useAuth();
-  const { mode, themeMode, setThemeMode } = useTheme();
+  const { themeMode, setThemeMode } = useTheme();
   const { data, isLoading, error } = useApiKeys();
   const createMutation = useCreateApiKey();
   const deleteMutation = useDeleteApiKey();
@@ -83,7 +87,7 @@ export const Settings: React.FC = () => {
     <Container maxWidth="lg" sx={{ py: 0 }}>
       {/* Header */}
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" gutterBottom>
+        <Typography variant="h4" gutterBottom sx={{ fontWeight: 500 }}>
           Settings
         </Typography>
         <Typography variant="body1" color="text.secondary">
@@ -100,6 +104,7 @@ export const Settings: React.FC = () => {
         <Tab label="API Keys" />
         <Tab label="Profile" />
         <Tab label="Appearance" />
+        <Tab label="Terms" />
         <Tab label="Security" />
       </Tabs>
 
@@ -219,37 +224,86 @@ curl -H "X-API-Key: your_api_key" \\
             </Typography>
 
             <Box>
-              <Typography variant="subtitle2" gutterBottom>
+              <Typography variant="subtitle2" gutterBottom sx={{ mb: 2 }}>
                 Theme
               </Typography>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                <Button
-                  variant={themeMode === 'system' ? 'contained' : 'outlined'}
-                  onClick={() => setThemeMode('system')}
-                  sx={{ justifyContent: 'flex-start', px: 2 }}
+              <FormControl component="fieldset">
+                <RadioGroup
+                  value={themeMode}
+                  onChange={(e) => setThemeMode(e.target.value as 'system' | 'light' | 'dark')}
+                  sx={{ gap: 0.5 }}
                 >
-                  System preference
-                  {themeMode === 'system' && (
-                    <Typography variant="caption" sx={{ ml: 'auto', opacity: 0.7 }}>
-                      (Currently {mode})
-                    </Typography>
-                  )}
-                </Button>
-                <Button
-                  variant={themeMode === 'light' ? 'contained' : 'outlined'}
-                  onClick={() => setThemeMode('light')}
-                  sx={{ justifyContent: 'flex-start', px: 2 }}
-                >
-                  Light
-                </Button>
-                <Button
-                  variant={themeMode === 'dark' ? 'contained' : 'outlined'}
-                  onClick={() => setThemeMode('dark')}
-                  sx={{ justifyContent: 'flex-start', px: 2 }}
-                >
-                  Dark
-                </Button>
-              </Box>
+                  <FormControlLabel
+                    value="system"
+                    control={<Radio size="small" sx={{ display: 'none' }} />}
+                    label={
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, py: 0.5 }}>
+                        <Monitor size={18} style={{ opacity: 0.7 }} />
+                        <Typography variant="body2">System preference</Typography>
+                      </Box>
+                    }
+                    sx={{
+                      m: 0,
+                      px: 2,
+                      py: 1,
+                      borderRadius: 1,
+                      border: '1px solid',
+                      borderColor: themeMode === 'system' ? 'primary.main' : 'divider',
+                      bgcolor: themeMode === 'system' ? 'action.selected' : 'transparent',
+                      '&:hover': {
+                        bgcolor: themeMode === 'system' ? 'action.selected' : 'action.hover',
+                      },
+                      transition: 'all 0.2s ease',
+                    }}
+                  />
+                  <FormControlLabel
+                    value="light"
+                    control={<Radio size="small" sx={{ display: 'none' }} />}
+                    label={
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, py: 0.5 }}>
+                        <Sun size={18} style={{ opacity: 0.7 }} />
+                        <Typography variant="body2">Light</Typography>
+                      </Box>
+                    }
+                    sx={{
+                      m: 0,
+                      px: 2,
+                      py: 1,
+                      borderRadius: 1,
+                      border: '1px solid',
+                      borderColor: themeMode === 'light' ? 'primary.main' : 'divider',
+                      bgcolor: themeMode === 'light' ? 'action.selected' : 'transparent',
+                      '&:hover': {
+                        bgcolor: themeMode === 'light' ? 'action.selected' : 'action.hover',
+                      },
+                      transition: 'all 0.2s ease',
+                    }}
+                  />
+                  <FormControlLabel
+                    value="dark"
+                    control={<Radio size="small" sx={{ display: 'none' }} />}
+                    label={
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, py: 0.5 }}>
+                        <Moon size={18} style={{ opacity: 0.7 }} />
+                        <Typography variant="body2">Dark</Typography>
+                      </Box>
+                    }
+                    sx={{
+                      m: 0,
+                      px: 2,
+                      py: 1,
+                      borderRadius: 1,
+                      border: '1px solid',
+                      borderColor: themeMode === 'dark' ? 'primary.main' : 'divider',
+                      bgcolor: themeMode === 'dark' ? 'action.selected' : 'transparent',
+                      '&:hover': {
+                        bgcolor: themeMode === 'dark' ? 'action.selected' : 'action.hover',
+                      },
+                      transition: 'all 0.2s ease',
+                    }}
+                  />
+                </RadioGroup>
+              </FormControl>
             </Box>
 
             <Box sx={{ mt: 4, p: 2, bgcolor: 'background.default', borderRadius: 1 }}>
@@ -260,8 +314,68 @@ curl -H "X-API-Key: your_api_key" \\
         </Box>
       </TabPanel>
 
-      {/* Security Tab */}
+      {/* Terms Tab */}
       <TabPanel value={tabValue} index={3}>
+        <Box sx={{ py: 3 }}>
+            <Typography variant="h6" gutterBottom>
+              Legal Documents
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              Review our terms of service and privacy policy
+            </Typography>
+
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <Button
+                variant="outlined"
+                onClick={() => window.open('/legal/terms-of-service', '_blank')}
+                sx={{
+                  justifyContent: 'flex-start',
+                  px: 2,
+                  py: 1.5,
+                  textAlign: 'left'
+                }}
+              >
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                  <Typography variant="body2" fontWeight={500}>
+                    Terms of Service
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    Terms and conditions for using Allcontext
+                  </Typography>
+                </Box>
+              </Button>
+
+              <Button
+                variant="outlined"
+                onClick={() => window.open('/legal/privacy-policy', '_blank')}
+                sx={{
+                  justifyContent: 'flex-start',
+                  px: 2,
+                  py: 1.5,
+                  textAlign: 'left'
+                }}
+              >
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                  <Typography variant="body2" fontWeight={500}>
+                    Privacy Policy
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    How we collect, use, and protect your data
+                  </Typography>
+                </Box>
+              </Button>
+            </Box>
+
+            <Box sx={{ mt: 4, p: 2, bgcolor: 'background.default', borderRadius: 1 }}>
+              <Typography variant="body2" color="text.secondary">
+                These documents are GDPR-compliant and were last updated on September 15, 2025.
+              </Typography>
+            </Box>
+        </Box>
+      </TabPanel>
+
+      {/* Security Tab */}
+      <TabPanel value={tabValue} index={4}>
         <Box sx={{ py: 3 }}>
             <Typography variant="h6" gutterBottom>
               Security Settings

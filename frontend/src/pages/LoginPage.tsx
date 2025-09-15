@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import { ArrowRight, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { Footer } from '../components/Layout/Footer';
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
@@ -127,181 +128,177 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="xs">
-      <Box
-        sx={{
-          marginTop: 8,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-        }}
-      >
-        <Paper 
-          elevation={0} 
-          sx={{ 
-            p: 4, 
-            width: '100%',
-            border: '1px solid',
-            borderColor: 'divider',
-            borderRadius: 2,
-            position: 'relative',
-            overflow: 'hidden'
-          }}
-        >
-          {loading && (
-            <LinearProgress 
-              sx={{ 
-                position: 'absolute', 
-                top: 0, 
-                left: 0, 
-                right: 0 
-              }} 
-            />
-          )}
-          
-          <Typography component="h1" variant="h5" sx={{ mb: 1, textAlign: 'center' }}>
-            {isSignupMode ? 'Create Account' : 'Welcome to Allcontext'}
-          </Typography>
-
-          <Typography
-            variant="body2"
-            color="text.secondary"
-            sx={{ mb: 3, textAlign: 'center' }}
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      <Box sx={{ flex: 1, display: 'flex', alignItems: 'center' }}>
+        <Container maxWidth="xs">
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
           >
-            {step === 'email'
-              ? (isSignupMode ? 'Sign up for your free account' : 'Enter your email to continue')
-              : isNewUser
-                ? 'Create your account'
-                : 'Welcome back! Enter your password'
-            }
-          </Typography>
-          
-          {error && (
-            <Fade in>
-              <Alert severity="error" sx={{ mb: 2 }}>
-                {error}
-              </Alert>
-            </Fade>
-          )}
-          
-          {step === 'email' ? (
-            <Box component="form" onSubmit={handleEmailSubmit}>
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                id="email"
-                label="Email Address"
-                name="email"
-                autoComplete="email"
-                autoFocus
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  setError('');
+          <Paper
+            elevation={0}
+            sx={{
+              p: 4,
+              width: '100%',
+              border: '1px solid',
+              borderColor: 'divider',
+              borderRadius: 2,
+              position: 'relative',
+              overflow: 'hidden'
+            }}
+          >
+            {loading && (
+              <LinearProgress
+                sx={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0
                 }}
-                disabled={loading}
-                error={!!error}
               />
-              
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                sx={{ mt: 3, mb: 2 }}
-                disabled={loading || !email}
-                endIcon={<ArrowRight size={18} />}
-              >
-                Continue
-              </Button>
-            </Box>
-          ) : (
-            <Box component="form" onSubmit={handlePasswordSubmit}>
-              <Box sx={{ mb: 2 }}>
-                <Button
-                  startIcon={<ArrowLeft size={18} />}
-                  onClick={handleBack}
-                  disabled={loading}
-                  size="small"
-                  sx={{ mb: 2 }}
-                >
-                  Back
-                </Button>
-                
-                <TextField
-                  fullWidth
-                  value={email}
-                  disabled
-                  variant="filled"
-                  label="Email"
-                  sx={{ mb: 2 }}
-                />
-              </Box>
-              
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                name="password"
-                label={isNewUser ? "Create Password" : "Password"}
-                type="password"
-                id="password"
-                autoComplete={isNewUser ? 'new-password' : 'current-password'}
-                autoFocus
-                value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                  setError('');
-                }}
-                disabled={loading}
-                error={!!error}
-                helperText={
-                  isNewUser 
-                    ? "Use at least 6 characters" 
-                    : error ? null : "Enter your password"
-                }
-              />
-              
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                sx={{ mt: 3, mb: 2 }}
-                disabled={loading || !password || password.length < 6}
-              >
-                {loading 
-                  ? 'Loading...' 
-                  : isNewUser 
-                    ? 'Create Account' 
-                    : 'Sign In'
-                }
-              </Button>
+            )}
 
-              {!isNewUser && (
-                <Typography 
-                  variant="caption" 
-                  color="text.secondary" 
-                  sx={{ 
-                    display: 'block', 
-                    textAlign: 'center',
-                    mt: 2 
+            <Typography component="h1" variant="h5" sx={{ mb: 1, textAlign: 'center' }}>
+              {isSignupMode ? 'Create Account' : 'Welcome to Allcontext'}
+            </Typography>
+
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ mb: 3, textAlign: 'center' }}
+            >
+              {step === 'email'
+                ? (isSignupMode ? 'Sign up for your free account' : 'Enter your email to continue')
+                : isNewUser
+                  ? 'Create your account'
+                  : 'Welcome back! Enter your password'
+              }
+            </Typography>
+
+            {error && (
+              <Fade in>
+                <Alert severity="error" sx={{ mb: 2 }}>
+                  {error}
+                </Alert>
+              </Fade>
+            )}
+
+            {step === 'email' ? (
+              <Box component="form" onSubmit={handleEmailSubmit}>
+                <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="email"
+                  label="Email Address"
+                  name="email"
+                  autoComplete="email"
+                  autoFocus
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    setError('');
                   }}
+                  disabled={loading}
+                  error={!!error}
+                />
+
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  sx={{ mt: 3, mb: 2 }}
+                  disabled={loading || !email}
+                  endIcon={<ArrowRight size={18} />}
                 >
-                  Forgot password? Contact support
-                </Typography>
-              )}
-            </Box>
-          )}
-        </Paper>
-        
-        <Typography 
-          variant="caption" 
-          color="text.secondary" 
-          sx={{ mt: 4, textAlign: 'center' }}
-        >
-          By continuing, you agree to our Terms of Service
-        </Typography>
+                  Continue
+                </Button>
+              </Box>
+            ) : (
+              <Box component="form" onSubmit={handlePasswordSubmit}>
+                <Box sx={{ mb: 2 }}>
+                  <Button
+                    startIcon={<ArrowLeft size={18} />}
+                    onClick={handleBack}
+                    disabled={loading}
+                    size="small"
+                    sx={{ mb: 2 }}
+                  >
+                    Back
+                  </Button>
+
+                  <TextField
+                    fullWidth
+                    value={email}
+                    disabled
+                    variant="filled"
+                    label="Email"
+                    sx={{ mb: 2 }}
+                  />
+                </Box>
+
+                <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  name="password"
+                  label={isNewUser ? "Create Password" : "Password"}
+                  type="password"
+                  id="password"
+                  autoComplete={isNewUser ? 'new-password' : 'current-password'}
+                  autoFocus
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setError('');
+                  }}
+                  disabled={loading}
+                  error={!!error}
+                  helperText={
+                    isNewUser
+                      ? "Use at least 6 characters"
+                      : error ? null : "Enter your password"
+                  }
+                />
+
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  sx={{ mt: 3, mb: 2 }}
+                  disabled={loading || !password || password.length < 6}
+                >
+                  {loading
+                    ? 'Loading...'
+                    : isNewUser
+                      ? 'Create Account'
+                      : 'Sign In'
+                  }
+                </Button>
+
+                {!isNewUser && (
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{
+                      display: 'block',
+                      textAlign: 'center',
+                      mt: 2
+                    }}
+                  >
+                    Forgot password? Contact support
+                  </Typography>
+                )}
+              </Box>
+            )}
+          </Paper>
+          </Box>
+        </Container>
       </Box>
-    </Container>
+      <Footer />
+    </Box>
   );
 };
