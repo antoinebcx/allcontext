@@ -146,6 +146,7 @@ export const createAppTheme = (mode: PaletteMode) => {
             minWidth: 180,
             border: '1px solid',
             borderColor: isLight ? '#e0e0e0' : 'rgba(255, 255, 255, 0.12)',
+            boxShadow: 'none',
           },
         },
       },

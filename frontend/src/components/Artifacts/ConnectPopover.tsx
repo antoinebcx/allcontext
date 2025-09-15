@@ -57,8 +57,8 @@ export const ConnectPopover: React.FC<ConnectPopoverProps> = ({
   // Code snippets formatted as markdown
   const aiChatExample = `\`\`\`markdown
 # With Claude Code / Claude Desktop (MCP configured)
-"Can you get my artifact titled '${artifactTitle}' from Allcontext?"
-"Search for and retrieve my '${artifactTitle}' artifact"
+"Can you get my artifact titled '${artifactTitle}'?"
+"Search for my '${artifactTitle}' artifact"
 "Update my '${artifactTitle}' artifact with the following changes..."
 \`\`\``;
 
@@ -123,7 +123,7 @@ response = client.beta.messages.create(
     model="claude-sonnet-4-20250514",
     messages=[{
         "role": "user",
-        "content": "Get my '${artifactTitle}' artifact from Allcontext"
+        "content": "Read my '${artifactTitle}' artifact from Allcontext"
     }],
     mcp_servers=[{
         "type": "url",
@@ -147,7 +147,7 @@ resp = client.responses.create(
         "server_url": "https://api.allcontext.dev/mcp",
         "authorization": "YOUR_API_KEY"
     }],
-    input="Get my '${artifactTitle}' artifact"
+    input="Read my '${artifactTitle}' artifact"
 )
 \`\`\``;
 
@@ -171,10 +171,14 @@ resp = client.responses.create(
             sx: {
               width: { xs: '90vw', sm: 600 },
               maxWidth: 600,
-              height: { xs: '80vh', sm: 500 },
+              height: { xs: '80vh', sm: 600 },
               overflow: 'hidden',
               display: 'flex',
               flexDirection: 'column',
+              border: '1px solid',
+              borderColor: 'divider',
+              backgroundImage: 'none',
+              boxShadow: 'none',
             },
           },
         }}
@@ -200,19 +204,19 @@ resp = client.responses.create(
           <Tab label="Chat" />
           <Tab label="Claude Code" />
           <Tab label="API" />
-          <Tab label="SDKs" />
+          <Tab label="AI SDKs" />
         </Tabs>
 
         <Box sx={{ flexGrow: 1, overflowY: 'auto', px: 2 }}>
           <TabPanel value={tabValue} index={0}>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 2, mb: 2 }}>
               Reference this artifact in AI conversations:
             </Typography>
             <MarkdownRenderer content={aiChatExample} />
           </TabPanel>
 
           <TabPanel value={tabValue} index={1}>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 2, mb: 2 }}>
               Configure Claude Code to access your Allcontext:
             </Typography>
             <MarkdownRenderer content={claudeCodeExample} />
@@ -239,15 +243,15 @@ resp = client.responses.create(
           </TabPanel>
 
           <TabPanel value={tabValue} index={3}>
+            <Typography variant="subtitle2" sx={{ mt: 2 }} gutterBottom>
+              OpenAI SDK
+            </Typography>
+            <MarkdownRenderer content={openaiSdkExample} />
+
             <Typography variant="subtitle2" gutterBottom>
               Anthropic SDK
             </Typography>
             <MarkdownRenderer content={anthropicSdkExample} />
-
-            <Typography variant="subtitle2" sx={{ mt: 3 }} gutterBottom>
-              OpenAI SDK
-            </Typography>
-            <MarkdownRenderer content={openaiSdkExample} />
 
             <Typography variant="caption" color="text.secondary" sx={{ mt: 2, display: 'block' }}>
               Both SDKs support MCP for accessing your Allcontext artifacts
