@@ -5,8 +5,14 @@ from datetime import datetime, timezone, timedelta
 from uuid import UUID
 from pydantic import ValidationError
 
-from app.models.artifacts import ArtifactCreate, ArtifactUpdate, Artifact
-from app.models.api_key import ApiKeyCreate, ApiKeyUpdate, ApiKeyScope
+from app.models.artifacts import (
+    ArtifactCreate, ArtifactUpdate, Artifact, ArtifactList, ArtifactSearchResult,
+    ArtifactVersion, ArtifactVersionSummary, ArtifactVersionsResponse
+)
+from app.models.api_key import (
+    ApiKeyCreate, ApiKeyUpdate, ApiKeyScope, ApiKeyResponse,
+    ApiKeyCreated, ApiKeyList, ApiKeyValidation
+)
 from app.models.auth import AuthRequest, EmailCheckRequest
 
 
@@ -195,3 +201,207 @@ class TestAuthModels:
         
         with pytest.raises(ValidationError):
             EmailCheckRequest(email="invalid")
+
+
+class TestArtifactVersionModels:
+    """Test suite for artifact version models."""
+
+    def test_artifact_version_minimal(self):
+        """Should create version with required fields."""
+        version = ArtifactVersion(
+            version=1,
+            title="Test",
+            content="Content",
+            metadata={},
+            updated_at=datetime.now(timezone.utc),
+            content_length=7
+        )
+        assert version.version == 1
+        assert version.title_changed is False
+        assert version.content_changed is False
+
+    def test_artifact_version_with_changes(self):
+        """Should track title and content changes."""
+        version = ArtifactVersion(
+            version=2,
+            title="Updated",
+            content="New content",
+            metadata={"key": "value"},
+            updated_at=datetime.now(timezone.utc),
+            content_length=11,
+            title_changed=True,
+            content_changed=True
+        )
+        assert version.title_changed is True
+        assert version.content_changed is True
+
+    def test_artifact_version_summary_minimal(self):
+        """Should create version summary with required fields."""
+        summary = ArtifactVersionSummary(
+            version=1,
+            title="Test",
+            updated_at=datetime.now(timezone.utc),
+            content_length=100
+        )
+        assert summary.version == 1
+        assert summary.changes == []
+
+    def test_artifact_version_summary_with_changes(self):
+        """Should track changes in summary."""
+        summary = ArtifactVersionSummary(
+            version=2,
+            title="Updated",
+            updated_at=datetime.now(timezone.utc),
+            content_length=150,
+            changes=["title", "content"]
+        )
+        assert summary.changes == ["title", "content"]
+
+    def test_artifact_versions_response(self):
+        """Should create versions response."""
+        test_id = UUID("12345678-1234-5678-1234-567812345678")
+        response = ArtifactVersionsResponse(
+            id=test_id,
+            current_version=2,
+            version_count=2,
+            versions=[
+                ArtifactVersionSummary(
+                    version=1,
+                    title="Original",
+                    updated_at=datetime.now(timezone.utc),
+                    content_length=100
+                )
+            ]
+        )
+        assert response.id == test_id
+        assert response.current_version == 2
+        assert len(response.versions) == 1
+
+
+class TestArtifactListModels:
+    """Test suite for artifact list and search models."""
+
+    def test_artifact_list_minimal(self):
+        """Should create artifact list with required fields."""
+        artifact_list = ArtifactList(
+            items=[],
+            total=0
+        )
+        assert artifact_list.items == []
+        assert artifact_list.total == 0
+        assert artifact_list.page == 1
+        assert artifact_list.page_size == 50
+
+    def test_artifact_list_with_pagination(self):
+        """Should create artifact list with pagination."""
+        artifact_list = ArtifactList(
+            items=[],
+            total=100,
+            page=2,
+            page_size=25
+        )
+        assert artifact_list.page == 2
+        assert artifact_list.page_size == 25
+
+    def test_artifact_search_result(self):
+        """Should create search result."""
+        test_id = UUID("12345678-1234-5678-1234-567812345678")
+        result = ArtifactSearchResult(
+            id=test_id,
+            title="Search Result",
+            snippet="This is a snippet...",
+            created_at=datetime.now(timezone.utc),
+            updated_at=datetime.now(timezone.utc)
+        )
+        assert result.id == test_id
+        assert result.snippet == "This is a snippet..."
+        assert result.metadata == {}
+
+    def test_artifact_search_result_with_metadata(self):
+        """Should create search result with metadata."""
+        test_id = UUID("12345678-1234-5678-1234-567812345678")
+        result = ArtifactSearchResult(
+            id=test_id,
+            title="Search Result",
+            snippet="Snippet",
+            metadata={"category": "test"},
+            created_at=datetime.now(timezone.utc),
+            updated_at=datetime.now(timezone.utc)
+        )
+        assert result.metadata == {"category": "test"}
+
+
+class TestApiKeyResponseModels:
+    """Test suite for API key response models."""
+
+    def test_api_key_response(self):
+        """Should create API key response without sensitive data."""
+        test_id = UUID("12345678-1234-5678-1234-567812345678")
+        test_user_id = UUID("87654321-4321-8765-4321-876543218765")
+        response = ApiKeyResponse(
+            id=test_id,
+            user_id=test_user_id,
+            name="Test Key",
+            key_prefix="sk_prod_",
+            last_4="abcd",
+            scopes=["read", "write"],
+            created_at=datetime.now(timezone.utc),
+            updated_at=datetime.now(timezone.utc)
+        )
+        assert response.name == "Test Key"
+        assert response.key_prefix == "sk_prod_"
+        assert response.last_4 == "abcd"
+        assert response.is_active is True
+        assert response.last_used_at is None
+
+    def test_api_key_created_with_key(self):
+        """Should create API key creation response with actual key."""
+        test_id = UUID("12345678-1234-5678-1234-567812345678")
+        test_user_id = UUID("87654321-4321-8765-4321-876543218765")
+        response = ApiKeyCreated(
+            id=test_id,
+            user_id=test_user_id,
+            name="Test Key",
+            key_prefix="sk_prod_",
+            last_4="abcd",
+            api_key="sk_prod_1234567890abcdefghijklmnopqrstuvwxyz",
+            scopes=["read", "write"],
+            created_at=datetime.now(timezone.utc),
+            updated_at=datetime.now(timezone.utc)
+        )
+        assert response.api_key == "sk_prod_1234567890abcdefghijklmnopqrstuvwxyz"
+        assert response.name == "Test Key"
+
+    def test_api_key_list(self):
+        """Should create API key list response."""
+        key_list = ApiKeyList(
+            items=[],
+            total=0
+        )
+        assert key_list.items == []
+        assert key_list.total == 0
+
+    def test_api_key_validation_valid(self):
+        """Should create valid API key validation result."""
+        test_user_id = UUID("12345678-1234-5678-1234-567812345678")
+        test_key_id = UUID("87654321-4321-8765-4321-876543218765")
+        validation = ApiKeyValidation(
+            is_valid=True,
+            user_id=test_user_id,
+            scopes=["read", "write"],
+            key_id=test_key_id
+        )
+        assert validation.is_valid is True
+        assert validation.user_id == test_user_id
+        assert validation.error_message is None
+
+    def test_api_key_validation_invalid(self):
+        """Should create invalid API key validation result."""
+        validation = ApiKeyValidation(
+            is_valid=False,
+            error_message="Invalid API key"
+        )
+        assert validation.is_valid is False
+        assert validation.user_id is None
+        assert validation.scopes == []
+        assert validation.error_message == "Invalid API key"

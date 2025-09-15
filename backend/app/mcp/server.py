@@ -17,9 +17,10 @@ from app.services.artifacts import artifact_service
 # Set up logging
 logger = logging.getLogger(__name__)
 
-# Context variable for storing authenticated user ID per request
-# This is thread-safe and async-safe
+# Context variables for storing authenticated user context per request
+# These are thread-safe and async-safe
 authenticated_user_id: ContextVar[Optional[UUID]] = ContextVar('authenticated_user_id', default=None)
+authenticated_scopes: ContextVar[List[str]] = ContextVar('authenticated_scopes', default=[])
 
 
 class ApiKeyVerifier(TokenVerifier):
@@ -44,32 +45,48 @@ class ApiKeyVerifier(TokenVerifier):
         validation = await api_key_service.validate(token)
         
         if validation.is_valid and validation.user_id:
-            # Store user_id in context variable (thread-safe, request-scoped)
+            # Store user_id and scopes in context variables (thread-safe, request-scoped)
             authenticated_user_id.set(validation.user_id)
-            
+            authenticated_scopes.set(validation.scopes or ["read", "write"])
+
             return AccessToken(
                 token=token,
                 client_id=f"user_{validation.user_id}",
                 user_id=str(validation.user_id),
                 scopes=validation.scopes or ["read", "write"]
             )
-        
+
         # Clear context on validation failure
         authenticated_user_id.set(None)
+        authenticated_scopes.set([])
         return None
 
 
 def get_authenticated_user_id() -> Optional[UUID]:
     """
     Get the authenticated user ID for the current request.
-    
+
     This retrieves the user_id stored by ApiKeyVerifier during token validation.
     Uses contextvars for thread-safe, request-scoped storage.
-    
+
     Returns:
         UUID of the authenticated user or None if not authenticated
     """
     return authenticated_user_id.get()
+
+
+def check_required_scope(required_scope: str) -> bool:
+    """
+    Check if the authenticated user has the required scope.
+
+    Args:
+        required_scope: The scope to check for ("read", "write", "delete")
+
+    Returns:
+        True if the user has the required scope, False otherwise
+    """
+    user_scopes = authenticated_scopes.get()
+    return required_scope in user_scopes
 
 
 def create_mcp_server() -> FastMCP:
@@ -118,23 +135,27 @@ async def create_artifact(
 ) -> Dict[str, Any]:
     """
     Create a new artifact in your context platform.
-    
+
     Args:
         content: Main content (max 100k chars)
         title: Optional title (max 200 chars)
         metadata: Optional metadata as key-value pairs
         ctx: Context object (injected by FastMCP)
-    
+
     Returns:
         The created artifact with its ID and timestamps
     """
     try:
         user_id = get_authenticated_user_id()
-        
+
         if not user_id:
             logger.warning("Tool called without authentication")
             return {"error": "Authentication required. Please provide a valid API key."}
-        
+
+        if not check_required_scope("write"):
+            logger.warning(f"User {user_id} attempted create_artifact without write scope")
+            return {"error": "Insufficient permissions. Required scope: write"}
+
         data = ArtifactCreate(
             title=title,
             content=content,
@@ -167,21 +188,25 @@ async def list_artifacts(
 ) -> List[Dict[str, Any]]:
     """
     List your artifacts.
-    
+
     Args:
         limit: Maximum number of artifacts to return (default 10, max 50)
         offset: Number of artifacts to skip for pagination
         ctx: Context object (injected by FastMCP)
-    
+
     Returns:
         List of artifacts sorted by creation date (newest first)
     """
     try:
         user_id = get_authenticated_user_id()
-        
+
         if not user_id:
             logger.warning("Tool called without authentication")
             return [{"error": "Authentication required. Please provide a valid API key."}]
+
+        if not check_required_scope("read"):
+            logger.warning(f"User {user_id} attempted list_artifacts without read scope")
+            return [{"error": "Insufficient permissions. Required scope: read"}]
         
         # Validate and cap limit
         limit = min(max(1, limit), 50)
@@ -228,11 +253,15 @@ async def search_artifacts(
     """
     try:
         user_id = get_authenticated_user_id()
-        
+
         if not user_id:
             logger.warning("Tool called without authentication")
             return [{"error": "Authentication required. Please provide a valid API key."}]
-        
+
+        if not check_required_scope("read"):
+            logger.warning(f"User {user_id} attempted search_artifacts without read scope")
+            return [{"error": "Insufficient permissions. Required scope: read"}]
+
         if not query or not query.strip():
             return [{"error": "Search query cannot be empty"}]
         
@@ -270,21 +299,25 @@ async def get_artifact(
 ) -> Dict[str, Any]:
     """
     Retrieve a specific artifact by its ID.
-    
+
     Args:
         artifact_id: UUID of the artifact
         ctx: Context object (injected by FastMCP)
-    
+
     Returns:
         The complete artifact with all fields
     """
     try:
         user_id = get_authenticated_user_id()
-        
+
         if not user_id:
             logger.warning("Tool called without authentication")
             return {"error": "Authentication required. Please provide a valid API key."}
-        
+
+        if not check_required_scope("read"):
+            logger.warning(f"User {user_id} attempted get_artifact without read scope")
+            return {"error": "Insufficient permissions. Required scope: read"}
+
         try:
             artifact_uuid = UUID(artifact_id)
         except ValueError:
@@ -321,24 +354,27 @@ async def update_artifact(
 ) -> Dict[str, Any]:
     """
     Update an existing artifact.
-    
+
     Args:
         artifact_id: UUID of the artifact to update
         title: New title (optional)
         content: New content (optional)
         metadata: New metadata (optional)
         ctx: Context object (injected by FastMCP)
-    
+
     Returns:
         The updated artifact
     """
     try:
         user_id = get_authenticated_user_id()
-        
+
         if not user_id:
             logger.warning("Tool called without authentication")
             return {"error": "Authentication required. Please provide a valid API key."}
-        
+
+        if not check_required_scope("write"):
+            logger.warning(f"User {user_id} attempted update_artifact without write scope")
+            return {"error": "Insufficient permissions. Required scope: write"}
         try:
             artifact_uuid = UUID(artifact_id)
         except ValueError:
@@ -401,6 +437,10 @@ async def delete_artifact(
             logger.warning("Tool called without authentication")
             return {"error": "Authentication required. Please provide a valid API key."}
 
+        if not check_required_scope("delete"):
+            logger.warning(f"User {user_id} attempted delete_artifact without delete scope")
+            return {"error": "Insufficient permissions. Required scope: delete"}
+
         try:
             artifact_uuid = UUID(artifact_id)
         except ValueError:
@@ -442,6 +482,10 @@ async def list_artifact_versions(
 
         if not user_id:
             return {"error": "Authentication required. Please provide a valid API key."}
+
+        if not check_required_scope("read"):
+            logger.warning(f"User {user_id} attempted list_artifact_versions without read scope")
+            return {"error": "Insufficient permissions. Required scope: read"}
 
         try:
             artifact_uuid = UUID(artifact_id)
@@ -495,6 +539,10 @@ async def get_artifact_version(
         if not user_id:
             return {"error": "Authentication required. Please provide a valid API key."}
 
+        if not check_required_scope("read"):
+            logger.warning(f"User {user_id} attempted get_artifact_version without read scope")
+            return {"error": "Insufficient permissions. Required scope: read"}
+
         try:
             artifact_uuid = UUID(artifact_id)
         except ValueError:
@@ -539,6 +587,10 @@ async def restore_artifact_version(
 
         if not user_id:
             return {"error": "Authentication required. Please provide a valid API key."}
+
+        if not check_required_scope("write"):
+            logger.warning(f"User {user_id} attempted restore_artifact_version without write scope")
+            return {"error": "Insufficient permissions. Required scope: write"}
 
         try:
             artifact_uuid = UUID(artifact_id)

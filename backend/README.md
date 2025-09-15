@@ -58,7 +58,8 @@ backend/
 │       ├── test_utils_markdown.py  # Markdown title extraction tests
 │       ├── test_utils_text.py      # Text processing tests (snippets)
 │       ├── test_models_validation.py # Pydantic model validation tests
-│       └── test_api_key_hashing.py # API key security tests
+│       ├── test_api_key_hashing.py # API key security tests
+│       └── test_mcp_server.py      # MCP authentication and scope enforcement tests
 ├── schema/
 │   └── schema.sql                   # Consolidated database schema with lookup_hash
 ├── requirements.txt                  # Python dependencies
@@ -252,7 +253,7 @@ The MCP server provides the following tools (all require API key authentication)
 - `get_artifact_version` - Get specific historical version
 - `restore_artifact_version` - Restore artifact to previous version
 
-Each tool operates within the context of the authenticated user, ensuring data isolation and security.
+Each tool operates within the context of the authenticated user, ensuring data isolation and security. **Scope enforcement**: READ tools require `read` scope, WRITE tools require `write` scope, DELETE tools require `delete` scope.
 
 ## Testing
 
@@ -442,6 +443,7 @@ Located in `/backend/.env`:
 - All artifact endpoints require authentication
 - Row Level Security (RLS) policies ready in database
 - CORS configured with `Mcp-Session-Id` exposed for browser MCP clients
+- **MCP scope enforcement**: API key permissions enforced at tool level with proper error handling
 
 ### Known Limitations
 Due to current limitations in the MCP Python SDK's stateless HTTP mode, we use contextvars for thread-safe auth context injection into tools - a temporary but robust solution until native support arrives. We're monitoring SDK releases for proper auth parameter propagation in stateless configurations.
