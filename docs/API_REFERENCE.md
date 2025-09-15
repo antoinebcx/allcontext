@@ -289,8 +289,7 @@ Create a new artifact.
   "metadata": {
     "category": "documentation",
     "tags": ["api", "reference"]
-  },
-  "is_public": false
+  }
 }
 ```
 
@@ -298,7 +297,6 @@ Create a new artifact.
 - `title` (optional): Will auto-generate from content if not provided
 - `content` (required): Markdown content (max 100k chars)
 - `metadata` (optional): JSON object with any structure
-- `is_public` (optional): Whether artifact is publicly visible (default: false)
 
 **Response** (201):
 ```json
@@ -311,7 +309,6 @@ Create a new artifact.
     "category": "documentation",
     "tags": ["api", "reference"]
   },
-  "is_public": false,
   "created_at": "2024-01-01T00:00:00Z",
   "updated_at": "2024-01-01T00:00:00Z",
   "version": 1
@@ -341,7 +338,7 @@ curl -X POST https://api.allcontext.dev/api/v1/artifacts \
 
 #### GET `/api/v1/artifacts`
 
-List artifacts (user's artifacts + public artifacts).
+List artifacts (user's artifacts only).
 
 **Authentication**: Required (JWT or API Key)
 
@@ -362,7 +359,6 @@ List artifacts (user's artifacts + public artifacts).
         "category": "engineering",
         "team": "backend"
       },
-      "is_public": false,
       "created_at": "2024-01-01T00:00:00Z",
       "updated_at": "2024-01-01T00:00:00Z",
       "version": 1
@@ -397,7 +393,6 @@ Search artifacts by text in title and content.
     "title": "API Guidelines",
     "snippet": "# API Guidelines\n\nBest practices for our API design:\n\n1. Use RESTful conventions\n2. Include proper status codes\n3. Provide clear error messages...",
     "metadata": {"category": "engineering"},
-    "is_public": false,
     "created_at": "2024-01-01T00:00:00Z",
     "updated_at": "2024-01-01T00:00:00Z"
   }
@@ -407,7 +402,7 @@ Search artifacts by text in title and content.
 **Search Behavior**:
 - Searches both title and content
 - Case-insensitive partial matching
-- Returns user's artifacts + public artifacts
+- Returns user's artifacts only
 - Returns preview snippets (200 chars)
 - Use `GET /artifacts/{id}` to retrieve full content
 
@@ -434,7 +429,6 @@ Get a specific artifact by ID.
   "title": "API Guidelines",
   "content": "# API Guidelines\n\nBest practices...",
   "metadata": {"category": "engineering"},
-  "is_public": false,
   "created_at": "2024-01-01T00:00:00Z",
   "updated_at": "2024-01-01T00:00:00Z",
   "version": 1
@@ -442,7 +436,7 @@ Get a specific artifact by ID.
 ```
 
 **Access Control**:
-- Returns artifact if user owns it OR it's public
+- Returns artifact if user owns it
 - Returns 404 if artifact doesn't exist or access denied
 
 **Example**:
@@ -469,8 +463,7 @@ Update an existing artifact.
     "category": "engineering",
     "team": "backend",
     "updated_reason": "Added security section"
-  },
-  "is_public": true
+  }
 }
 ```
 
@@ -486,7 +479,6 @@ Update an existing artifact.
     "team": "backend",
     "updated_reason": "Added security section"
   },
-  "is_public": true,
   "created_at": "2024-01-01T00:00:00Z",
   "updated_at": "2024-01-01T01:30:00Z",
   "version": 1
@@ -506,7 +498,6 @@ curl -X PUT https://api.allcontext.dev/api/v1/artifacts/123e4567-e89b-12d3-a456-
   -H "X-API-Key: sk_prod_your_api_key" \
   -d '{
     "title": "Updated API Guidelines",
-    "is_public": true
   }'
 ```
 

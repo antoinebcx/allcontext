@@ -4,7 +4,6 @@ export interface Artifact {
   title: string;
   content: string;
   metadata: Record<string, any>;
-  is_public: boolean;
   created_at: string;
   updated_at: string;
   version: number;
@@ -14,14 +13,12 @@ export interface ArtifactCreate {
   title?: string;
   content: string;
   metadata?: Record<string, any>;
-  is_public?: boolean;
 }
 
 export interface ArtifactUpdate {
   title?: string;
   content?: string;
   metadata?: Record<string, any>;
-  is_public?: boolean;
 }
 
 export interface ArtifactList {
@@ -36,7 +33,6 @@ export interface ArtifactSearchResult {
   title: string;
   snippet: string;  // First 200 chars of content
   metadata: Record<string, any>;
-  is_public: boolean;
   created_at: string;
   updated_at: string;
 }

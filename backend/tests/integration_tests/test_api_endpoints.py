@@ -225,8 +225,7 @@ def test_create_artifacts():
             "metadata": {
                 "category": "testing",
                 "created_by": "api_integration_test"
-            },
-            "is_public": False
+            }
         }
 
         response = make_request("POST", "/api/v1/artifacts", json=artifact_data)

@@ -157,8 +157,7 @@ Create a new context artifact.
 async def create_artifact(
     content: str,
     title: Optional[str] = None,
-    metadata: Optional[Dict[str, Any]] = None,
-    is_public: bool = False
+    metadata: Optional[Dict[str, Any]] = None
 ) -> Dict[str, Any]
 ```
 
@@ -169,7 +168,6 @@ async def create_artifact(
 | `content` | string | ✅ | Artifact content (max 100k chars) |
 | `title` | string | ❌ | Title (max 200 chars, auto-generated if not provided) |
 | `metadata` | object | ❌ | JSON metadata object |
-| `is_public` | boolean | ❌ | Public visibility (default: false) |
 
 **Auto-Title Generation**:
 1. Use provided `title` if present
@@ -185,7 +183,6 @@ async def create_artifact(
   "title": "Generated Title",
   "content": "# My Context\n\nThis is my artifact content...",
   "metadata": {"category": "personal"},
-  "is_public": false,
   "created_at": "2024-01-01T00:00:00Z",
   "message": "Created artifact: Generated Title"
 }
@@ -225,8 +222,7 @@ async def list_artifacts(
     "title": "My Context Document",
     "content_preview": "# My Context\n\nThis document contains important information about my project setup and preferences. It includes configuration details, coding standards, and workflow preferences...",
     "metadata": {"category": "project", "priority": "high"},
-    "is_public": false,
-    "created_at": "2024-01-01T00:00:00Z",
+      "created_at": "2024-01-01T00:00:00Z",
     "updated_at": "2024-01-01T00:00:00Z"
   }
 ]
@@ -235,7 +231,7 @@ async def list_artifacts(
 **Notes**:
 - Returns artifacts sorted by creation date (newest first)
 - Content is truncated to 200 characters with "..." if longer
-- Includes user's artifacts and public artifacts they can access
+- Includes user's artifacts only
 
 ### 3. search_artifacts
 
@@ -260,7 +256,7 @@ async def search_artifacts(
 - **Case-insensitive** partial matching
 - Searches both **title** and **content** fields
 - Uses PostgreSQL **ILIKE** pattern matching
-- Results from user's artifacts + public artifacts
+- Results from user's artifacts only
 
 **Success Response**:
 ```json
@@ -314,7 +310,6 @@ async def get_artifact(
     "importance": "high",
     "last_review": "2024-01-01"
   },
-  "is_public": false,
   "created_at": "2024-01-01T00:00:00Z",
   "updated_at": "2024-01-01T00:00:00Z",
   "version": 1
@@ -335,7 +330,7 @@ async def get_artifact(
 ```
 
 **Access Control**:
-- Returns artifact if user owns it OR it's public
+- Returns artifact if user owns it
 - Returns error for non-existent or inaccessible artifacts
 
 ### 5. update_artifact
@@ -348,8 +343,7 @@ async def update_artifact(
     artifact_id: str,
     title: Optional[str] = None,
     content: Optional[str] = None,
-    metadata: Optional[Dict[str, Any]] = None,
-    is_public: Optional[bool] = None
+    metadata: Optional[Dict[str, Any]] = None
 ) -> Dict[str, Any]
 ```
 
@@ -361,7 +355,6 @@ async def update_artifact(
 | `title` | string | ❌ | New title (max 200 chars) |
 | `content` | string | ❌ | New content (max 100k chars) |
 | `metadata` | object | ❌ | New metadata object |
-| `is_public` | boolean | ❌ | New public status |
 
 **Update Behavior**:
 - **Partial updates**: Only provided fields are modified
@@ -380,7 +373,6 @@ async def update_artifact(
     "tags": ["updated", "current"],
     "last_modified_by": "user"
   },
-  "is_public": true,
   "created_at": "2024-01-01T00:00:00Z",
   "updated_at": "2024-01-01T10:30:00Z",
   "version": 1,
@@ -514,8 +506,8 @@ All MCP tools return errors in a consistent format:
 ### Privacy Considerations
 
 1. **Data Ownership**: Users own all their artifacts
-2. **Public Artifacts**: Users can choose public visibility
-3. **Search Scope**: Users only search their own + public artifacts
+2. **Privacy**: All artifacts are private to the user
+3. **Search Scope**: Users only search their own artifacts
 4. **No Cross-User Access**: Strict user boundary enforcement
 5. **Metadata Privacy**: User-defined metadata not exposed beyond access controls
 

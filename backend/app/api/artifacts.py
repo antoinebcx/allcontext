@@ -28,7 +28,6 @@ async def create_artifact(
     - **title**: Title of the artifact (max 200 chars)
     - **content**: Main content (max 100k chars)
     - **metadata**: Optional metadata as JSON object
-    - **is_public**: Whether artifact is publicly accessible
     """
     artifact = await artifact_service.create(user_id, data)
     return artifact
@@ -42,8 +41,8 @@ async def list_artifacts(
 ):
     """
     List artifacts.
-    
-    Returns user's artifacts and public artifacts.
+
+    Returns user's artifacts.
     """
     artifacts = await artifact_service.list(
         user_id=user_id,
@@ -87,8 +86,8 @@ async def get_artifact(
 ):
     """
     Get a single artifact by ID.
-    
-    Returns artifact if it belongs to user or is public.
+
+    Returns artifact if it belongs to user.
     """
     artifact = await artifact_service.get(artifact_id, user_id)
     

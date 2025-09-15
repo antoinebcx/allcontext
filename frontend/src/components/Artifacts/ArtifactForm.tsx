@@ -36,7 +36,6 @@ export const ArtifactForm: React.FC<ArtifactFormProps> = ({
   const [formData, setFormData] = useState<ArtifactCreate>({
     content: '',
     metadata: {},
-    is_public: false,
   });
   const [loading, setLoading] = useState(false);
   const [tabValue, setTabValue] = useState(0);
@@ -47,14 +46,12 @@ export const ArtifactForm: React.FC<ArtifactFormProps> = ({
       setFormData({
         content: artifact.content,
         metadata: artifact.metadata || {},
-        is_public: artifact.is_public,
       });
     } else if (mode === 'create') {
       setFormData({
         content: '',
         metadata: {},
-        is_public: false,
-      });
+          });
     }
   }, [artifact, mode, open]);
 
@@ -70,7 +67,6 @@ export const ArtifactForm: React.FC<ArtifactFormProps> = ({
         const updates: ArtifactUpdate = {
           content: formData.content,
           metadata: formData.metadata,
-          is_public: formData.is_public,
         };
         await onSubmit(updates);
       } else {
@@ -80,7 +76,6 @@ export const ArtifactForm: React.FC<ArtifactFormProps> = ({
       setFormData({
         content: '',
         metadata: {},
-        is_public: false,
       });
       setTabValue(0);
     } catch (error) {

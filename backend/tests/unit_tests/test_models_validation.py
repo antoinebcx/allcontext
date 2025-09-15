@@ -19,20 +19,17 @@ class TestArtifactModels:
         assert artifact.content == "Test content"
         assert artifact.title is None
         assert artifact.metadata == {}
-        assert artifact.is_public is False
     
     def test_artifact_create_full(self):
         """Should create artifact with all fields."""
         artifact = ArtifactCreate(
             title="Test Title",
             content="Test content",
-            metadata={"key": "value"},
-            is_public=True
+            metadata={"key": "value"}
         )
         assert artifact.title == "Test Title"
         assert artifact.content == "Test content"
         assert artifact.metadata == {"key": "value"}
-        assert artifact.is_public is True
     
     def test_artifact_create_content_required(self):
         """Should fail when content is missing."""
@@ -70,7 +67,6 @@ class TestArtifactModels:
         assert update.title is None
         assert update.content is None
         assert update.metadata is None
-        assert update.is_public is None
     
     def test_artifact_update_partial(self):
         """Should allow partial updates."""
@@ -86,7 +82,6 @@ class TestArtifactModels:
             title="Test",
             content="Content",
             metadata={},
-            is_public=False,
             created_at=datetime.now(timezone.utc),
             updated_at=datetime.now(timezone.utc),
             version=1

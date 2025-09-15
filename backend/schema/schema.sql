@@ -13,7 +13,6 @@ CREATE TABLE IF NOT EXISTS artifacts (
     title TEXT NOT NULL CHECK (length(title) <= 200),
     content TEXT NOT NULL CHECK (length(content) <= 100000),
     metadata JSONB DEFAULT '{}',
-    is_public BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
     version INTEGER DEFAULT 1
@@ -22,7 +21,6 @@ CREATE TABLE IF NOT EXISTS artifacts (
 -- Create indexes for performance
 CREATE INDEX idx_artifacts_user_id ON artifacts(user_id);
 CREATE INDEX idx_artifacts_created_at ON artifacts(created_at DESC);
-CREATE INDEX idx_artifacts_is_public ON artifacts(is_public);
 
 -- Enable full-text search
 ALTER TABLE artifacts 
@@ -109,15 +107,10 @@ $$ LANGUAGE plpgsql;
 ALTER TABLE artifacts ENABLE ROW LEVEL SECURITY;
 
 -- Artifacts policies
-CREATE POLICY "Users can manage their own artifacts" 
-    ON artifacts 
-    FOR ALL 
+CREATE POLICY "Users can manage their own artifacts"
+    ON artifacts
+    FOR ALL
     USING (auth.uid() = user_id);
-
-CREATE POLICY "Anyone can read public artifacts" 
-    ON artifacts 
-    FOR SELECT 
-    USING (is_public = TRUE);
 
 -- Enable RLS on api_keys table
 ALTER TABLE api_keys ENABLE ROW LEVEL SECURITY;
@@ -144,32 +137,14 @@ CREATE POLICY "Users can delete their own API keys"
     USING (auth.uid() = user_id);
 
 -- ============================================================================
--- VIEWS (Optional)
--- ============================================================================
-
--- Create a view for public artifacts
-CREATE OR REPLACE VIEW public_artifacts AS
-SELECT 
-    id,
-    title,
-    content,
-    metadata,
-    created_at,
-    updated_at
-FROM artifacts
-WHERE is_public = TRUE;
-
--- ============================================================================
 -- PERMISSIONS
 -- ============================================================================
 
 -- Grant permissions
 GRANT USAGE ON SCHEMA public TO anon, authenticated;
 GRANT ALL ON artifacts TO authenticated;
-GRANT SELECT ON artifacts TO anon;
 GRANT ALL ON api_keys TO authenticated;
 GRANT SELECT ON api_keys TO anon;
-GRANT SELECT ON public_artifacts TO anon, authenticated;
 
 -- ============================================================================
 -- DOCUMENTATION

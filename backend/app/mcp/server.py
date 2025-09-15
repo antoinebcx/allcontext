@@ -114,7 +114,6 @@ async def create_artifact(
     content: str,
     title: Optional[str] = None,
     metadata: Optional[Dict[str, Any]] = None,
-    is_public: bool = False,
     ctx: Context = None
 ) -> Dict[str, Any]:
     """
@@ -124,7 +123,6 @@ async def create_artifact(
         content: Main content (max 100k chars)
         title: Optional title (max 200 chars)
         metadata: Optional metadata as key-value pairs
-        is_public: Whether artifact should be publicly accessible
         ctx: Context object (injected by FastMCP)
     
     Returns:
@@ -141,7 +139,6 @@ async def create_artifact(
             title=title,
             content=content,
             metadata=metadata or {},
-            is_public=is_public
         )
         
         artifact = await artifact_service.create(user_id, data)
@@ -151,7 +148,6 @@ async def create_artifact(
             "title": artifact.title,
             "content": artifact.content,
             "metadata": artifact.metadata,
-            "is_public": artifact.is_public,
             "created_at": artifact.created_at.isoformat(),
             "message": f"Created artifact: {artifact.title}"
         }
@@ -203,7 +199,6 @@ async def list_artifacts(
                 "title": a.title,
                 "content_preview": generate_snippet(a.content),
                 "metadata": a.metadata,
-                "is_public": a.is_public,
                 "created_at": a.created_at.isoformat(),
                 "updated_at": a.updated_at.isoformat()
             }
@@ -305,7 +300,6 @@ async def get_artifact(
             "title": artifact.title,
             "content": artifact.content,
             "metadata": artifact.metadata,
-            "is_public": artifact.is_public,
             "created_at": artifact.created_at.isoformat(),
             "updated_at": artifact.updated_at.isoformat(),
             "version": artifact.version
@@ -323,7 +317,6 @@ async def update_artifact(
     title: Optional[str] = None,
     content: Optional[str] = None,
     metadata: Optional[Dict[str, Any]] = None,
-    is_public: Optional[bool] = None,
     ctx: Context = None
 ) -> Dict[str, Any]:
     """
@@ -334,7 +327,6 @@ async def update_artifact(
         title: New title (optional)
         content: New content (optional)
         metadata: New metadata (optional)
-        is_public: New public status (optional)
         ctx: Context object (injected by FastMCP)
     
     Returns:
@@ -353,14 +345,13 @@ async def update_artifact(
             return {"error": "Invalid artifact ID format. Must be a valid UUID."}
         
         # Check if any update fields are provided
-        if all(v is None for v in [title, content, metadata, is_public]):
+        if all(v is None for v in [title, content, metadata]):
             return {"error": "No update fields provided"}
         
         update_data = ArtifactUpdate(
             title=title,
             content=content,
             metadata=metadata,
-            is_public=is_public
         )
         
         artifact = await artifact_service.update(
@@ -377,7 +368,6 @@ async def update_artifact(
             "title": artifact.title,
             "content": artifact.content,
             "metadata": artifact.metadata,
-            "is_public": artifact.is_public,
             "updated_at": artifact.updated_at.isoformat(),
             "version": artifact.version,
             "message": f"Updated artifact: {artifact.title}"

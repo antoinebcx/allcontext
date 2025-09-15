@@ -11,7 +11,6 @@ class ArtifactBase(BaseModel):
     title: str = Field(..., min_length=1, max_length=200)
     content: str = Field(..., min_length=1, max_length=100000)
     metadata: Dict[str, Any] = Field(default_factory=dict)
-    is_public: bool = False
 
 
 class ArtifactCreate(BaseModel):
@@ -19,7 +18,6 @@ class ArtifactCreate(BaseModel):
     title: Optional[str] = Field(None, min_length=1, max_length=200)
     content: str = Field(..., min_length=1, max_length=100000)
     metadata: Dict[str, Any] = Field(default_factory=dict)
-    is_public: bool = False
 
 
 class ArtifactUpdate(BaseModel):
@@ -27,7 +25,6 @@ class ArtifactUpdate(BaseModel):
     title: Optional[str] = Field(None, min_length=1, max_length=200)
     content: Optional[str] = Field(None, min_length=1, max_length=100000)
     metadata: Optional[Dict[str, Any]] = None
-    is_public: Optional[bool] = None
 
 
 class Artifact(ArtifactBase):
@@ -45,7 +42,6 @@ class Artifact(ArtifactBase):
                     "tags": ["review", "security"],
                     "model": "claude-3"
                 },
-                "is_public": False,
                 "created_at": "2024-01-01T00:00:00Z",
                 "updated_at": "2024-01-01T00:00:00Z",
                 "version": 1
@@ -74,6 +70,5 @@ class ArtifactSearchResult(BaseModel):
     title: str
     snippet: str = Field(..., description="First 200 chars of content")
     metadata: Dict[str, Any] = Field(default_factory=dict)
-    is_public: bool
     created_at: datetime
     updated_at: datetime

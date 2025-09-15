@@ -60,7 +60,7 @@ tags_metadata = [
         "name": "artifacts",
         "description": "Core CRUD operations for managing AI context artifacts. "
                       "Artifacts are markdown-based content with auto-title generation, metadata support, "
-                      "and full-text search capabilities. Supports both personal and public artifacts.",
+                      "and full-text search capabilities. All artifacts are private to the user.",
     },
     {
         "name": "api-keys",
@@ -117,7 +117,7 @@ Store markdown-based content with:
 ### 🔍 **Search & Discovery**
 - PostgreSQL full-text search with GIN indexes
 - ILIKE pattern matching for flexible queries
-- User-scoped results with public artifact inclusion
+- User-scoped results only
 
 ### 📊 **Pagination & Limits**
 - Configurable page sizes (1-100 items)

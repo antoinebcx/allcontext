@@ -213,8 +213,7 @@ curl -X PUT "https://api.allcontext.dev/api/v1/artifacts/123e4567-e89b-12d3-a456
   -H "X-API-Key: $API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "title": "Updated Title",
-    "is_public": true
+    "title": "Updated Title"
   }'
 ```
 
@@ -222,8 +221,7 @@ curl -X PUT "https://api.allcontext.dev/api/v1/artifacts/123e4567-e89b-12d3-a456
 ```python
 artifact_id = "123e4567-e89b-12d3-a456-426614174000"
 update_data = {
-    "title": "Updated Title",
-    "is_public": True
+    "title": "Updated Title"
 }
 response = requests.put(
     f"https://api.allcontext.dev/api/v1/artifacts/{artifact_id}",
@@ -237,8 +235,7 @@ updated_artifact = response.json()
 ```javascript
 const artifactId = '123e4567-e89b-12d3-a456-426614174000';
 const updateData = {
-  title: 'Updated Title',
-  is_public: true
+  title: 'Updated Title'
 };
 const response = await fetch(`https://api.allcontext.dev/api/v1/artifacts/${artifactId}`, {
   method: 'PUT',

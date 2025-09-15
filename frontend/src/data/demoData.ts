@@ -50,7 +50,6 @@ Ready to centralize your AI context? Sign up and get your first API key in secon
       category: 'demo',
       type: 'documentation'
     },
-    is_public: true,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     version: 1
@@ -106,7 +105,6 @@ Remember: I prefer working solutions over theoretical discussions. When in doubt
       type: 'instructions',
       usage: 'claude-code'
     },
-    is_public: true,
     created_at: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
     updated_at: new Date(Date.now() - 86400000).toISOString(),
     version: 1
@@ -189,7 +187,7 @@ response = client.beta.messages.create(
 ✓ Create separate API keys for different tools
 ✓ Use read-only keys for safer access
 ✓ Organize with metadata tags for better search
-✓ Keep sensitive content private with \`is_public: false\`
+✓ All artifacts are private to your account
 
 Your context, always at your AI's fingertips.`,
     metadata: {
@@ -197,7 +195,6 @@ Your context, always at your AI's fingertips.`,
       type: 'guide',
       tags: ['mcp', 'integration', 'claude']
     },
-    is_public: true,
     created_at: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
     updated_at: new Date(Date.now() - 172800000).toISOString(),
     version: 1

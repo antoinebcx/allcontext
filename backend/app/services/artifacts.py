@@ -28,7 +28,6 @@ class ArtifactService:
             "title": title,
             "content": data.content,
             "metadata": data.metadata,
-            "is_public": data.is_public
         }
         
         response = self.client.table("artifacts").insert(artifact_data).execute()
@@ -50,7 +49,7 @@ class ArtifactService:
         artifact = Artifact(**response.data[0])
         
         # Check access permissions
-        if user_id and artifact.user_id != user_id and not artifact.is_public:
+        if user_id and artifact.user_id != user_id:
             return None
         
         return artifact
@@ -64,10 +63,10 @@ class ArtifactService:
         """List artifacts from Supabase with optional filtering."""
         query = self.client.table("artifacts").select("*")
         
-        # Filter by user or public
+        # Filter by user only
         if user_id:
-            # Get user's artifacts and public ones
-            query = query.or_(f"user_id.eq.{str(user_id)},is_public.eq.true")
+            # Get user's artifacts only
+            query = query.eq("user_id", str(user_id))
         
         # Order by created_at descending
         query = query.order("created_at", desc=True)
@@ -102,8 +101,6 @@ class ArtifactService:
                 update_data["title"] = extract_title_from_content(data.content)
         if data.metadata is not None:
             update_data["metadata"] = data.metadata
-        if data.is_public is not None:
-            update_data["is_public"] = data.is_public
         
         if not update_data:
             return existing  # Nothing to update
@@ -141,8 +138,8 @@ class ArtifactService:
         # Build the search query
         search_query = self.client.table("artifacts").select("*")
 
-        # Filter by user or public
-        search_query = search_query.or_(f"user_id.eq.{str(user_id)},is_public.eq.true")
+        # Filter by user only
+        search_query = search_query.eq("user_id", str(user_id))
 
         # Use ILIKE for partial matching
         search_pattern = f"%{query}%"
@@ -162,7 +159,6 @@ class ArtifactService:
                 title=artifact.title,
                 snippet=generate_snippet(artifact.content),
                 metadata=artifact.metadata,
-                is_public=artifact.is_public,
                 created_at=artifact.created_at,
                 updated_at=artifact.updated_at
             ))
@@ -174,7 +170,7 @@ class ArtifactService:
         query = self.client.table("artifacts").select("id", count="exact")
         
         if user_id:
-            query = query.or_(f"user_id.eq.{str(user_id)},is_public.eq.true")
+            query = query.eq("user_id", str(user_id))
         
         response = query.execute()
         return response.count if response.count else 0
