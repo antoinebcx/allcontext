@@ -160,13 +160,13 @@ export const Dashboard: React.FC = () => {
           sx={{
             p: { xs: 2, sm: 2 },
             mb: { xs: 4, sm: 7 },
-            border: '1px solid',
-            borderColor: 'divider',
             display: 'flex',
             flexDirection: { xs: 'column', sm: 'row' },
             alignItems: { xs: 'stretch', sm: 'center' },
             gap: 2,
-            bgcolor: 'transparent'
+            bgcolor: 'transparent',
+            maxWidth: '850px',
+            margin: '0 auto'
           }}
         >
           <Box sx={{ flexGrow: 1 }}>

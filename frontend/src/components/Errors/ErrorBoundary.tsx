@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import type { ErrorInfo, ReactNode } from 'react';
 import { Box, Button, Typography, Paper, Container } from '@mui/material';
 import { AlertTriangle, RefreshCw } from 'lucide-react';

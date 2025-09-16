@@ -13,6 +13,7 @@ import { Settings } from './pages/Settings';
 import { Docs } from './pages/Docs';
 import { LoginPage } from './pages/LoginPage';
 import { LegalPage } from './pages/LegalPage';
+import { AuthCallback } from './pages/AuthCallback';
 import { useAuth } from './contexts/AuthContext';
 import { useTheme } from './contexts/ThemeContext';
 
@@ -55,6 +56,9 @@ function App() {
           <Routes>
             {/* Login route without layout */}
             <Route path="/login" element={<LoginPage />} />
+
+            {/* OAuth callback route */}
+            <Route path="/auth/callback" element={<AuthCallback />} />
 
             {/* Legal routes without layout */}
             <Route path="/legal/:documentId" element={<LegalPage />} />

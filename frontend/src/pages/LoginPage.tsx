@@ -9,10 +9,13 @@ import {
   Alert,
   Paper,
   LinearProgress,
-  Fade
+  Fade,
+  Divider
 } from '@mui/material';
 import { ArrowRight, ArrowLeft } from 'lucide-react';
+import { Google as GoogleIcon } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../contexts/AuthContext';
 import { Footer } from '../components/Layout/Footer';
 
 export const LoginPage: React.FC = () => {
@@ -127,6 +130,30 @@ export const LoginPage: React.FC = () => {
     setIsNewUser(false);
   };
 
+  const handleGoogleSignIn = async () => {
+    setError('');
+    setLoading(true);
+
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          }
+        }
+      });
+
+      if (error) throw error;
+      // Browser will redirect to Google
+    } catch (err: any) {
+      setError('Failed to initiate Google sign-in');
+      setLoading(false);
+    }
+  };
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Box sx={{ flex: 1, display: 'flex', alignItems: 'center' }}>
@@ -210,11 +237,29 @@ export const LoginPage: React.FC = () => {
                   type="submit"
                   fullWidth
                   variant="contained"
-                  sx={{ mt: 3, mb: 2 }}
+                  sx={{ mt: 2 }}
                   disabled={loading || !email}
                   endIcon={<ArrowRight size={18} />}
                 >
                   Continue
+                </Button>
+
+                <Divider sx={{ my: 3.5 }}>
+                  <Typography variant="body2" color="text.secondary">
+                    OR
+                  </Typography>
+                </Divider>
+
+                {/* Google Sign-in Button */}
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  startIcon={<GoogleIcon />}
+                  onClick={handleGoogleSignIn}
+                  disabled={loading}
+                  sx={{ textTransform: 'none' }}
+                >
+                  Continue with Google
                 </Button>
               </Box>
             ) : (
@@ -268,7 +313,7 @@ export const LoginPage: React.FC = () => {
                   type="submit"
                   fullWidth
                   variant="contained"
-                  sx={{ mt: 3, mb: 2 }}
+                  sx={{ mt: 2, mb: 2 }}
                   disabled={loading || !password || password.length < 6}
                 >
                   {loading

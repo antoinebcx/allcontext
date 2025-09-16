@@ -40,6 +40,7 @@ A minimal, elegant React application for managing markdown-based AI artifacts (p
 - 🔄 **Network Resilience** - Automatic retry with exponential backoff
 - ⚠️ **Error Recovery** - User-friendly messages and recovery options
 - 📜 **Version History** - Track last 20 versions with restore capability
+- 🔑 **Google OAuth** - Sign in with Google for seamless authentication
 
 ## API Documentation
 
@@ -115,7 +116,8 @@ frontend/
 │   │   └── PRIVACY_POLICY.md
 │   ├── pages/
 │   │   ├── Dashboard.tsx       # Main page with unified search/new
-│   │   ├── LoginPage.tsx       # Two-step auth flow with signup mode
+│   │   ├── LoginPage.tsx       # Two-step auth flow with email/Google
+│   │   ├── AuthCallback.tsx    # OAuth callback handler
 │   │   ├── Settings.tsx        # Settings with API keys, appearance & terms
 │   │   ├── Docs.tsx            # Documentation page
 │   │   └── LegalPage.tsx       # Legal document viewer
@@ -187,6 +189,7 @@ The frontend expects a backend API at `VITE_API_URL` with these endpoints:
 - `POST /api/v1/auth/signup` - Register new user
 - `POST /api/v1/auth/check-email` - Check if email exists
 - `POST /api/v1/auth/logout` - Sign out
+- **OAuth**: Google authentication handled via Supabase (no backend endpoint needed)
 
 ### Protected Endpoints (Require Bearer Token)
 - `GET /api/v1/artifacts` - List all artifacts
