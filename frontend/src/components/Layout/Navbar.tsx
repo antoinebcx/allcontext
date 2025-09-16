@@ -32,13 +32,19 @@ export const Navbar: React.FC = () => {
   const isMobile = useMediaQuery(muiTheme.breakpoints.down('sm'));
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [scrolled, setScrolled] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Handle scroll detection
   useEffect(() => {
     const handleScroll = () => {
-      const isScrolled = window.scrollY > 10;
+      const scrollY = window.scrollY;
+      const isScrolled = scrollY > 10;
       setScrolled(isScrolled);
+
+      // Progress from 0 to 1 over 80px of scroll
+      const progress = Math.min(Math.max(scrollY - 20, 0) / 80, 1);
+      setScrollProgress(progress);
     };
 
     // Set initial state
@@ -113,7 +119,26 @@ export const Navbar: React.FC = () => {
           }}
           onClick={() => navigate('/')}
         >
-          Allcontext
+          <Box component="span" sx={{ display: 'inline-flex', alignItems: 'baseline' }}>
+            {'{ '}All
+            {!isMobile && (
+              <Box
+                component="span"
+                sx={{
+                  display: 'inline-block',
+                  maxWidth: `${(1 - scrollProgress) * 65}px`,
+                  opacity: 1 - scrollProgress,
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  overflow: 'hidden',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                context
+              </Box>
+            )}
+            <span>&nbsp;</span>
+            {'}'}
+          </Box>
         </Typography>
 
         {/* Spacer */}
@@ -204,18 +229,12 @@ export const Navbar: React.FC = () => {
               onClick={() => navigate('/docs')}
               sx={{
                 color: location.pathname.startsWith('/docs') ? 'primary.main' : 'text.secondary',
-                fontWeight: location.pathname.startsWith('/docs') ? 600 : 400
+                fontWeight: location.pathname.startsWith('/docs') ? 600 : 400,
+                mr: -0.5
               }}
             >
               Docs
             </Button>
-            <IconButton
-              onClick={toggleTheme}
-              size="small"
-              title={mode === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
-            >
-              {mode === 'light' ? <Moon size={18} /> : <Sun size={18} />}
-            </IconButton>
             <Button
               onClick={() => navigate('/login')}
               sx={{

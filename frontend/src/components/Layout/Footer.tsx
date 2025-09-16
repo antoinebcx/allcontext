@@ -1,9 +1,14 @@
 import React from 'react';
-import { Box, Container, Link, Divider, Typography } from '@mui/material';
+import { Box, Container, Link, Divider, Typography, IconButton } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { Moon, Sun } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
+import { useTheme } from '../../contexts/ThemeContext';
 
 export const Footer: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { mode, toggleTheme } = useTheme();
 
   const handleLegalLinkClick = (docId: string) => {
     navigate(`/legal/${docId}`);
@@ -35,13 +40,13 @@ export const Footer: React.FC = () => {
               © 2025 Allcontext
             </Typography>
 
-            <Divider orientation="vertical" flexItem sx={{ height: 16 }} />
+            <Divider orientation="vertical" flexItem sx={{ height: 16, alignSelf: 'center' }} />
 
             {/* Legal Links */}
             <Box
               sx={{
                 display: 'flex',
-                gap: 2,
+                gap: 3,
                 alignItems: 'center',
               }}
             >
@@ -66,7 +71,7 @@ export const Footer: React.FC = () => {
                 Terms of Service
               </Link>
 
-              <Divider orientation="vertical" flexItem sx={{ height: 16 }} />
+              <Divider orientation="vertical" flexItem sx={{ height: 16, alignSelf: 'center' }} />
 
               <Link
                 component="button"
@@ -88,6 +93,21 @@ export const Footer: React.FC = () => {
               >
                 Privacy Policy
               </Link>
+
+              {/* Theme Toggle for non-authenticated users */}
+              {!user && (
+                <>
+                  <Divider orientation="vertical" flexItem sx={{ height: 16, alignSelf: 'center' }} />
+                  <IconButton
+                    onClick={toggleTheme}
+                    size="small"
+                    title={mode === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+                    sx={{ color: 'text.secondary' }}
+                  >
+                    {mode === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+                  </IconButton>
+                </>
+              )}
             </Box>
           </Box>
         </Container>

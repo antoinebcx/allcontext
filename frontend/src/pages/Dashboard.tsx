@@ -19,7 +19,6 @@ import { ArtifactForm } from '../components/Artifacts/ArtifactForm';
 import { ArtifactDetail } from '../components/Artifacts/ArtifactDetail';
 import { useAuth } from '../contexts/AuthContext';
 import { demoArtifacts } from '../data/demoData';
-import { Footer } from '../components/Layout/Footer';
 import type { Artifact, ArtifactCreate, ArtifactUpdate, ArtifactSearchResult } from '../types';
 
 export const Dashboard: React.FC = () => {
@@ -151,7 +150,7 @@ export const Dashboard: React.FC = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight:  user ? '' : 'calc(100vh - 100px)' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100%' }}>
       <Box sx={{ flex: 1 }}>
         {/* Welcome Banner for non-authenticated users */}
         {!user && (
@@ -165,19 +164,16 @@ export const Dashboard: React.FC = () => {
             alignItems: { xs: 'stretch', sm: 'center' },
             gap: 2,
             bgcolor: 'transparent',
-            maxWidth: '850px',
+            maxWidth: '600px',
             margin: '0 auto'
           }}
         >
           <Box sx={{ flexGrow: 1 }}>
-            <Typography variant="body1" fontWeight={500}>
-              Welcome to Allcontext!
+            <Typography variant="subtitle1" fontWeight={500}>
+              Unified context platform for human-AI collaboration
             </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-              Your context in the cloud — accessible anywhere, anytime, through any interface (app, API, MCP).
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-              You're viewing demo content. Sign up to create your own artifacts.
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+              Access from anywhere via MCP, API, or web.
             </Typography>
           </Box>
           <Button
@@ -305,9 +301,6 @@ export const Dashboard: React.FC = () => {
           onUpdate={handleArtifactUpdate}
         />
       </Box>
-
-      {/* Footer - only for non-authenticated users */}
-      {!user && <Footer />}
     </Box>
   );
 };

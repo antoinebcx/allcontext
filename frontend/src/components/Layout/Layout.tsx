@@ -2,6 +2,8 @@ import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { Box, Container, Toolbar } from '@mui/material';
 import { Navbar } from './Navbar';
+import { Footer } from './Footer';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -9,6 +11,7 @@ interface LayoutProps {
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
+  const { user } = useAuth();
   const isDocsRoute = location.pathname.startsWith('/docs');
 
   return (
@@ -38,6 +41,9 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           </Container>
         </Box>
       )}
+
+      {/* Footer - shown for non-authenticated users on all pages */}
+      {!user && <Footer />}
     </Box>
   );
 };

@@ -10,12 +10,14 @@ import {
   Paper,
   LinearProgress,
   Fade,
-  Divider
+  Divider,
+  Toolbar
 } from '@mui/material';
 import { ArrowRight, ArrowLeft } from 'lucide-react';
 import { Google as GoogleIcon } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../contexts/AuthContext';
+import { Navbar } from '../components/Layout/Navbar';
 import { Footer } from '../components/Layout/Footer';
 
 export const LoginPage: React.FC = () => {
@@ -156,6 +158,8 @@ export const LoginPage: React.FC = () => {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      <Navbar />
+      <Toolbar /> {/* Spacer for fixed navbar */}
       <Box sx={{ flex: 1, display: 'flex', alignItems: 'center' }}>
         <Container maxWidth="xs">
           <Box
