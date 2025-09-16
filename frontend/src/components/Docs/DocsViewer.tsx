@@ -148,9 +148,13 @@ export const DocsViewer: React.FC<DocsViewerProps> = ({ doc }) => {
           }}
         >
           {isLargeDoc ? (
-            <ProgressiveMarkdownRenderer content={doc.content} />
+            <ProgressiveMarkdownRenderer
+              key={doc.id}
+              content={doc.content}
+              autoLoadAll={true}
+            />
           ) : (
-            <MarkdownRenderer content={doc.content} />
+            <MarkdownRenderer key={doc.id} content={doc.content} />
           )}
         </Box>
       </Box>

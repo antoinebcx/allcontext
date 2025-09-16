@@ -9,6 +9,7 @@ interface ProgressiveMarkdownRendererProps {
   content: string;
   chunkSize?: number;
   initialChunks?: number;
+  autoLoadAll?: boolean;
   onRenderComplete?: () => void;
 }
 
@@ -20,6 +21,7 @@ export const ProgressiveMarkdownRenderer: React.FC<ProgressiveMarkdownRendererPr
   content,
   chunkSize = 5000,
   initialChunks = 2,
+  autoLoadAll = false,
   onRenderComplete,
 }) => {
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -40,12 +42,23 @@ export const ProgressiveMarkdownRenderer: React.FC<ProgressiveMarkdownRendererPr
     loadMoreChunks: 1,
   });
 
-  // Auto-load more when sentinel is visible
+  // Auto-load more when sentinel is visible (scroll-triggered)
   useEffect(() => {
-    if (intersection?.isIntersecting && hasMore && !isLoading) {
+    if (!autoLoadAll && intersection?.isIntersecting && hasMore && !isLoading) {
       loadMore();
     }
-  }, [intersection?.isIntersecting, hasMore, isLoading, loadMore]);
+  }, [autoLoadAll, intersection?.isIntersecting, hasMore, isLoading, loadMore]);
+
+  // Auto-load all chunks when autoLoadAll is enabled
+  useEffect(() => {
+    if (autoLoadAll && hasMore && !isLoading) {
+      // Small delay to not block initial render
+      const timer = setTimeout(() => {
+        loadMore();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [autoLoadAll, hasMore, isLoading, loadMore, visibleChunks]);
 
   // Notify when rendering is complete
   useEffect(() => {

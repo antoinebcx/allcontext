@@ -1,6 +1,7 @@
 import React, { memo, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import rehypeSlug from 'rehype-slug';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Box, Link, IconButton, Tooltip, useTheme } from '@mui/material';
@@ -64,6 +65,7 @@ const MarkdownRendererComponent: React.FC<MarkdownRendererProps> = ({ content, p
     >
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
+        rehypePlugins={[rehypeSlug]}
         components={{
           code({ node, inline, className, children, ...props }: any) {
             const match = /language-(\w+)/.exec(className || '');
@@ -122,8 +124,13 @@ const MarkdownRendererComponent: React.FC<MarkdownRendererProps> = ({ content, p
                   href={href}
                   onClick={(e) => {
                     e.preventDefault();
-                    const element = document.querySelector(href);
-                    element?.scrollIntoView({ behavior: 'smooth' });
+                    const targetId = href.slice(1); // Remove the # prefix
+                    const element = document.getElementById(targetId);
+                    if (element) {
+                      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    } else {
+                      console.warn(`Element with id "${targetId}" not found`);
+                    }
                   }}
                   sx={{ cursor: 'pointer' }}
                 >

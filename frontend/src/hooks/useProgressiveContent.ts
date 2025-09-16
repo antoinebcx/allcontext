@@ -46,9 +46,10 @@ export function useProgressiveContent(
   const hasMore = visibleChunks < totalChunks;
   const progress = totalChunks > 0 ? visibleChunks / totalChunks : 1;
 
-  // Reset visible chunks when content changes
+  // Reset visible chunks and loading state when content changes
   useEffect(() => {
     setVisibleChunks(initialChunks);
+    setIsLoading(false);
   }, [content, initialChunks]);
 
   const loadMore = useCallback(() => {
