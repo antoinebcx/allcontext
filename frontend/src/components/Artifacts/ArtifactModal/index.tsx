@@ -29,6 +29,7 @@ interface ArtifactModalProps {
   onSave: (data: ArtifactCreate | ArtifactUpdate) => Promise<void>;
   onDelete: () => void;
   onUpdate?: (updatedArtifact: Artifact) => void;
+  isAuthenticated?: boolean;
 }
 
 export const ArtifactModal: React.FC<ArtifactModalProps> = ({
@@ -39,6 +40,7 @@ export const ArtifactModal: React.FC<ArtifactModalProps> = ({
   onSave,
   onDelete,
   onUpdate,
+  isAuthenticated = true,
 }) => {
   // UI State
   const [showCopySuccess, setShowCopySuccess] = useState(false);
@@ -92,6 +94,9 @@ export const ArtifactModal: React.FC<ArtifactModalProps> = ({
 
   // Handlers
   const handleEdit = () => {
+    // Prevent editing if not authenticated
+    if (!isAuthenticated) return;
+
     setCurrentMode('edit');
     setEditContent(artifact?.content || '');
     setHasChanges(false);
@@ -232,6 +237,7 @@ export const ArtifactModal: React.FC<ArtifactModalProps> = ({
             onDownload={handleDownload}
             onToggleHistory={handleToggleHistory}
             onDelete={() => setShowDeleteConfirm(true)}
+            isAuthenticated={isAuthenticated}
           />
 
           {/* Content Area */}

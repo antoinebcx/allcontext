@@ -42,8 +42,8 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         </Box>
       )}
 
-      {/* Footer - shown for non-authenticated users on all pages */}
-      {!user && <Footer />}
+      {/* Footer - shown for non-authenticated users (except on docs pages) */}
+      {!user && !isDocsRoute && <Footer />}
     </Box>
   );
 };

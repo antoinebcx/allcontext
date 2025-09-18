@@ -1,6 +1,6 @@
 # Allcontext API Reference
 
-Comprehensive reference for the Allcontext REST API - your personal AI context management platform.
+Comprehensive reference for the Allcontext REST API.
 
 ## Table of Contents
 

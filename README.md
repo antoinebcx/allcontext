@@ -2,7 +2,7 @@
 
 Personal AI context management platform.
 
-Your context in the cloud — accessible anywhere, anytime, through any interface (app, API, MCP).
+Unified context platform for human-AI collaboration. Access from anywhere via MCP, API, or web.
 
 ## Structure
 

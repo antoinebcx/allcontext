@@ -1,5 +1,7 @@
 # Allcontext MCP Integration & Configuration
 
+Quick guide to connect AI assistants to Allcontext via Model Context Protocol (MCP) for seamless artifact management.
+
 ## Table of Contents
 
 - [Quick Start](#quick-start)

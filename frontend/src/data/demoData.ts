@@ -7,45 +7,60 @@ export const demoArtifacts: Artifact[] = [
     title: 'Welcome to Allcontext',
     content: `# Welcome to Allcontext
 
-Your context in the cloud — accessible anywhere, anytime, through any interface.
+Unified context platform for human-AI collaboration. Access from anywhere via MCP, API, or web.
 
-## The Problem We Solve
+## The Problems We Solve
 
-If you use AI tools daily, you know the frustration:
-- Your prompts are scattered across ChatGPT, Claude, and local files
-- You copy-paste the same context repeatedly
-- Your team can't share proven prompts and instructions
-- There's no single source of truth for your AI workflows
+• **Context fragmentation** — Your prompts and docs scattered across Claude, ChatGPT, Cursor, repos  
+• **Context drift** — Different AI tools have different versions of your instructions  
+• **No persistence** — AI can't save outputs back to your context for next time  
+• **Tool lock-in** — Your context trapped in proprietary platforms and formats  
+• **No shared workspace** — Can't collaborate with AI on the same living documents
 
 ## How Allcontext Works
 
-**One platform, three access methods:**
+Allcontext is a cloud-native platform that stores your AI context as markdown artifacts, accessible through three synchronized interfaces:
 
-### 📱 Web App
-Write, organize, and search your artifacts with our clean, minimal interface. Perfect for managing your growing library of prompts, instructions, and documentation.
+### MCP (Model Context Protocol)
+Direct integration with AI tools via the 2025 MCP standard. Your AI assistants get read/write access to your context through native tool calling. Setup takes one line in your terminal: 'claude mcp add allcontext https://api.allcontext.dev/mcp'. This gives your AI assistants access to nine native tools for creating, reading, updating, deleting, searching, and version control of your artifacts. The integration works seamlessly with Claude Code, Cursor, OpenAI SDK, and Anthropic SDK.
 
-### 🔌 MCP Protocol
-Connect directly to Claude Code, OpenAI, or any MCP-compatible AI tool. Your artifacts become native tools that AI assistants can access in real-time.
+### REST API  
+Full-featured API for custom integrations and automation. Authentication works through both JWT tokens and API keys with granular scopes. Every operation returns in under 100ms with built-in versioning and diff tracking. We provide complete Python, TypeScript, and curl examples that are ready to copy and run in your projects.
 
-### 🚀 REST API
-Integrate with your workflows using our simple API. Build custom integrations, automate artifact management, or embed your context anywhere.
+### Web Interface
+Clean, fast React app for direct context management. The real-time markdown editor makes it simple to create and edit your artifacts. Full-text search works across all your content instantly. You can generate and manage API keys with specific read, write, or delete permissions. The interface is designed for zero-friction creation and organization of your context.
 
-## Real Use Cases
+All three interfaces share the same backend and data model. Changes propagate instantly across every access point.
 
-- **Engineering teams**: Share coding standards, review guidelines, and debugging prompts
-- **Content creators**: Store brand voice guides, content templates, and style instructions
-- **Researchers**: Maintain analysis frameworks, methodology docs, and data processing prompts
-- **Consultants**: Keep client contexts, project templates, and deliverable frameworks
+## Use Cases
+
+**"My coding standards everywhere"**  
+Store your team's coding guidelines once. Claude Code reads them when reviewing PRs. Cursor follows them when generating code. ChatGPT references them when debugging.
+
+**"AI that remembers our discussions"**  
+After a brainstorming session: "Claude, save these insights to my context." Next week: "What did we decide about the API design?" It's all there.
+
+**"Living documentation"**  
+Your project README isn't static. AI assistants read it for context, update it with changes, and keep it current as your project evolves.
+
+**"Context that travels with you"**  
+Switch from Claude to ChatGPT to Cursor throughout your day. Your context, preferences, and project knowledge follow you everywhere.
 
 ## Why Allcontext?
 
-✓ **Always in sync** — Changes propagate instantly across all interfaces
-✓ **Version controlled** — Never lose important context iterations
-✓ **Search everything** — Full-text search across all your artifacts
-✓ **API keys** — Secure, scoped access for different tools and team members
-✓ **Markdown native** — Write once, render beautifully everywhere
+**Why now?** The shift to human-AI collaboration is happening. A year ago, this would have been a notes app with an API. Today, with MCP becoming the standard and AI agents needing persistent memory, a unified context platform is essential infrastructure.
 
-Ready to centralize your AI context? Sign up and get your first API key in seconds.`,
+**Why unified?** Every AI tool wants to build its own memory system. That path leads to fragmentation. We believe in one source of truth that all tools can access.
+
+**Why open?** Your context is too important to trust to a single vendor. Allcontext is open source. Run our cloud version, self-host, or fork it. You own your data.
+
+**Why MCP-native?** We didn't bolt MCP onto an existing product. We built specifically for a world where AI agents are first-class citizens that need to read and write context.
+
+**Why simple?** No complex schemas. No proprietary formats. Just markdown, accessible everywhere. Get your API key and connect in 30 seconds.
+
+---
+
+*The future of work is human-AI collaboration. Start building your shared context today.*`,
     metadata: {
       category: 'demo',
       type: 'documentation'
@@ -56,61 +71,6 @@ Ready to centralize your AI context? Sign up and get your first API key in secon
   },
   {
     id: 'demo-2',
-    user_id: 'demo-user',
-    title: 'My CLAUDE.md Instructions',
-    content: `# Claude Instructions
-
-## Context About My Work
-
-I'm a full-stack developer working on modern web applications. I value clean, maintainable code and prefer composition over inheritance. I work primarily with:
-- **Frontend**: React, TypeScript, Tailwind/MUI
-- **Backend**: Node.js/Python, REST APIs, PostgreSQL
-- **Tools**: Git, Docker, AWS/Vercel
-
-## How I Want You to Help
-
-### Code Reviews
-- Focus on security, performance, and maintainability
-- Suggest idiomatic solutions for the language/framework
-- Point out potential edge cases I might have missed
-
-### Problem Solving
-- Start with clarifying questions if requirements are ambiguous
-- Provide multiple approaches with trade-offs
-- Include code examples that follow my stack's conventions
-
-### Documentation
-- Keep it concise and practical
-- Include examples for complex concepts
-- Follow the style of my existing docs
-
-## Communication Style
-
-- Be direct and concise
-- Skip pleasantries and get to the point
-- Use bullet points for multiple items
-- Include code snippets where relevant
-
-## Project-Specific Context
-
-When working on my **Allcontext** project:
-- It's a context management platform for AI workflows
-- Uses FastAPI (backend) and React (frontend)
-- Follows REST conventions with JWT/API key auth
-- Database is Supabase (PostgreSQL with RLS)
-
-Remember: I prefer working solutions over theoretical discussions. When in doubt, show me the code.`,
-    metadata: {
-      category: 'demo',
-      type: 'instructions',
-      usage: 'claude-code'
-    },
-    created_at: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
-    updated_at: new Date(Date.now() - 86400000).toISOString(),
-    version: 1
-  },
-  {
-    id: 'demo-3',
     user_id: 'demo-user',
     title: 'MCP Integration Guide',
     content: `# Connecting Allcontext to Claude Code
@@ -184,12 +144,8 @@ response = client.beta.messages.create(
 
 ## Pro Tips
 
-✓ Create separate API keys for different tools
 ✓ Use read-only keys for safer access
-✓ Organize with metadata tags for better search
-✓ All artifacts are private to your account
-
-Your context, always at your AI's fingertips.`,
+✓ All artifacts are private to your account`,
     metadata: {
       category: 'demo',
       type: 'guide',
@@ -197,6 +153,83 @@ Your context, always at your AI's fingertips.`,
     },
     created_at: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
     updated_at: new Date(Date.now() - 172800000).toISOString(),
+    version: 1
+  },
+  {
+    id: 'demo-3',
+    user_id: 'demo-user',
+    title: 'AGENTS.md',
+    content: `# AGENTS.md
+
+## Project Context
+
+Building next-gen AI agent systems. Focus: reliability at scale, sub-100ms latency, graceful degradation.
+
+Stack: Python 3.12, FastAPI, Anthropic/OpenAI SDKs, PostgreSQL, Redis, Kubernetes.
+
+## Core Principles
+
+- First principles thinking. Question assumptions. Build from fundamentals.
+- Simplicity > complexity. If it's not simple, we haven't understood it yet.
+- No praise for bad ideas. Be Socratic—challenge me to think better.
+
+## Commands
+
+\`\`\`bash
+# Development
+make dev          # Start local environment
+make test         # Run test suite (must pass before commit)
+make eval         # Run evaluation benchmarks
+
+# Deployment
+make build        # Build containers
+make deploy-staging  # Deploy to staging
+make deploy-prod  # Production (requires approval)
+\`\`\`
+
+## Code Standards
+
+- Type everything. No \`Any\` without justification
+- Docstrings for public functions
+- Tests before implementation (TDD)
+- Keep functions under 20 lines
+- Async by default for I/O operations
+
+## AI Engineering Patterns
+
+- Streaming responses for user-facing LLM calls
+- Structured outputs with Pydantic models
+- Retry with exponential backoff (max 3 attempts)
+- Always have fallback for LLM failures
+- Log prompts and responses for debugging (dev only)
+- Temperature 0 for deterministic tasks, 0.7 for creative
+
+## Architecture Decisions
+
+- Stateless agents (context in DB, not memory)
+- Event-driven with clear boundaries
+- Separate prompt management from business logic
+- Version all prompts like code
+- Monitor: latency p50/p95/p99, token usage, error rates
+
+## Communication Style
+
+- Direct feedback. Skip pleasantries.
+- Show me metrics, not opinions
+- Code > lengthy explanations
+- If unsure, ask. Don't guess.
+
+## Current Focus
+
+Making our agent pipeline 10x faster without sacrificing quality.
+Key metric: 95% success rate at <100ms latency.`,
+    metadata: {
+      category: 'demo',
+      type: 'instructions',
+      usage: 'ai-agents'
+    },
+    created_at: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
+    updated_at: new Date(Date.now() - 86400000).toISOString(),
     version: 1
   }
 ];

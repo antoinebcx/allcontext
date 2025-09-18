@@ -1,6 +1,6 @@
 # Allcontext MCP Server Specification
 
-Model Context Protocol (MCP) server specification for Allcontext - enabling AI assistants to manage personal context artifacts.
+Model Context Protocol (MCP) server specification for Allcontext.
 
 ## Table of Contents
 

@@ -39,6 +39,7 @@ interface ArtifactModalHeaderProps {
   onDownload: () => void;
   onToggleHistory: () => void;
   onDelete: () => void;
+  isAuthenticated?: boolean;
 }
 
 export const ArtifactModalHeader: React.FC<ArtifactModalHeaderProps> = ({
@@ -59,6 +60,7 @@ export const ArtifactModalHeader: React.FC<ArtifactModalHeaderProps> = ({
   onDownload,
   onToggleHistory,
   onDelete,
+  isAuthenticated = true,
 }) => {
   return (
     <Box
@@ -158,7 +160,7 @@ export const ArtifactModalHeader: React.FC<ArtifactModalHeaderProps> = ({
                 size="small"
                 variant="text"
                 onClick={onSave}
-                disabled={isSaving || !editContent.trim()}
+                disabled={isSaving || !editContent.trim() || !isAuthenticated}
                 startIcon={<Save size={14} />}
                 sx={{
                   height: 28,
@@ -194,14 +196,16 @@ export const ArtifactModalHeader: React.FC<ArtifactModalHeaderProps> = ({
             </>
           ) : (
             <>
-              <Tooltip title="Edit">
-                <IconButton
-                  size="small"
-                  onClick={onEdit}
-                  disabled={isViewingHistory}
-                >
-                  <Edit size={16} />
-                </IconButton>
+              <Tooltip title={!isAuthenticated ? "Sign in to edit" : "Edit"}>
+                <span>
+                  <IconButton
+                    size="small"
+                    onClick={onEdit}
+                    disabled={isViewingHistory || !isAuthenticated}
+                  >
+                    <Edit size={16} />
+                  </IconButton>
+                </span>
               </Tooltip>
               <Tooltip title="Copy as Markdown">
                 <IconButton size="small" onClick={() => onCopy('markdown')}>

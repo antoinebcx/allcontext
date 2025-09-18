@@ -281,6 +281,7 @@ export const Dashboard: React.FC = () => {
           onSave={handleSave}
           onDelete={handleDelete}
           onUpdate={handleArtifactUpdate}
+          isAuthenticated={!!user}
         />
       </Box>
     </Box>
