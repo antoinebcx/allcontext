@@ -64,9 +64,11 @@ frontend/
 │   │   └── logger.ts           # Logger types
 │   ├── components/
 │   │   ├── Artifacts/
+│   │   │   ├── ArtifactModal/          # Unified modal for view/edit/create
+│   │   │   │   ├── index.tsx           # Main modal orchestrator
+│   │   │   │   ├── ArtifactModalHeader.tsx  # Header with title/dates/actions
+│   │   │   │   └── ArtifactEditor.tsx       # Editor with write/preview tabs
 │   │   │   ├── ArtifactCard.tsx        # Grid card component with connect button
-│   │   │   ├── ArtifactDetail.tsx      # Detail view modal with version history
-│   │   │   ├── ArtifactForm.tsx        # Create/edit form (no title field)
 │   │   │   ├── ConnectPopover.tsx      # API/MCP usage examples popover
 │   │   │   └── VersionHistory.tsx      # Version history sidebar panel
 │   │   ├── ApiKeys/
@@ -98,6 +100,7 @@ frontend/
 │   │   ├── useIntersectionObserver.ts # Viewport detection for lazy loading
 │   │   └── useProgressiveContent.ts   # Chunk loading management
 │   ├── utils/
+│   │   ├── dates.ts            # Date formatting utilities
 │   │   ├── errors.ts           # Error handling utilities
 │   │   ├── logger.ts           # Logging utility (dev-only)
 │   │   └── markdown/

@@ -15,8 +15,7 @@ import { Plus, Search } from 'lucide-react';
 import { useDebounce } from '../hooks/useDebounce';
 import { useArtifacts, useCreateArtifact, useUpdateArtifact, useDeleteArtifact, useSearchArtifacts } from '../hooks/useArtifacts';
 import { ArtifactCard } from '../components/Artifacts/ArtifactCard';
-import { ArtifactForm } from '../components/Artifacts/ArtifactForm';
-import { ArtifactDetail } from '../components/Artifacts/ArtifactDetail';
+import { ArtifactModal } from '../components/Artifacts/ArtifactModal';
 import { useAuth } from '../contexts/AuthContext';
 import { demoArtifacts } from '../data/demoData';
 import type { Artifact, ArtifactCreate, ArtifactUpdate, ArtifactSearchResult } from '../types';
@@ -26,9 +25,8 @@ export const Dashboard: React.FC = () => {
   const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedArtifact, setSelectedArtifact] = useState<Artifact | null>(null);
-  const [formOpen, setFormOpen] = useState(false);
-  const [formMode, setFormMode] = useState<'create' | 'edit'>('create');
-  const [detailOpen, setDetailOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState<'view' | 'edit' | 'create'>('view');
 
   // Debounce search query
   const debouncedSearch = useDebounce(searchQuery, 300);
@@ -91,8 +89,8 @@ export const Dashboard: React.FC = () => {
       return;
     }
     setSelectedArtifact(null);
-    setFormMode('create');
-    setFormOpen(true);
+    setModalMode('create');
+    setModalOpen(true);
   };
 
   const handleView = async (artifactOrResult: Artifact | ArtifactSearchResult) => {
@@ -106,17 +104,8 @@ export const Dashboard: React.FC = () => {
       return;
     }
     setSelectedArtifact(artifactOrResult as Artifact);
-    setDetailOpen(true);
-  };
-
-  const handleEdit = () => {
-    if (!user) {
-      navigate('/login');
-      return;
-    }
-    setFormMode('edit');
-    setFormOpen(true);
-    setDetailOpen(false);
+    setModalMode('view');
+    setModalOpen(true);
   };
 
   const handleDelete = async () => {
@@ -126,21 +115,22 @@ export const Dashboard: React.FC = () => {
     }
     if (selectedArtifact) {
       await deleteMutation.mutateAsync(selectedArtifact.id);
-      setDetailOpen(false);
+      setModalOpen(false);
       setSelectedArtifact(null);
     }
   };
 
-  const handleFormSubmit = async (data: ArtifactCreate | ArtifactUpdate) => {
-    if (formMode === 'create') {
+  const handleSave = async (data: ArtifactCreate | ArtifactUpdate) => {
+    if (modalMode === 'create') {
       await createMutation.mutateAsync(data as ArtifactCreate);
+      setModalOpen(false);
     } else if (selectedArtifact) {
       await updateMutation.mutateAsync({
         id: selectedArtifact.id,
         data: data as ArtifactUpdate,
       });
+      // Don't close modal, just switch to view mode (handled in ArtifactModal)
     }
-    setFormOpen(false);
   };
 
   const handleArtifactUpdate = (updatedArtifact: Artifact) => {
@@ -282,21 +272,13 @@ export const Dashboard: React.FC = () => {
         </Grid>
       )}
 
-        {/* Create/Edit Form */}
-        <ArtifactForm
-          open={formOpen}
-          onClose={() => setFormOpen(false)}
-          onSubmit={handleFormSubmit}
+        {/* Unified Modal for view/edit/create */}
+        <ArtifactModal
+          open={modalOpen}
+          onClose={() => setModalOpen(false)}
           artifact={selectedArtifact}
-          mode={formMode}
-        />
-
-        {/* Detail View */}
-        <ArtifactDetail
-          open={detailOpen}
-          onClose={() => setDetailOpen(false)}
-          artifact={selectedArtifact}
-          onEdit={handleEdit}
+          mode={modalMode}
+          onSave={handleSave}
           onDelete={handleDelete}
           onUpdate={handleArtifactUpdate}
         />
