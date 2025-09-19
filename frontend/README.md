@@ -313,23 +313,28 @@ curl -X POST http://localhost:8000/api/v1/artifacts \
 
 ## Deployment
 
-### Build for Production
+### Netlify Deployment
+
+The frontend is deployed on [Netlify](https://netlify.com).
+
+**Required Environment Variables** (set in Netlify dashboard):
 ```bash
-npm run build
-# Output in dist/ folder
+VITE_API_URL=https://api.allcontext.dev  # Your Railway backend URL
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key
 ```
 
-### Environment Variables
-Set these in your deployment platform:
-- `VITE_API_URL` - Backend API URL
-- `VITE_SUPABASE_URL` - Supabase project URL
-- `VITE_SUPABASE_ANON_KEY` - Supabase anon key
+**Build Settings**:
+- Build command: `npm run build`
+- Publish directory: `dist`
+- Includes `public/_redirects` for SPA routing
 
-### Static Hosting
-Deploy `dist/` folder to:
-- **Netlify** (production-ready with error recovery)
-- Vercel
-- GitHub Pages  
+### Build for Production
+
+```bash
+npm run build    # Build locally
+npm run preview  # Test production build
+```  
 
 ## Next Steps
 

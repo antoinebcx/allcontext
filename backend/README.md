@@ -450,29 +450,40 @@ Due to current limitations in the MCP Python SDK's stateless HTTP mode, we use c
 
 ## Deployment
 
-### Heroku Deployment
+### Railway Deployment
 
-The backend is configured for Heroku deployment with:
+The backend is deployed on [Railway](https://railway.app) with automatic deployments from GitHub.
+
+#### Required Environment Variables
+
+Set these in your Railway project settings:
+
+```bash
+# Supabase Configuration (Required)
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_KEY=your-service-role-key
+SUPABASE_ANON_KEY=your-anon-key
+
+# Environment Configuration
+ENVIRONMENT=production
+API_BASE_URL=https://your-app.railway.app
+
+# Port is automatically set by Railway
+# Railway provides PORT environment variable
+```
+
+#### Deployment Steps
+
+1. **Connect GitHub repository** to Railway
+2. **Set environment variables** in Railway dashboard
+3. **Deploy** - Railway automatically builds and deploys on push
+
+The backend includes:
 - `Procfile` for web process definition
 - `runtime.txt` specifying Python 3.11.10
-- Pydantic Settings handling environment variables
-- Database singleton for connection efficiency
+- Pydantic Settings for environment variables
+- Automatic PORT binding from Railway
 
-1. **Set Heroku environment variables:**
-```bash
-heroku config:set SUPABASE_URL=your_url
-heroku config:set SUPABASE_KEY=your_key
-heroku config:set SUPABASE_ANON_KEY=your_anon_key
-heroku config:set ENVIRONMENT=production
-heroku config:set API_BASE_URL=https://your-app.herokuapp.com
-```
-
-2. **Deploy:**
-```bash
-git add .
-git commit -m "Add production deployment configuration"
-git push heroku main
-```
 
 ## Documentation
 
