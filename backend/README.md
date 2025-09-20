@@ -41,10 +41,12 @@ backend/
 │   ├── utils/
 │   │   ├── __init__.py
 │   │   ├── markdown.py              # Title extraction utility
-│   │   └── text.py                  # Text processing utilities (snippets)
+│   │   └── text.py                  # Text processing utilities (snippets, string manipulation)
 │   └── mcp/
 │       ├── __init__.py
-│       └── server.py                # MCP server with stateless HTTP transport
+│       ├── server.py                # MCP server configuration
+│       ├── auth.py                  # Authentication & context management
+│       └── tools.py                 # All MCP tools
 ├── tests/
 │   ├── __init__.py
 │   ├── integration_tests/
@@ -57,6 +59,7 @@ backend/
 │       ├── __init__.py
 │       ├── test_utils_markdown.py  # Markdown title extraction tests
 │       ├── test_utils_text.py      # Text processing tests (snippets)
+│       ├── test_utils_string_manipulation.py # String manipulation tests
 │       ├── test_models_validation.py # Pydantic model validation tests
 │       ├── test_api_key_hashing.py # API key security tests
 │       └── test_mcp_server.py      # MCP authentication and scope enforcement tests
@@ -243,12 +246,17 @@ API keys created through the UI work for both REST API and MCP access. Configure
 
 The MCP server provides the following tools (all require API key authentication):
 
+### Core CRUD Operations
 - `create_artifact` - Create new artifact in your personal collection
 - `list_artifacts` - List your artifacts with pagination
 - `search_artifacts` - Search your artifacts by text
 - `get_artifact` - Get a specific artifact by ID
-- `update_artifact` - Update an existing artifact
+- `update_artifact` - Update an existing artifact entirely
+- `str_replace_artifact` - Replace specific strings without reading entire content
+- `str_insert_artifact` - Insert text at specific line number
 - `delete_artifact` - Delete an artifact
+
+### Version Management
 - `list_artifact_versions` - Get version history for an artifact
 - `get_artifact_version` - Get specific historical version
 - `restore_artifact_version` - Restore artifact to previous version

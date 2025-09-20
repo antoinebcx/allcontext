@@ -260,6 +260,91 @@ class ArtifactService:
 
         return None
 
+    async def string_replace(
+        self,
+        artifact_id: UUID,
+        user_id: UUID,
+        old_string: str,
+        new_string: str,
+        count: Optional[int] = None
+    ) -> Optional[Artifact]:
+        """
+        Replace string in artifact content.
+
+        Args:
+            artifact_id: Artifact UUID
+            user_id: User UUID for authorization
+            old_string: String to replace
+            new_string: Replacement string
+            count: Max replacements (None for all)
+
+        Returns:
+            Updated artifact or None if not found/unauthorized
+        """
+        from app.utils import find_and_replace
+
+        # Get current artifact
+        artifact = await self.get(artifact_id, user_id)
+        if not artifact or artifact.user_id != user_id:
+            return None
+
+        # Perform replacement
+        try:
+            modified_content, replacements = find_and_replace(
+                artifact.content,
+                old_string,
+                new_string,
+                count
+            )
+        except ValueError:
+            # String not found or other validation error
+            raise
+
+        # Update artifact with new content
+        update_data = ArtifactUpdate(content=modified_content)
+        return await self.update(artifact_id, user_id, update_data)
+
+    async def string_insert(
+        self,
+        artifact_id: UUID,
+        user_id: UUID,
+        line_number: int,
+        text: str
+    ) -> Optional[Artifact]:
+        """
+        Insert text at specific line in artifact content.
+
+        Args:
+            artifact_id: Artifact UUID
+            user_id: User UUID for authorization
+            line_number: Line number (1-based) where to insert
+            text: Text to insert
+
+        Returns:
+            Updated artifact or None if not found/unauthorized
+        """
+        from app.utils import insert_at_line
+
+        # Get current artifact
+        artifact = await self.get(artifact_id, user_id)
+        if not artifact or artifact.user_id != user_id:
+            return None
+
+        # Perform insertion
+        try:
+            modified_content = insert_at_line(
+                artifact.content,
+                line_number,
+                text
+            )
+        except ValueError:
+            # Line number out of range
+            raise
+
+        # Update artifact with new content
+        update_data = ArtifactUpdate(content=modified_content)
+        return await self.update(artifact_id, user_id, update_data)
+
     async def restore_version(self, artifact_id: UUID, user_id: UUID, version_number: int) -> Optional[Artifact]:
         """Restore artifact to a previous version by version number."""
         # First get the version to restore

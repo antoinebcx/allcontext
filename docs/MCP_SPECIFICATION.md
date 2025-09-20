@@ -36,11 +36,12 @@ The Allcontext MCP server provides AI assistants with direct access to personal 
 
 ### Key Features
 
-- **6 Core Tools** for complete CRUD operations on artifacts
+- **11 Core Tools** for complete CRUD operations and efficient editing
 - **Stateless Architecture** optimized for cloud deployment
 - **Thread-safe Authentication** via contextvars
 - **User Data Isolation** with proper access controls
 - **Error Handling** with detailed feedback
+- **Token-Efficient Editing** with string replacement tools
 
 ---
 
@@ -146,7 +147,20 @@ def get_authenticated_user_id() -> Optional[UUID]:
 
 ## Tools
 
-The Allcontext MCP server provides 6 core tools for complete artifact management.
+The Allcontext MCP server provides 11 core tools for complete artifact management and efficient editing.
+
+Available tools:
+1. **create_artifact** - Create a new artifact
+2. **list_artifacts** - List artifacts with pagination
+3. **search_artifacts** - Search artifacts by text
+4. **get_artifact** - Get a specific artifact by ID
+5. **update_artifact** - Update an existing artifact entirely
+6. **str_replace_artifact** - Replace specific strings without reading entire content
+7. **str_insert_artifact** - Insert text at specific line number
+8. **delete_artifact** - Delete an artifact
+9. **list_artifact_versions** - Get version history for an artifact
+10. **get_artifact_version** - Get specific historical version
+11. **restore_artifact_version** - Restore artifact to previous version
 
 ### 1. create_artifact
 
@@ -380,7 +394,114 @@ async def update_artifact(
 }
 ```
 
-### 6. delete_artifact
+### 6. str_replace_artifact
+
+Replace specific strings in artifact content without reading entire content.
+
+**Function Signature**:
+```python
+async def str_replace_artifact(
+    artifact_id: str,
+    old_string: str,
+    new_string: str,
+    count: Optional[int] = None
+) -> Dict[str, Any]
+```
+
+**Parameters**:
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `artifact_id` | string | ✅ | UUID of the artifact |
+| `old_string` | string | ✅ | Exact string to find and replace |
+| `new_string` | string | ✅ | Replacement string |
+| `count` | integer | ❌ | Max replacements (None for all) |
+
+**Success Response**:
+```json
+{
+  "id": "123e4567-e89b-12d3-a456-426614174000",
+  "title": "Updated Title",
+  "version": 7,
+  "updated_at": "2024-01-02T00:00:00Z",
+  "message": "Successfully replaced string in artifact"
+}
+```
+
+**Error Response**:
+```json
+{
+  "error": "String not found: 'old text...'"
+}
+```
+
+**Benefits**:
+- **Token Efficiency**: Only send strings to replace, not entire content
+- **Performance**: Faster for large artifacts
+- **Precision**: Exact string matching prevents unintended changes
+- **Versioning**: Automatically creates new version
+
+**Use Cases**:
+- Fixing typos or errors
+- Updating variable names
+- Changing configuration values
+- Refactoring code snippets
+
+---
+
+### 7. str_insert_artifact
+
+Insert text at a specific line in artifact content.
+
+**Function Signature**:
+```python
+async def str_insert_artifact(
+    artifact_id: str,
+    line_number: int,
+    text: str
+) -> Dict[str, Any]
+```
+
+**Parameters**:
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `artifact_id` | string | ✅ | UUID of the artifact |
+| `line_number` | integer | ✅ | Line number (1-based) |
+| `text` | string | ✅ | Text to insert |
+
+**Success Response**:
+```json
+{
+  "id": "123e4567-e89b-12d3-a456-426614174000",
+  "title": "Updated Title",
+  "version": 8,
+  "updated_at": "2024-01-02T00:00:00Z",
+  "message": "Successfully inserted text at line 5"
+}
+```
+
+**Error Response**:
+```json
+{
+  "error": "Line number 100 out of range (1-50)"
+}
+```
+
+**Line Numbering**:
+- **1-based**: First line is line 1
+- **Insert at end**: Use line_number = total_lines + 1
+- **Insert before**: Text inserted as new line before specified line
+
+**Use Cases**:
+- Adding new sections to documents
+- Inserting import statements
+- Adding configuration entries
+- Appending log entries
+
+---
+
+### 8. delete_artifact
 
 Delete an artifact.
 
@@ -419,7 +540,7 @@ async def delete_artifact(
 
 ---
 
-### 7. list_artifact_versions
+### 9. list_artifact_versions
 
 Get version history for an artifact.
 
@@ -468,7 +589,7 @@ async def list_artifact_versions(
 
 ---
 
-### 8. get_artifact_version
+### 10. get_artifact_version
 
 Get a specific version of an artifact.
 
@@ -507,7 +628,7 @@ async def get_artifact_version(
 
 ---
 
-### 9. restore_artifact_version
+### 11. restore_artifact_version
 
 Restore an artifact to a previous version.
 
@@ -546,6 +667,7 @@ async def restore_artifact_version(
 **Note**: Restoring creates a new version with content from the specified version.
 
 ---
+
 
 ## Error Handling
 

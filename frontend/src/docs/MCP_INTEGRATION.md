@@ -24,7 +24,9 @@ Your AI assistant will have access to these artifact management tools:
 - `list_artifacts` - List your artifacts with pagination
 - `search_artifacts` - Search artifacts by text
 - `get_artifact` - Get specific artifact by ID
-- `update_artifact` - Update existing artifacts
+- `update_artifact` - Update existing artifacts entirely
+- `str_replace_artifact` - Replace specific strings without reading entire content
+- `str_insert_artifact` - Insert text at specific line number
 - `delete_artifact` - Delete artifacts
 - `list_artifact_versions` - View version history
 - `get_artifact_version` - Get specific version
