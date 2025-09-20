@@ -112,6 +112,14 @@ export const CreateApiKey: React.FC<CreateApiKeyProps> = ({ open, onClose, onCre
             required
             helperText="A friendly name to identify this key"
             error={!!error && !name.trim()}
+            slotProps={{
+              inputLabel: {
+                sx: { fontSize: 16 }
+              },
+              htmlInput: {
+                style: { fontSize: 16 } // Prevents zoom on iOS
+              }
+            }}
           />
 
           <FormControl component="fieldset">

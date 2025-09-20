@@ -20,6 +20,7 @@ import {
   useTheme as useMuiTheme,
 } from '@mui/material';
 import { User, LogOut, Settings, Moon, Sun, BookOpen, Menu as MenuIcon, X, Home } from 'lucide-react';
+import { GitHub as GitHubIcon } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
 
@@ -214,6 +215,22 @@ export const Navbar: React.FC = () => {
                 <Settings size={16} style={{ marginRight: 8 }} />
                 Settings
               </MenuItem>
+              <MenuItem
+                component="a"
+                href="https://github.com/antoinebcx/allcontext"
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{
+                  color: 'inherit',
+                  textDecoration: 'none',
+                  '&:hover': {
+                    backgroundColor: 'action.hover',
+                  },
+                }}
+              >
+                <GitHubIcon sx={{ fontSize: 16, mr: 1 }} />
+                GitHub
+              </MenuItem>
               <Divider />
               <MenuItem onClick={handleLogout}>
                 <LogOut size={16} style={{ marginRight: 8 }} />
@@ -349,6 +366,22 @@ export const Navbar: React.FC = () => {
                   {mode === 'light' ? <Moon size={20} /> : <Sun size={20} />}
                 </ListItemIcon>
                 <ListItemText primary={mode === 'light' ? 'Dark Mode' : 'Light Mode'} />
+              </ListItemButton>
+            </ListItem>
+
+            {/* GitHub Link */}
+            <ListItem disablePadding sx={{ mb: 1 }}>
+              <ListItemButton
+                component="a"
+                href="https://github.com/antoinebcx/allcontext"
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{ borderRadius: 1 }}
+              >
+                <ListItemIcon>
+                  <GitHubIcon sx={{ fontSize: 20 }} />
+                </ListItemIcon>
+                <ListItemText primary="GitHub" />
               </ListItemButton>
             </ListItem>
 

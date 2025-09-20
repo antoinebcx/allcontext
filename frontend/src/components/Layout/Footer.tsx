@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Container, Link, Divider, Typography, IconButton } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { Moon, Sun } from 'lucide-react';
+import { GitHub as GitHubIcon } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
 
@@ -92,6 +93,27 @@ export const Footer: React.FC = () => {
                 }}
               >
                 Privacy Policy
+              </Link>
+
+              <Divider orientation="vertical" flexItem sx={{ height: 16, alignSelf: 'center' }} />
+
+              {/* GitHub Link */}
+              <Link
+                href="https://github.com/antoinebcx/allcontext"
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 0.5,
+                  color: 'text.secondary',
+                  textDecoration: 'none',
+                  '&:hover': {
+                    color: 'primary.main',
+                  },
+                }}
+              >
+                <GitHubIcon sx={{ fontSize: 18 }} />
               </Link>
 
               {/* Theme Toggle for non-authenticated users */}

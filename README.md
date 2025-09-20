@@ -24,5 +24,4 @@ Unified context platform for human-AI collaboration. Access from anywhere via MC
 
 ## Future To-dos
 
-- Docker files / docker-compose and deployment documentation
 - CI/CD pipelines - GitHub Actions with automated testing

@@ -86,7 +86,7 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
                 height: '100%',
                 alignItems: 'flex-start',
                 p: 2,
-                fontSize: '0.95rem',
+                fontSize: 16, // Prevents zoom on iOS
                 lineHeight: 1.6,
               },
               '& fieldset': {
@@ -95,6 +95,7 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
               '& .MuiInputBase-input': {
                 height: '100% !important',
                 overflowY: 'auto !important',
+                fontSize: 16, // Prevents zoom on iOS
               },
             }}
           />

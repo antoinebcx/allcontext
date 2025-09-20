@@ -14,6 +14,7 @@ import {
   Radio,
 } from '@mui/material';
 import { Plus, Monitor, Sun, Moon } from 'lucide-react';
+import { GitHub as GitHubIcon } from '@mui/icons-material';
 import { useApiKeys, useCreateApiKey, useDeleteApiKey } from '../hooks/useApiKeys';
 import { ApiKeysList } from '../components/ApiKeys/ApiKeysList';
 import { CreateApiKey } from '../components/ApiKeys/CreateApiKey';
@@ -106,6 +107,7 @@ export const Settings: React.FC = () => {
         <Tab label="Appearance" />
         <Tab label="Terms" />
         <Tab label="Security" />
+        <Tab label="About" />
       </Tabs>
 
       {/* API Keys Tab */}
@@ -383,6 +385,48 @@ curl -H "X-API-Key: your_api_key" \\
             <Typography variant="body2" color="text.secondary">
               Security settings and password management coming soon.
             </Typography>
+        </Box>
+      </TabPanel>
+
+      {/* About Tab */}
+      <TabPanel value={tabValue} index={5}>
+        <Box sx={{ py: 3 }}>
+          <Typography variant="h6" gutterBottom>
+            About Allcontext
+          </Typography>
+
+          <Box sx={{ mb: 4 }}>
+            <Typography variant="body1" sx={{ mb: 2 }}>
+              Unified context platform for human-AI collaboration. Access from anywhere via MCP, API, or web.
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Allcontext helps you manage markdown-based AI artifacts (prompts and documents) with seamless integration across multiple interfaces.
+            </Typography>
+          </Box>
+
+          <Box sx={{ mb: 4 }}>
+            <Button
+              variant="outlined"
+              startIcon={<GitHubIcon />}
+              href="https://github.com/antoinebcx/allcontext"
+              target="_blank"
+              rel="noopener noreferrer"
+              component="a"
+              sx={{
+                textTransform: 'none',
+                mb: 2
+              }}
+            >
+              View on GitHub
+            </Button>
+
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+              Allcontext is open source software licensed under the MIT License.
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Contributions, bug reports, and feature requests are welcome!
+            </Typography>
+          </Box>
         </Box>
       </TabPanel>
 

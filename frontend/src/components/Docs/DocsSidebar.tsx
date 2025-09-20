@@ -6,9 +6,11 @@ import {
   ListItemText,
   Typography,
   Divider,
+  Button,
   useTheme,
   useMediaQuery,
 } from '@mui/material';
+import { GitHub as GitHubIcon } from '@mui/icons-material';
 import { docsRegistry, type DocItem } from '../../data/docsRegistry';
 
 interface DocsSidebarProps {
@@ -83,6 +85,33 @@ export const DocsSidebar: React.FC<DocsSidebarProps> = ({
           </ListItemButton>
         ))}
       </List>
+
+      <Divider />
+
+      {/* GitHub Link */}
+      <Box sx={{ p: 2, pl: { xs: 2, md: 3 } }}>
+        <Button
+          fullWidth
+          variant="text"
+          startIcon={<GitHubIcon />}
+          href="https://github.com/antoinebcx/allcontext"
+          target="_blank"
+          rel="noopener noreferrer"
+          component="a"
+          sx={{
+            justifyContent: 'flex-start',
+            textTransform: 'none',
+            color: 'text.secondary',
+            fontWeight: 400,
+            '&:hover': {
+              color: 'primary.main',
+              bgcolor: 'action.hover',
+            },
+          }}
+        >
+          View on GitHub
+        </Button>
+      </Box>
     </Box>
   );
 };

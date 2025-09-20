@@ -202,7 +202,7 @@ export const LoginPage: React.FC = () => {
               sx={{ mb: 3, textAlign: 'center' }}
             >
               {step === 'email'
-                ? (isSignupMode ? 'Sign up for your free account' : 'Enter your email to continue')
+                ? (isSignupMode ? 'Open source and free to use' : 'Open source unified context platform')
                 : isNewUser
                   ? 'Create your account'
                   : 'Welcome back! Enter your password'
@@ -235,6 +235,14 @@ export const LoginPage: React.FC = () => {
                   }}
                   disabled={loading}
                   error={!!error}
+                  slotProps={{
+                    inputLabel: {
+                      sx: { fontSize: 16 }
+                    },
+                    htmlInput: {
+                      style: { fontSize: 16 } // Prevents zoom on iOS
+                    }
+                  }}
                 />
 
                 <Button
@@ -286,6 +294,14 @@ export const LoginPage: React.FC = () => {
                     variant="filled"
                     label="Email"
                     sx={{ mb: 2 }}
+                    slotProps={{
+                      inputLabel: {
+                        sx: { fontSize: 16 }
+                      },
+                      htmlInput: {
+                        style: { fontSize: 16 }
+                      }
+                    }}
                   />
                 </Box>
 
@@ -311,6 +327,14 @@ export const LoginPage: React.FC = () => {
                       ? "Use at least 6 characters"
                       : error ? null : "Enter your password"
                   }
+                  slotProps={{
+                    inputLabel: {
+                      sx: { fontSize: 16 }
+                    },
+                    htmlInput: {
+                      style: { fontSize: 16 } // Prevents zoom on iOS
+                    }
+                  }}
                 />
 
                 <Button

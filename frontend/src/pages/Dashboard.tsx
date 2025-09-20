@@ -207,6 +207,9 @@ export const Dashboard: React.FC = () => {
             '& .MuiOutlinedInput-root': {
               bgcolor: 'background.default',
               height: { xs: 48, sm: 58 }
+            },
+            '& .MuiOutlinedInput-input': {
+              fontSize: 16, // Prevents zoom on iOS
             }
           }}
         />

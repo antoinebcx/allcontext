@@ -7,9 +7,10 @@ import {
   Button,
   Box,
   Typography,
-  Snackbar,
-  Alert,
   CircularProgress,
+  Alert,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import { Trash2 } from 'lucide-react';
 import type { Artifact, ArtifactCreate, ArtifactUpdate } from '../../../types';
@@ -42,8 +43,12 @@ export const ArtifactModal: React.FC<ArtifactModalProps> = ({
   onUpdate,
   isAuthenticated = true,
 }) => {
+  // Theme and responsive
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   // UI State
-  const [showCopySuccess, setShowCopySuccess] = useState(false);
+  const [copiedFormat, setCopiedFormat] = useState<'markdown' | 'plain' | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [connectAnchorEl, setConnectAnchorEl] = useState<HTMLElement | null>(null);
   const [showVersionHistory, setShowVersionHistory] = useState(false);
@@ -148,9 +153,10 @@ export const ArtifactModal: React.FC<ArtifactModalProps> = ({
 
     try {
       await navigator.clipboard.writeText(textToCopy);
-      setShowCopySuccess(true);
+      setCopiedFormat(format);
+      setTimeout(() => setCopiedFormat(null), 2000);
     } catch (error) {
-      setShowCopySuccess(false);
+      // Copy failed, don't show success state
     }
   };
 
@@ -208,11 +214,12 @@ export const ArtifactModal: React.FC<ArtifactModalProps> = ({
         onClose={onClose}
         maxWidth="lg"
         fullWidth
+        fullScreen={isMobile}
         slotProps={{
           paper: {
             sx: {
-              borderRadius: 1.5,
-              height: '90vh',
+              borderRadius: isMobile ? 0 : 1.5,
+              height: isMobile ? '100vh' : '90vh',
             },
           },
         }}
@@ -228,6 +235,7 @@ export const ArtifactModal: React.FC<ArtifactModalProps> = ({
             hasChanges={hasChanges}
             isSaving={isSaving}
             editContent={editContent}
+            copiedFormat={copiedFormat}
             onClose={onClose}
             onEdit={handleEdit}
             onSave={handleSave}
@@ -339,22 +347,6 @@ export const ArtifactModal: React.FC<ArtifactModalProps> = ({
           </Button>
         </DialogActions>
       </Dialog>
-
-      {/* Copy Success Snackbar */}
-      <Snackbar
-        open={showCopySuccess}
-        autoHideDuration={2000}
-        onClose={() => setShowCopySuccess(false)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert
-          onClose={() => setShowCopySuccess(false)}
-          severity="success"
-          sx={{ width: '100%' }}
-        >
-          Copied to clipboard!
-        </Alert>
-      </Snackbar>
 
       {/* Connect Popover */}
       {artifact && (

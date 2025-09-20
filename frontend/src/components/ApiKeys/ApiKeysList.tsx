@@ -17,7 +17,7 @@ import {
   DialogActions,
   Button,
 } from '@mui/material';
-import { Trash2, Copy, Eye, EyeOff } from 'lucide-react';
+import { Trash2, Copy, Check, Eye, EyeOff } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import type { ApiKey } from '../../types';
 
@@ -28,6 +28,7 @@ interface ApiKeysListProps {
 
 export const ApiKeysList: React.FC<ApiKeysListProps> = ({ apiKeys, onDelete }) => {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [copiedKeyId, setCopiedKeyId] = useState<string | null>(null);
   const [keyToDelete, setKeyToDelete] = useState<ApiKey | null>(null);
 
   const handleDeleteClick = (key: ApiKey) => {
@@ -62,8 +63,10 @@ export const ApiKeysList: React.FC<ApiKeysListProps> = ({ apiKeys, onDelete }) =
     return `${prefix}${'•'.repeat(32)}${last4}`;
   };
 
-  const copyToClipboard = (text: string) => {
+  const copyToClipboard = (keyId: string, text: string) => {
     navigator.clipboard.writeText(text);
+    setCopiedKeyId(keyId);
+    setTimeout(() => setCopiedKeyId(null), 2000);
   };
 
   if (apiKeys.length === 0) {
@@ -112,12 +115,12 @@ export const ApiKeysList: React.FC<ApiKeysListProps> = ({ apiKeys, onDelete }) =
                     >
                       {maskKey(key.key_prefix, key.last_4)}
                     </Typography>
-                    <Tooltip title="Copy prefix">
-                      <IconButton 
-                        size="small" 
-                        onClick={() => copyToClipboard(key.key_prefix)}
+                    <Tooltip title={copiedKeyId === key.id ? "Copied!" : "Copy prefix"}>
+                      <IconButton
+                        size="small"
+                        onClick={() => copyToClipboard(key.id, key.key_prefix)}
                       >
-                        <Copy size={14} />
+                        {copiedKeyId === key.id ? <Check size={14} /> : <Copy size={14} />}
                       </IconButton>
                     </Tooltip>
                   </Box>

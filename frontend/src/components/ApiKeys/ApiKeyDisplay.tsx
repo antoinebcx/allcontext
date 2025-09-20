@@ -11,8 +11,9 @@ import {
   IconButton,
   Alert,
   Paper,
+  Tooltip,
 } from '@mui/material';
-import { Copy, Eye, EyeOff } from 'lucide-react';
+import { Copy, Check, Eye, EyeOff } from 'lucide-react';
 import { MarkdownRenderer } from '../Markdown/MarkdownRenderer';
 import type { ApiKeyCreated } from '../../types';
 
@@ -88,22 +89,21 @@ export const ApiKeyDisplay: React.FC<ApiKeyDisplayProps> = ({ open, onClose, api
                   },
                   endAdornment: (
                     <Box sx={{ display: 'flex', gap: 0.5 }}>
-                      <IconButton size="small" onClick={toggleShowKey}>
-                        {showKey ? <EyeOff size={18} /> : <Eye size={18} />}
-                      </IconButton>
-                      <IconButton size="small" onClick={handleCopy}>
-                        <Copy size={18} />
-                      </IconButton>
+                      <Tooltip title={showKey ? "Hide key" : "Show key"}>
+                        <IconButton size="small" onClick={toggleShowKey}>
+                          {showKey ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title={copied ? "Copied!" : "Copy key"}>
+                        <IconButton size="small" onClick={handleCopy}>
+                          {copied ? <Check size={18} /> : <Copy size={18} />}
+                        </IconButton>
+                      </Tooltip>
                     </Box>
                   ),
                 }}
               />
             </Paper>
-            {copied && (
-              <Typography variant="caption" color="success.main" sx={{ mt: 0.5 }}>
-                Copied to clipboard!
-              </Typography>
-            )}
           </Box>
 
           <Box>
