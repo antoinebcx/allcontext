@@ -1,7 +1,7 @@
 # Claude (Code) instructions
 
 Context about this project / idea:
-- "Unified context platform for human-AI collaboration. Access from anywhere via MCP, API, or web."
+- "Persistent context that works across all your AI tools. Access from anywhere via MCP, API, or web."
 - Platform to host your personal docs, prompts, notes, CLAUDE/AGENTS.mds etc. and make them accessible to AI tools. Simple auth, accessible via all interfaces: UI, MCP, API, SDK...
 - General principles: Markdown artifacts, shared Pydantic schemas/methods in backend, read/create/edit/delete/search via UI/API/MCP/SDK
 

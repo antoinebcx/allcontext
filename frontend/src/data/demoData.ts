@@ -7,7 +7,7 @@ export const demoArtifacts: Artifact[] = [
     title: 'Welcome to Allcontext',
     content: `# Welcome to Allcontext
 
-Unified context platform for human-AI collaboration. Access from anywhere via MCP, API, or web.
+Persistent context that works across all your AI tools. Access from anywhere via MCP, API, or web.
 
 ## The Problems We Solve
 
