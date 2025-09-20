@@ -73,7 +73,7 @@ backend/
 
 ### Dual Access Pattern
 - **REST API** at `/api/v1/*` for traditional HTTP clients
-- **MCP Server** at `/mcp` for AI assistants (Claude, OpenAI, etc.)
+- **MCP Server** at `/mcp/` for AI assistants (Claude, OpenAI, etc.)
 - Both use the same backend services and authentication system
 
 ### Authentication Strategy
@@ -189,7 +189,7 @@ The backend serves both REST API and MCP from a single deployment:
 - `http://localhost:8000/api/docs` - Interactive API documentation
 
 ### MCP Server Endpoint
-- `http://localhost:8000/mcp` - MCP server for AI assistants
+- `http://localhost:8000/mcp/` - MCP server for AI assistants
 
 ### Health Check
 - `http://localhost:8000/health` - Enhanced health with database status

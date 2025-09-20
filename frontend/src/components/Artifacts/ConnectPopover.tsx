@@ -64,7 +64,7 @@ export const ConnectPopover: React.FC<ConnectPopoverProps> = ({
 
   const claudeCodeExample = `\`\`\`bash
 # Add Allcontext MCP to Claude Code (run once)
-claude mcp add --transport http allcontext https://api.allcontext.dev/mcp \\
+claude mcp add --transport http allcontext https://api.allcontext.dev/mcp/ \\
   --header "Authorization: Bearer YOUR_API_KEY"
 
 # Then ask Claude to work with your artifacts
@@ -127,7 +127,7 @@ response = client.beta.messages.create(
     }],
     mcp_servers=[{
         "type": "url",
-        "url": "https://api.allcontext.dev/mcp",
+        "url": "https://api.allcontext.dev/mcp/",
         "name": "Allcontext",
         "authorization_token": "YOUR_API_KEY"
     }],
@@ -144,7 +144,7 @@ resp = client.responses.create(
     tools=[{
         "type": "mcp",
         "server_label": "Allcontext",
-        "server_url": "https://api.allcontext.dev/mcp",
+        "server_url": "https://api.allcontext.dev/mcp/",
         "authorization": "YOUR_API_KEY"
     }],
     input="Read my '${artifactTitle}' artifact"

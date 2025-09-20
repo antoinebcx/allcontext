@@ -34,7 +34,7 @@ Your AI assistant will have access to these artifact management tools:
 
 Add the MCP to Claude Code with this simple terminal command:
 ```zsh
-claude mcp add --transport http allcontext https://api.allcontext.dev/mcp \
+claude mcp add --transport http allcontext https://api.allcontext.dev/mcp/ \
   --header "Authorization: Bearer your_api_key"
 ```
 
@@ -59,7 +59,7 @@ resp = client.responses.create(
             "type": "mcp",
             "server_label": "Allcontext",
             "server_description": "Personal context management platform",
-            "server_url": "https://api.allcontext.dev/mcp",
+            "server_url": "https://api.allcontext.dev/mcp/",
             "authorization": "YOUR_API_KEY",
             "require_approval": "never",
         },
@@ -82,7 +82,7 @@ const resp = await client.responses.create({
       type: "mcp",
       server_label: "Allcontext",
       server_description: "Personal context management platform",
-      server_url: "https://api.allcontext.dev/mcp",
+      server_url: "https://api.allcontext.dev/mcp/",
       authorization: "YOUR_API_KEY",
       require_approval: "never",
     },
@@ -113,7 +113,7 @@ response = client.beta.messages.create(
     }],
     mcp_servers=[{
         "type": "url",
-        "url": "https://api.allcontext.dev/mcp",
+        "url": "https://api.allcontext.dev/mcp/",
         "name": "Allcontext",
         "authorization_token": "YOUR_API_KEY"
     }],
@@ -138,7 +138,7 @@ const response = await anthropic.beta.messages.create({
   mcp_servers: [
     {
       type: "url",
-      url: "https://api.allcontext.dev/mcp",
+      url: "https://api.allcontext.dev/mcp/",
       name: "Allcontext",
       authorization_token: "YOUR_API_KEY",
     },
@@ -156,7 +156,7 @@ Add to your Claude Desktop config:
 {
   "mcpServers": {
     "allcontext": {
-      "url": "https://api.allcontext.dev/mcp",
+      "url": "https://api.allcontext.dev/mcp/",
       "transport": "http",
       "headers": {
         "Authorization": "Bearer YOUR_API_KEY"

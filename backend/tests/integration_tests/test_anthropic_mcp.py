@@ -25,7 +25,7 @@ from anthropic import Anthropic
 
 # Configuration
 NGROK_URL = os.getenv("NGROK_URL", "http://localhost:8000")
-MCP_URL = f"{NGROK_URL}/mcp"
+MCP_URL = f"{NGROK_URL}/mcp/"
 API_KEY = os.getenv("ALLCONTEXT_API_KEY")
 ANTHROPIC_KEY = os.getenv("ANTHROPIC_API_KEY")
 

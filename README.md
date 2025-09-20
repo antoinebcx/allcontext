@@ -1,7 +1,5 @@
 # Allcontext
 
-Personal AI context management platform.
-
 Unified context platform for human-AI collaboration. Access from anywhere via MCP, API, or web.
 
 ## Structure

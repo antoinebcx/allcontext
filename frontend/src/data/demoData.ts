@@ -22,7 +22,7 @@ Unified context platform for human-AI collaboration. Access from anywhere via MC
 Allcontext is a cloud-native platform that stores your AI context as markdown artifacts, accessible through three synchronized interfaces:
 
 ### MCP (Model Context Protocol)
-Direct integration with AI tools via the 2025 MCP standard. Your AI assistants get read/write access to your context through native tool calling. Setup takes one line in your terminal: 'claude mcp add allcontext https://api.allcontext.dev/mcp'. This gives your AI assistants access to nine native tools for creating, reading, updating, deleting, searching, and version control of your artifacts. The integration works seamlessly with Claude Code, Cursor, OpenAI SDK, and Anthropic SDK.
+Direct integration with AI tools via the 2025 MCP standard. Your AI assistants get read/write access to your context through native tool calling. Setup takes one line in your terminal: 'claude mcp add allcontext https://api.allcontext.dev/mcp/'. This gives your AI assistants access to nine native tools for creating, reading, updating, deleting, searching, and version control of your artifacts. The integration works seamlessly with Claude Code, Cursor, OpenAI SDK, and Anthropic SDK.
 
 ### REST API  
 Full-featured API for custom integrations and automation. Authentication works through both JWT tokens and API keys with granular scopes. Every operation returns in under 100ms with built-in versioning and diff tracking. We provide complete Python, TypeScript, and curl examples that are ready to copy and run in your projects.
@@ -90,7 +90,7 @@ Make your Allcontext artifacts instantly available in Claude Code with a single 
 Simply run this command in your terminal:
 
 \`\`\`bash
-claude mcp add --transport http allcontext https://api.allcontext.dev/mcp \\
+claude mcp add --transport http allcontext https://api.allcontext.dev/mcp/ \\
   --header "Authorization: Bearer sk_prod_your_api_key_here"
 \`\`\`
 
@@ -123,7 +123,7 @@ resp = client.responses.create(
     model="gpt-5",
     tools=[{
         "type": "mcp",
-        "server_url": "https://api.allcontext.dev/mcp",
+        "server_url": "https://api.allcontext.dev/mcp/",
         "authorization": "YOUR_API_KEY",
     }],
     input="List my artifacts"
@@ -136,7 +136,7 @@ client = anthropic.Anthropic()
 response = client.beta.messages.create(
     model="claude-sonnet-4",
     mcp_servers=[{
-        "url": "https://api.allcontext.dev/mcp",
+        "url": "https://api.allcontext.dev/mcp/",
         "authorization_token": "YOUR_API_KEY"
     }]
 )

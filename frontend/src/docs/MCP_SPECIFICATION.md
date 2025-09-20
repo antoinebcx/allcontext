@@ -51,7 +51,7 @@ The Allcontext MCP server provides AI assistants with direct access to personal 
 | Property | Value | Description |
 |----------|-------|-------------|
 | **Protocol** | `http/https` | Standard HTTP transport |
-| **Endpoint** | `/mcp` | MCP server mount point |
+| **Endpoint** | `/mcp/` | MCP server mount point |
 | **Method** | `POST` | JSON-RPC over HTTP POST |
 | **Content-Type** | `application/json` | JSON-RPC 2.0 format |
 
@@ -61,15 +61,15 @@ The Allcontext MCP server provides AI assistants with direct access to personal 
 {
   "servers": [
     {
-      "url": "http://localhost:8000/mcp",
+      "url": "http://localhost:8000/mcp/",
       "description": "Local development"
     },
     {
-      "url": "https://api.allcontext.dev/mcp",
+      "url": "https://api.allcontext.dev/mcp/",
       "description": "Production server"
     },
     {
-      "url": "https://your-tunnel.ngrok-free.app/mcp",
+      "url": "https://your-tunnel.ngrok-free.app/mcp/",
       "description": "Development tunnel"
     }
   ]
@@ -89,7 +89,7 @@ FastMCP(
     token_verifier=ApiKeyVerifier(),
     auth=AuthSettings(
         issuer_url="https://api.allcontext.dev",
-        resource_server_url="https://api.allcontext.dev/mcp",
+        resource_server_url="https://api.allcontext.dev/mcp/",
         required_scopes=["read", "write"]
     )
 )

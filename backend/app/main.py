@@ -99,7 +99,7 @@ Allcontext provides a unified platform for storing and managing AI context artif
 
 ### Dual Access Architecture
 - **REST API** (`/api/v1/*`) - Traditional HTTP endpoints for web applications
-- **MCP Server** (`/mcp`) - Model Context Protocol for AI assistants (Claude, OpenAI, etc.)
+- **MCP Server** (`/mcp/`) - Model Context Protocol for AI assistants (Claude, OpenAI, etc.)
 
 ### Artifacts
 Store markdown-based content with:
@@ -191,7 +191,7 @@ async def root():
         "endpoints": {
             "api_docs": "/api/docs",
             "rest_api": "/api/v1",
-            "mcp_server": "/mcp"
+            "mcp_server": "/mcp/"
         },
         "health": "/health"
     }

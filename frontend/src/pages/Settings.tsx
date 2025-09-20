@@ -169,7 +169,7 @@ export const Settings: React.FC = () => {
                 Add the MCP to Claude Code with this simple terminal command:
               </Typography>
               <MarkdownRenderer content={`\`\`\`bash
-claude mcp add --transport http allcontext https://api.allcontext.dev/mcp \\
+claude mcp add --transport http allcontext https://api.allcontext.dev/mcp/ \\
   --header "Authorization: Bearer your_api_key"
 \`\`\``} />
 

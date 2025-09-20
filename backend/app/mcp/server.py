@@ -116,7 +116,7 @@ def create_mcp_server() -> FastMCP:
         token_verifier=ApiKeyVerifier(),
         auth=AuthSettings(
             issuer_url=AnyHttpUrl(base_url),
-            resource_server_url=AnyHttpUrl(f"{base_url}/mcp"),
+            resource_server_url=AnyHttpUrl(f"{base_url}/mcp/"),
             required_scopes=["read", "write"]
         )
     )
