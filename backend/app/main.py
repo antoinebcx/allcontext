@@ -146,26 +146,12 @@ Built with FastAPI, Supabase, and following OpenAPI 3.1 standards.
     lifespan=lifespan
 )
 
-# Configure CORS based on environment
-if settings.is_production:
-    # Production: restrictive CORS
-    origins = [
-        "https://allcontext.dev",
-        "https://www.allcontext.dev",
-        # Add your production frontend domain here
-    ]
-else:
-    # Development: allow local origins
-    origins = [
-        "http://localhost:5173",  # Vite dev server
-        "http://localhost:3000",  # Alternative dev port
-        "http://localhost:8000",  # Local API
-    ]
-
+# Configure CORS for API service with API key authentication
+# Following industry best practices: open CORS with API key security
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
+    allow_origins=["*"],  # Open for all origins (security via API keys)
+    allow_credentials=False,  # No cookies needed with API keys
     allow_methods=["*"],
     allow_headers=["*"],
     expose_headers=["Mcp-Session-Id"],  # Required for MCP browser clients

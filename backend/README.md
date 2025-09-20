@@ -442,7 +442,7 @@ Located in `/backend/.env`:
 - API keys hashed with bcrypt before storage
 - All artifact endpoints require authentication
 - Row Level Security (RLS) policies ready in database
-- CORS configured with `Mcp-Session-Id` exposed for browser MCP clients
+- CORS open for all origins (security via API keys), with `Mcp-Session-Id` exposed for MCP clients
 - **MCP scope enforcement**: API key permissions enforced at tool level with proper error handling
 
 ### Known Limitations
