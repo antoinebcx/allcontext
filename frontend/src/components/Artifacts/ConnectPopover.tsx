@@ -71,6 +71,18 @@ claude mcp add --transport http allcontext https://api.allcontext.dev/mcp/ \\
 "Get my '${artifactTitle}' artifact from Allcontext"
 \`\`\``;
 
+  const codexExample = `\`\`\`toml
+# Add to ~/.codex/config.toml
+[mcp_servers.allcontext]
+command = "npx"
+args = [
+    "-y",
+    "supergateway",
+    "--streamableHttp", "https://api.allcontext.dev/mcp/",
+    "--header", "Authorization: Bearer YOUR_API_KEY"
+]
+\`\`\``;
+
   const curlExample = `\`\`\`bash
 # Get by ID
 curl "${API_URL}/api/v1/artifacts/${artifactId}" \\
@@ -201,28 +213,36 @@ resp = client.responses.create(
           scrollButtons={false}
           sx={{ borderBottom: 1, borderColor: 'divider', px: 2 }}
         >
-          <Tab label="Chat" />
-          <Tab label="Claude Code" />
+          <Tab label="Code Agents" />
           <Tab label="API" />
           <Tab label="AI SDKs" />
+          <Tab label="Chat" />
         </Tabs>
 
         <Box sx={{ flexGrow: 1, overflowY: 'auto', px: 2 }}>
           <TabPanel value={tabValue} index={0}>
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 2, mb: 2 }}>
-              Reference this artifact in AI conversations:
+            <Typography variant="subtitle2" sx={{ mt: 2, mb: 1 }} fontWeight={600}>
+              Claude Code
             </Typography>
-            <MarkdownRenderer content={aiChatExample} />
-          </TabPanel>
-
-          <TabPanel value={tabValue} index={1}>
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 2, mb: 2 }}>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
               Configure Claude Code to access your Allcontext:
             </Typography>
             <MarkdownRenderer content={claudeCodeExample} />
+
+            <Typography variant="subtitle2" sx={{ mt: 3, mb: 1 }} fontWeight={600}>
+              Codex CLI
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              Configure Codex CLI using supergateway bridge:
+            </Typography>
+            <MarkdownRenderer content={codexExample} />
+
+            <Typography variant="caption" color="text.secondary" sx={{ mt: 2, display: 'block' }}>
+              Note: Codex CLI requires supergateway (npm install -g supergateway) to bridge to HTTP-based MCP servers
+            </Typography>
           </TabPanel>
 
-          <TabPanel value={tabValue} index={2}>
+          <TabPanel value={tabValue} index={1}>
             <Tabs
               value={apiSubTab}
               onChange={handleApiSubTabChange}
@@ -242,7 +262,7 @@ resp = client.responses.create(
             </Typography>
           </TabPanel>
 
-          <TabPanel value={tabValue} index={3}>
+          <TabPanel value={tabValue} index={2}>
             <Typography variant="subtitle2" sx={{ mt: 2 }} gutterBottom>
               OpenAI SDK
             </Typography>
@@ -256,6 +276,13 @@ resp = client.responses.create(
             <Typography variant="caption" color="text.secondary" sx={{ mt: 2, display: 'block' }}>
               Both SDKs support MCP for accessing your Allcontext artifacts
             </Typography>
+          </TabPanel>
+
+          <TabPanel value={tabValue} index={3}>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 2, mb: 2 }}>
+              Reference this artifact in AI conversations:
+            </Typography>
+            <MarkdownRenderer content={aiChatExample} />
           </TabPanel>
         </Box>
       </Popover>

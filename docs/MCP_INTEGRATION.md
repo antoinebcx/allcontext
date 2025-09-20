@@ -44,6 +44,34 @@ You can then ask Claude to interact with your Allcontext (search, read, write...
 
 Learn more about MCP connectors with Claude Code: https://docs.anthropic.com/en/docs/claude-code/mcp
 
+### Codex CLI
+
+Since Codex CLI only supports stdio-based MCP servers, you'll need supergateway to bridge to Allcontext's HTTP-based MCP server.
+
+**Step 1:** Install supergateway:
+```bash
+npm install -g supergateway
+```
+
+**Step 2:** Open your Codex configuration:
+```bash
+nano ~/.codex/config.toml
+```
+
+**Step 3:** Add this configuration block:
+```toml
+[mcp_servers.allcontext]
+command = "npx"
+args = [
+    "-y",
+    "supergateway",
+    "--streamableHttp", "https://api.allcontext.dev/mcp/",
+    "--header", "Authorization: Bearer your_api_key"
+]
+```
+
+The Allcontext tools will now be available in your Codex sessions.
+
 ### OpenAI SDK
 
 Use the Allcontext MCP with the OpenAI SDK:

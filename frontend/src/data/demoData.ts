@@ -11,7 +11,7 @@ Persistent context that works across all your AI tools. Access from anywhere via
 
 ## The Problems We Solve
 
-• **Context fragmentation** — Your prompts and docs scattered across Claude, ChatGPT, Cursor, repos  
+• **Context fragmentation** — Your prompts and docs scattered across Claude Code, Codex, Cursor, ChatGPT, repos  
 • **Context drift** — Different AI tools have different versions of your instructions  
 • **No persistence** — AI can't save outputs back to your context for next time  
 • **Tool lock-in** — Your context trapped in proprietary platforms and formats  
@@ -22,7 +22,7 @@ Persistent context that works across all your AI tools. Access from anywhere via
 Allcontext is a cloud-native platform that stores your AI context as markdown artifacts, accessible through three synchronized interfaces:
 
 ### MCP (Model Context Protocol)
-Direct integration with AI tools via the 2025 MCP standard. Your AI assistants get read/write access to your context through native tool calling. Setup takes one line in your terminal: 'claude mcp add allcontext https://api.allcontext.dev/mcp/'. This gives your AI assistants access to nine native tools for creating, reading, updating, deleting, searching, and version control of your artifacts. The integration works seamlessly with Claude Code, Cursor, OpenAI SDK, and Anthropic SDK.
+Direct integration with AI tools via the 2025 MCP standard. Your AI assistants get read/write access to your context through native tool calling. Setup takes one line in your terminal: 'claude mcp add allcontext https://api.allcontext.dev/mcp/'. This gives your AI assistants access to nine native tools for creating, reading, updating, deleting, searching, and version control of your artifacts. The integration works seamlessly with Claude Code, Codex CLI, Cursor, OpenAI SDK, and Anthropic SDK.
 
 ### REST API  
 Full-featured API for custom integrations and automation. Authentication works through both JWT tokens and API keys with granular scopes. Every operation returns in under 100ms with built-in versioning and diff tracking. We provide complete Python, TypeScript, and curl examples that are ready to copy and run in your projects.
