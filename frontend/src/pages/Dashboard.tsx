@@ -160,7 +160,7 @@ export const Dashboard: React.FC = () => {
         >
           <Box sx={{ flexGrow: 1 }}>
             <Typography variant="subtitle1" fontWeight={500}>
-              Persistent context that works across all your AI tools
+              Context platform that works across all your AI tools
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
               Access from anywhere via MCP, API, or web.

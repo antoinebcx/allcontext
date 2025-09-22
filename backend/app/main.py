@@ -20,7 +20,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.api import artifacts, auth, api_keys
-from app.mcp.server import mcp
+from app.mcp_server.server import mcp
 from app.config import settings
 from app.database import Database
 

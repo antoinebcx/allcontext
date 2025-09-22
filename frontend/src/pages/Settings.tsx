@@ -397,7 +397,7 @@ curl -H "X-API-Key: your_api_key" \\
 
           <Box sx={{ mb: 4 }}>
             <Typography variant="body1" sx={{ mb: 2 }}>
-              Persistent context that works across all your AI tools. Access from anywhere via MCP, API, or web.
+              Context platform that works across all your AI tools. Access from anywhere via MCP, API, or web.
             </Typography>
             <Typography variant="body2" color="text.secondary">
               Allcontext helps you manage markdown-based AI artifacts (prompts and documents) with seamless integration across multiple interfaces.

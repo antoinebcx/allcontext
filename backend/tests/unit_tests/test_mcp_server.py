@@ -5,12 +5,14 @@ from unittest.mock import patch, AsyncMock
 from uuid import uuid4
 from contextvars import copy_context
 
-from app.mcp.server import (
+from app.mcp_server.auth import (
     authenticated_user_id,
     authenticated_scopes,
     get_authenticated_user_id,
     check_required_scope,
-    ApiKeyVerifier,
+    ApiKeyVerifier
+)
+from app.mcp_server.tools import (
     create_artifact,
     list_artifacts,
     search_artifacts,

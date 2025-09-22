@@ -42,7 +42,7 @@ backend/
 │   │   ├── __init__.py
 │   │   ├── markdown.py              # Title extraction utility
 │   │   └── text.py                  # Text processing utilities (snippets, string manipulation)
-│   └── mcp/
+│   └── mcp_server/
 │       ├── __init__.py
 │       ├── server.py                # MCP server configuration
 │       ├── auth.py                  # Authentication & context management
